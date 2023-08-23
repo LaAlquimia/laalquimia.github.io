@@ -1,2 +1,0 @@
-# laalquimia.github.io
-Webpage
