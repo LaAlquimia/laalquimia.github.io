@@ -9,8 +9,7 @@ const auctionAdress= '0x103e996559056d4ade375597ac1c364c4071341d';
 const contractAddress = '0x4b48c0db4e460c894bfc031d602a5c3b57a26857';
 window.onload = async (event) => {  
   const bar = document.getElementById("barra")
-
-  
+  const currentPrice = document.getElementById("price")
 
   // check if ethereum extension is installed
   if (window.ethereum) {
@@ -38,7 +37,11 @@ async function placeBid(){
     const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
     await auctionContract.methods.bid("1").send({from: userWalletAddress});
 }
-
+async function currentBid() {
+    const balance = await tokenContract.methods.currentbid().call();
+    console.log(balance)
+    return balance      
+  } 
 const loginWithEth = async () => {
     // check if there is global window.web3 instance
     if (window.web3) {
@@ -62,7 +65,7 @@ const loginWithEth = async () => {
   
         const walletid = document.getElementById("walletid")
         const tokenbalance = document.getElementById("tokenbalance") 
-  
+        
   
         const conn = new Web3(window.ethereum);
         
@@ -74,7 +77,7 @@ const loginWithEth = async () => {
         async function obtenerBalance() {
           const balance = await tokenContract.methods.balanceOf(address).call()/10**18;
           console.log(balance)
-          return balance
+          return balance      
         } 
   
         walletid.innerHTML = address.slice(0, 3)+ "..."+address.slice(- 4);
