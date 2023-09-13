@@ -1,15 +1,10 @@
 # laalquimia.github.io
 
-To install dependencies:
+To Run Locally whit Python:
 
-```bash
-bun install
+```python3
+python3 -m http.server 
 ```
 
-To run:
+open browser http://localhost:8000
 
-```bash
-bun run main.js
-```
-
-This project was created using `bun init` in bun v1.0.1. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
