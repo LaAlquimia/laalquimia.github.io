@@ -5,7 +5,7 @@
 */
 // This file is intentionally blank
 // Use this file to add JavaScript to your project
-const minteAdress= '0x103e996559056d4ade375597ac1c364c4071341d';
+const auctionAdress= '0x103e996559056d4ade375597ac1c364c4071341d';
 const contractAddress = '0x4b48c0db4e460c894bfc031d602a5c3b57a26857';
 window.onload = async (event) => {  
   const bar = document.getElementById("barra")
@@ -30,9 +30,13 @@ window.onload = async (event) => {
 }
 
 async function allowtoken(){
-
       const ogtContract = new window.web3.eth.Contract(fullABI, ogtAddress); 
       await ogtContract.methods.approve("0x103e996559056d4ade375597ac1c364c4071341d", "100000000000000000000000").send({from: userWalletAddress});
+}
+
+async function placeBid(){
+    const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
+    await auctionContract.methods.bid("1").send({from: userWalletAddress});
 }
 
 const loginWithEth = async () => {
