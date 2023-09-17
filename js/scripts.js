@@ -31,6 +31,15 @@ async function currentBid() {
     return       cBid
   } 
 
+  async function hBider() { 
+    const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
+    const hBid = await auctionContract.methods.highestBidder().call()
+    const wallet = hBid.slice(0, 3)+ "..."+hBid.slice(- 4)
+    const cwallet = document.getElementById("wallethigh")
+    cwallet.setHTML(wallet)
+    return       wallet
+  } 
+
   
 async function alqAllow() {
   const auctionContract = new window.web3.eth.Contract(fullABI, contractAddress);   
@@ -47,6 +56,12 @@ async function callBid() {
   await placeBid(balance.value)
   console.log(balance.value)
 }
+
+async function toogle() {
+  const tabla = document.getElementById("tabla")
+  tabla.className = "row my-3"
+}
+
 
   window.onload = async (event) => {  
     const bar = document.getElementById("barra")
@@ -70,6 +85,8 @@ async function callBid() {
     walletid.innerHTML = '<button id = "login" href="#" onclick="loginWithEth()">Login</button>';
     try {
       const cBid = await currentBid();
+      
+      const hbbider = await hBider();
       
       // Puedes hacer lo que necesites con el resultado aquí
     } catch (error) {

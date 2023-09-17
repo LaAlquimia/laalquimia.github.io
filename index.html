@@ -1,222 +1,84 @@
 <!DOCTYPE html>
+<html lang="en">
+    <head>
 
-  
-<html>
+        
+        <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
-<head>
-  
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Philosopher Gold Stone</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navigation-->
+        <!-- Product section-->
+        <section class="py-2">
+            <div class="container px-4 px-lg-5 my-1">
+                <div class="row gx-4 gx-lg-5 align-items-center">
 
-  <meta charset="UTF-8">
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-
-  <style>
-    * {
-      font-family: 'Press Start 2P', cursive;
-      box-sizing: border-box;
-    }
-
-    body {
-      background-color: black;
-    }
-
-    h1 {
-      margin: 0;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background-color: #ddd;
-    }
-  </style>
-  <div id = "barra" class="barra">
-  <div id="wallet" class="division">Wallet : 
-  <div id="walletid" class="division"></div></div>
-  <div id="balance" class="division">Balance :</div>
-  <div id="tokenbalance" class="division"></div>
-</div>
-
-</head>
-
-<div style="display: inline-block; position: relative">
-  <div
-    id="overlappingDiv"
-    style="
-      background-color: black;
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 10;
-    "
-  ></div>
-
-  <canvas></canvas>
-  <div
-    id="characterDialogueBox"
-    style="
-      background-color: white;
-      height: 140px;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      border-top: 4px black solid;
-      display: none;
-      padding: 12px;
-    "
-  ></div>
-
-  <div id="userInterface" style="display: none">
-    <!-- Represents health bar of draggle (enemy) -->
-    <div
-      style="
-        background-color: white;
-        width: 250px;
-        position: absolute;
-        top: 50px;
-        left: 50px;
-        border: 4px black solid;
-        padding: 12px;
-      "
-    >
-      <h1 style="font-size: 16px">Draggle</h1>
-      <div style="position: relative">
-        <div
-          style="height: 5px; background-color: #ccc; margin-top: 10px"
-        ></div>
-        <div
-          id="enemyHealthBar"
-          style="
-            height: 5px;
-            background-color: green;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-          "
-        ></div>
-      </div>
-    </div>
-
-    <!-- Represents health bar of emby (us) -->
-    <div
-      style="
-        background-color: white;
-        width: 250px;
-        position: absolute;
-        top: 330px;
-        right: 50px;
-        border: 4px black solid;
-        padding: 12px;
-      "
-    >
-      <h1 style="font-size: 16px">Emby</h1>
-      <div style="position: relative">
-        <div
-          style="height: 5px; background-color: #ccc; margin-top: 10px"
-        ></div>
-        <div
-          id="playerHealthBar"
-          style="
-            height: 5px;
-            background-color: green;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-          "
-        ></div>
-      </div>
-    </div>
-
-    <div
-      style="
-        background-color: white;
-        height: 140px;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        border-top: 4px black solid;
-        display: flex;
-      "
-    >
-      <div
-        id="dialogueBox"
-        style="
-          position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          background-color: white;
-          padding: 12px;
-          display: none;
-          cursor: pointer;
-        "
-      >
-        sdkfjlsdajl
-      </div>
-      <div
-        id="attacksBox"
-        style="
-          width: 66.66%;
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-        "
-      ></div>
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 33.33%;
-          border-left: 4px black solid;
-        "
-      >
-        <h1 id="attackType" style="font-size: 16px">Attack Type</h1>
-      </div>
-    </div>
-  </div>
-</div>
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"
-  integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-></script>
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"
-  integrity="sha512-H6cPm97FAsgIKmlBA4s774vqoN24V5gSQL4yBTDOY2su2DeXZVhQPxFK4P6GPdnZqM9fg1G3cMv5wD7e6cFLZQ=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-></script>
-<script src="data/audio.js"></script>
-<script src="data/battleZones.js"></script>
-<script src="data/collisions.js"></script>
-<script src="data/attacks.js"></script>
-<script src="data/monsters.js"></script>
-<script src="data/characters.js"></script>
-<script src="js/utils.js"></script>
-<script src="classes.js"></script>
-<script src="index.js"></script>
-<script src="battleScene.js"></script>
+					<div id = "barra" class="fs-5 container column d-flex">
+						<div id="wallet" class="division row mx-auto">Wallet : 
+						<div id="walletid" class=""></div></div>
+						<div id="balance" class="division row mx-auto">Balance :
+						<div id="tokenbalance" class=""></div></div>
+						<div id="Availablebalance" class="division row mx-auto">Available Balance :
+						<div id="AvailableTokenbalance" class=""></div>
+						<div id="AvailableTokenbalance2" class=""></div></div>
+						</div>
 
 
 
-</html>
+
+                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="https://ipfs.io/ipfs/bafkreifvfq7pmz3bfksbyvpy7fg372r67cblw7bdezodiltbojkpeoujky" alt="..." /></div>
+                    <div class="col-md-6">
+                        <div class="small mb-1">SKU: TGS-420</div>
+                        <h1 class="display-5 fw-bolder">Philosopher Gold Stone T-shirt</h1>
+                        <div class="fs-5 mb-5">
+                            <span >Tshirt Algodon </span>
+                            <br>
+                            <span class="display-10">Current Max Bid (ALQ):  </span>
+                            <span id="price" class="display-5">$40.00</span>
+                            <br>
+                            <span id="wallethigh" class="display -10"></span>
+                        </div>
+                       
+                        <p class="lead">La Camiseta Mágica de la Piedra Filosofal Dorada. Esta camiseta es mucho más que moda; es una entrada al fascinante mundo donde la magia y el trading se fusionan en armonía</p>
+                        <div class="d-none row my-3" id = "tabla">
+                            <div class="d-flex col my-3">
+                            <input class="form-control text-center d-flex center me-3 mx-5 " id="inputQuantity" type="num" value="0" style="max-width: 10rem" />
+                            <button class="btn btn-outline-dark flex-shrink-0 my-2" type="button" onclick="callBid()">
+                                <i class="bi-cart-fill me-1"></i>
+                                Place A bid
+                            </button>
+                        </div>
+                        <div class="col my-3">
+                            <p class = "fs-5 me-3" > My Bid :</p>
+                            <p id = "mybid" class="d-flex center me-3 mx-3 fs-5">0</p>
+                        </div>  
+                            <button class="btn btn-outline-dark flex-shrink-0" type="button" onclick="witdraw()">
+                                <i ></i>
+                                Whitdraw my Bid 
+                            </button>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Footer-->
+        <footer class="py-5 bg-dark">
+            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; La Alquimia 2023</p></div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+    </body </html>
