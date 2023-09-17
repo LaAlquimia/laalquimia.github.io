@@ -11,12 +11,13 @@ const contractAddress = '0x4b48c0db4e460c894bfc031d602a5c3b57a26857';
 
 async function allowtoken(){
       const alqContract = new window.web3.eth.Contract(fullABI, contractAddress); 
-      await alqContract.methods.approve("0x8aBd78604182880FdaBEAD784183435E85aC98fd", "100000000000000000000000000").send({from: userWalletAddress});
+      await alqContract.methods.approve("0x8aBd78604182880FdaBEAD784183435E85aC98fd", "420000000000000000000").send({from: userWalletAddress});
 }
+
+
 async function placeBid(offer) {  
   // Agrega 18 ceros al final de la oferta
   const offerWithZeros = offer.toString().padEnd(offer.toString().length + 18, '0');
-
   const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
   await auctionContract.methods.bid(offerWithZeros).send({ from: userWalletAddress });
   } 
@@ -26,15 +27,13 @@ async function currentBid() {
     const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
     const cBid = await auctionContract.methods.highestBid().call();    
     const cubid = document.getElementById("price")
-    
     cubid.setHTML(" " + web3.utils.fromWei(cBid) )
     return       cBid
   } 
 
   
 async function alqAllow() {
-  const auctionContract = new window.web3.eth.Contract(fullABI, contractAddress); 
-  
+  const auctionContract = new window.web3.eth.Contract(fullABI, contractAddress);   
   const balance = document.getElementById("AvailableTokenbalance")
   const allow = await auctionContract.methods.allowance(userWalletAddress, auctionAdress).call()
   balance.setHTML(" " + web3.utils.fromWei(allow) )
@@ -42,6 +41,12 @@ async function alqAllow() {
   return allow
 }
 
+
+async function callBid() {
+  const balance = document.getElementById("inputQuantity")
+  await placeBid(balance.value)
+  console.log(balance.value)
+}
 
   window.onload = async (event) => {  
     const bar = document.getElementById("barra")
@@ -117,6 +122,11 @@ const loginWithEth = async () => {
         bal =  await obtenerBalance();
         tokenbalance.textContent = bal;
         const allo = await alqAllow();
+
+        
+        const allowa = document.getElementById("AvailableTokenbalance2")
+    
+        allowa.innerHTML = '<button id = "login" href="#" onclick="allowtoken()">Allow more +</button>';
   
       } catch (error) {
         alert(error);

@@ -9,7 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Shop Item - Start Bootstrap Template</title>
+        <title>Philosopher Gold Stone</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Bootstrap icons-->
@@ -30,7 +30,8 @@
 						<div id="balance" class="division row mx-auto">Balance :
 						<div id="tokenbalance" class=""></div></div>
 						<div id="Availablebalance" class="division row mx-auto">Available Balance :
-						<div id="AvailableTokenbalance" class=""></div></div>
+						<div id="AvailableTokenbalance" class=""></div>
+						<div id="AvailableTokenbalance2" class=""></div></div>
 						</div>
 
 
@@ -43,17 +44,28 @@
                         <div class="fs-5 mb-5">
                             <span >Tshirt Algodon </span>
                             <br>
-                            <span class="display-10">Current Bid (ALQ):  </span>
+                            <span class="display-10">Current Max Bid (ALQ):  </span>
                             <span id="price" class="display-5">$40.00</span>
                         </div>
-                        <div class="d-flex">
-                            <input class="form-control text-center me-3" id="inputQuantity" type="num" value="0" style="max-width: 10rem" />
-                            <button class="btn btn-outline-dark flex-shrink-0" type="button">
+                       
+                        <p class="lead">La Camiseta Mágica de la Piedra Filosofal Dorada. Esta camiseta es mucho más que moda; es una entrada al fascinante mundo donde la magia y el trading se fusionan en armonía</p>
+                        <div class="d-none row my-3" >
+                            <div class="d-flex col my-3">
+                            <input class="form-control text-center d-flex center me-3 mx-5 " id="inputQuantity" type="num" value="0" style="max-width: 10rem" />
+                            <button class="btn btn-outline-dark flex-shrink-0 my-2" type="button" onclick="callBid()">
                                 <i class="bi-cart-fill me-1"></i>
                                 Place A bid
                             </button>
                         </div>
-                        <p class="lead">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium at dolorem quidem modi. Nam sequi consequatur obcaecati excepturi alias magni, accusamus eius blanditiis delectus ipsam minima ea iste laborum vero?</p>
+                        <div class="col my-3">
+                            <p class = "fs-5 me-3" > My Bid :</p>
+                            <p id = "mybid" class="d-flex center me-3 mx-3 fs-5">0</p>
+                        </div>  
+                            <button class="btn btn-outline-dark flex-shrink-0" type="button" onclick="witdraw()">
+                                <i ></i>
+                                Whitdraw my Bid 
+                            </button>
+                        </div>
                         
                     </div>
                 </div>
