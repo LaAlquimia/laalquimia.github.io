@@ -5,43 +5,76 @@
 */
 // This file is intentionally blank
 // Use this file to add JavaScript to your project
-const auctionAdress= '0x103e996559056d4ade375597ac1c364c4071341d';
+const auctionAdress= '0x8aBd78604182880FdaBEAD784183435E85aC98fd';
 const contractAddress = '0x4b48c0db4e460c894bfc031d602a5c3b57a26857';
-window.onload = async (event) => {  
-  const bar = document.getElementById("barra")
-  const currentPrice = document.getElementById("price")
 
-  // check if ethereum extension is installed
-  if (window.ethereum) {
-    // create web3 instance
-    window.web3 = new Web3(window.ethereum);
-  } else {
-    // prompt user to install Metamask
-    alert("Please install MetaMask or any Ethereum Extension Wallet");
-  }
-  // check if user is already logged in and update the global userWalletAddress variable
-  window.userWalletAddress = window.localStorage.getItem("userWalletAddress");
-
-  // show the user dashboard
-
-  const walletid = document.getElementById("walletid")
-  walletid.innerHTML = '<button id = "login" href="#" onclick="loginWithEth()">Login</button>';
-}
 
 async function allowtoken(){
-      const ogtContract = new window.web3.eth.Contract(fullABI, ogtAddress); 
-      await ogtContract.methods.approve("0x103e996559056d4ade375597ac1c364c4071341d", "100000000000000000000000").send({from: userWalletAddress});
+      const alqContract = new window.web3.eth.Contract(fullABI, contractAddress); 
+      await alqContract.methods.approve("0x8aBd78604182880FdaBEAD784183435E85aC98fd", "100000000000000000000000000").send({from: userWalletAddress});
+}
+async function placeBid(offer) {  
+  // Agrega 18 ceros al final de la oferta
+  const offerWithZeros = offer.toString().padEnd(offer.toString().length + 18, '0');
+
+  const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
+  await auctionContract.methods.bid(offerWithZeros).send({ from: userWalletAddress });
+  } 
+
+
+async function currentBid() { 
+    const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
+    const cBid = await auctionContract.methods.highestBid().call();    
+    const cubid = document.getElementById("price")
+    
+    cubid.setHTML(" " + web3.utils.fromWei(cBid) )
+    return       cBid
+  } 
+
+  
+async function alqAllow() {
+  const auctionContract = new window.web3.eth.Contract(fullABI, contractAddress); 
+  
+  const balance = document.getElementById("AvailableTokenbalance")
+  const allow = await auctionContract.methods.allowance(userWalletAddress, auctionAdress).call()
+  balance.setHTML(" " + web3.utils.fromWei(allow) )
+  console.log(allow);
+  return allow
 }
 
-async function placeBid(){
-    const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
-    await auctionContract.methods.bid("1").send({from: userWalletAddress});
-}
-async function currentBid() {
-    const balance = await tokenContract.methods.currentbid().call();
-    console.log(balance)
-    return balance      
-  } 
+
+  window.onload = async (event) => {  
+    const bar = document.getElementById("barra")
+    const currentPrice = document.getElementById("price")
+  
+    // check if ethereum extension is installed
+    if (window.ethereum) {
+      // create web3 instance
+      window.web3 = new Web3(window.ethereum);
+    } else {
+      // prompt user to install Metamask
+      alert("Please install MetaMask or any Ethereum Extension Wallet");
+    }
+    // check if user is already logged in and update the global userWalletAddress variable
+    window.userWalletAddress = window.localStorage.getItem("userWalletAddress");
+  
+    // show the user dashboard
+  
+    const walletid = document.getElementById("walletid")
+    
+    walletid.innerHTML = '<button id = "login" href="#" onclick="loginWithEth()">Login</button>';
+    try {
+      const cBid = await currentBid();
+      
+      // Puedes hacer lo que necesites con el resultado aquí
+    } catch (error) {
+      console.error("Error al obtener la oferta actual:", error);
+    }
+  
+
+    
+  }
+
 const loginWithEth = async () => {
     // check if there is global window.web3 instance
     if (window.web3) {
@@ -83,6 +116,7 @@ const loginWithEth = async () => {
         walletid.innerHTML = address.slice(0, 3)+ "..."+address.slice(- 4);
         bal =  await obtenerBalance();
         tokenbalance.textContent = bal;
+        const allo = await alqAllow();
   
       } catch (error) {
         alert(error);
@@ -551,3 +585,299 @@ const loginWithEth = async () => {
     "type": "function"
   }
 ]
+
+  const auctionABI = [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_nft",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_alq",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_nftId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_startingBid",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Bid",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "winner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "End",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "Start",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "bidder",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Withdraw",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "alq",
+      "outputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "bid",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "bids",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "end",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "endAt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ended",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "highestBid",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "highestBidder",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nft",
+      "outputs": [
+        {
+          "internalType": "contract IERC721",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nftId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "name": "onERC721Received",
+      "outputs": [
+        {
+          "internalType": "bytes4",
+          "name": "",
+          "type": "bytes4"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "seller",
+      "outputs": [
+        {
+          "internalType": "address payable",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "start",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "started",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]
