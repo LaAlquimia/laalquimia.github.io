@@ -1,0 +1,19 @@
+.barra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 10px;
+}
+
+.division {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.division:hover {
+  color: #f00;
+}
