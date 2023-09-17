@@ -23,6 +23,14 @@ async function placeBid(offer) {
   } 
 
 
+async function withdraw() {  
+    // Agrega 18 ceros al final de la oferta
+    const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
+    await auctionContract.methods.withdraw().send({ from: userWalletAddress });
+    } 
+  
+
+
 async function currentBid() { 
     const auctionContract = new window.web3.eth.Contract(auctionABI, auctionAdress);
     const cBid = await auctionContract.methods.highestBid().call();    
@@ -61,6 +69,15 @@ async function toogle() {
   const tabla = document.getElementById("tabla")
   tabla.className = "row my-3"
 }
+
+async function mybid(){
+  const alqContract = new window.web3.eth.Contract(auctionABI, auctionAdress); 
+  const dmybid = await alqContract.methods.bids(ethereum.selectedAddress).call()
+  const mbidelement = document.getElementById("mybid")
+  mbidelement.setHTML("ALQ " + web3.utils.fromWei(dmybid))
+  return dmybid
+}
+
 
 
   window.onload = async (event) => {  
@@ -139,6 +156,7 @@ const loginWithEth = async () => {
         bal =  await obtenerBalance();
         tokenbalance.textContent = bal;
         const allo = await alqAllow();
+        const maibi = await mybid();
 
         
         const allowa = document.getElementById("AvailableTokenbalance2")
