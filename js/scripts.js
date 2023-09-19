@@ -157,7 +157,7 @@ const loginWithEth = async () => {
         tokenbalance.textContent = bal;
         const allo = await alqAllow();
         const maibi = await mybid();
-
+        const toog = await toogle();
         
         const allowa = document.getElementById("AvailableTokenbalance2")
     
