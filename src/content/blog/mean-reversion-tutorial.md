@@ -31,10 +31,6 @@ precio actual a la media y compararlo con la distancia del precio actual a la me
 precio actual está por
 encima de la media móvi entonces hay una mayor probabilidad de que el precio baje a la media móvil.
 
-Una vez que tenemos la media móvil, podemos calcular la distancia del
-precio actual a la media y compararlo con la distancia del precio actual a la media móvil. Si el
-precio actual está por
-encima de la media móvi entonces hay una mayor probabilidad de que el precio baje a la media móvil.
 
 #### Media móvil
 
