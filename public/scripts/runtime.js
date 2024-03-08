@@ -49,6 +49,6 @@ const loopFunct = () => {
 window.onload = (event) => {
   graphSeries('BTCUSDT');
   analyzeCoins();
-  setInterval(loopFunct, 60000);
+  setInterval(loopFunct, 60000);  
   
 };
