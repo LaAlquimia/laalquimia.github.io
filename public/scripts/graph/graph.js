@@ -49,7 +49,6 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
     });
     volumeSeries.setData(volumeData);
     umbSeries.setData(umbdata);
-
     umbSeries2.setData(umbdata2);
     emaSeries.setData(emaData);
     series.setData(datosConv1);
