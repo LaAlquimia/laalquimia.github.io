@@ -135,7 +135,7 @@ const graphSeries = async (symbol) => {
 
 
     umbSeries2 = chart.addLineSeries({
-      color: 'rgba(191, 150, 74, 0.569)',
+      color: 'rgba(74, 191, 113, 0.569)',
       lineWidth: 2,
     });
 
