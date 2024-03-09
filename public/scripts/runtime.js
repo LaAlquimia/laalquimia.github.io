@@ -2,6 +2,9 @@
 var chart = null;
 var series = null;
 var emaSeries = null;
+
+var umbSeries = null;
+var umbSeries2 = null;
 var volumeSeries = null;
 var longSymbols = [];
 var shortSymbols = [];

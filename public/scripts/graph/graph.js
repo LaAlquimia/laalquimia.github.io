@@ -30,7 +30,12 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
     const umbdata = datosConv1.slice(0, datosConv1.length).map((entry, index) => ({
       time: entry.time,
       value: ema[index]*(1+maxval),
-    }))
+    }));
+
+    const umbdata2 = datosConv1.slice(0, datosConv1.length).map((entry, index) => ({
+      time: entry.time,
+      value: ema[index]*(1+minval),
+    }));
     chart.applyOptions({
       watermark: {
         visible: true,
@@ -43,7 +48,9 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
       
     });
     volumeSeries.setData(volumeData);
-    // umbSeries.setData(umbdata);t
+    umbSeries.setData(umbdata);
+
+    umbSeries2.setData(umbdata2);
     emaSeries.setData(emaData);
     series.setData(datosConv1);
   
@@ -126,6 +133,14 @@ const graphSeries = async (symbol) => {
       color: 'rgba(191, 150, 74, 0.569)',
       lineWidth: 2,
     });
+
+
+    umbSeries2 = chart.addLineSeries({
+      color: 'rgba(191, 150, 74, 0.569)',
+      lineWidth: 2,
+    });
+
+
     volumeSeries = chart.addHistogramSeries({
       color: '#26a69984',
       priceFormat: {
