@@ -2,7 +2,6 @@
 var chart = null;
 var series = null;
 var emaSeries = null;
-
 var umbSeries = null;
 var umbSeries2 = null;
 var volumeSeries = null;
@@ -10,14 +9,15 @@ var longSymbols = [];
 var shortSymbols = [];
 var tickers = null;
 var signal_count = null;
+var interval = '1';
 
 const set_symbol = (symbol) => {
   document.getElementById('symbol').textContent = symbol;
 }
 
-const signals = (kline, symbol, emaDist) => {
-  const ordered = convertirDatos(kline).reverse();   
-  const rsi = RSI(ordered.map(entry => entry.open), 14);
+const signals = (kLine, symbol, emaDist) => {
+  const ordered = convertirDatos(kLine).reverse();   
+  const rsi = RSI(ordered.map(entry => entry.open), 28);
   if (rsi[0] < rsi[1] && rsi[1] > 75 && emaDist > 3) {
     const percent = (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt*100).toFixed(2);
     const signalMessage = 'SHORT ⛔'+ symbol + '\nEMA distance: ' + emaDist.toFixed(2) + '%\n 24h PriceChange ' + (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt*100).toFixed(2) +'%';
@@ -44,14 +44,14 @@ document.addEventListener('DOMContentLoaded', function() {
  });
  
 
-const loopFunct = () => {
+const loopFunction = () => {
   analyzeCoins();
-  const currentsymbol = document.getElementById('symbol').textContent;
-  graph(series, currentsymbol, emaSeries, volumeSeries);
+  const currentSymbol = document.getElementById('symbol').textContent;
+  graph(series, currentSymbol, emaSeries, volumeSeries);
 }
 window.onload = (event) => {
   graphSeries('BTCUSDT');
   analyzeCoins();
-  setInterval(loopFunct, 60000);  
+  setInterval(loopFunction, 60000);  
   
 };

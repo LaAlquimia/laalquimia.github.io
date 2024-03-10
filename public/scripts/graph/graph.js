@@ -22,7 +22,6 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
     });
     const maxval = Math.max(...distsData.map(obj => obj.emaDist));
     const minval = Math.min(...distsData.map(obj => obj.emaDist));
-
     const volumeData = datosConv1.slice(0, datosConv1.length).map((entry, index) => ({
       time: entry.time,
       value: entry.volume,
@@ -31,7 +30,6 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
       time: entry.time,
       value: ema[index]*(1+maxval),
     }));
-
     const umbdata2 = datosConv1.slice(0, datosConv1.length).map((entry, index) => ({
       time: entry.time,
       value: ema[index]*(1+minval),
@@ -54,7 +52,6 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
     series.setData(datosConv1);
   
   }
-  
 const graphSeries = async (symbol) => {
     const container = document.getElementById('chart');
     chart = LightweightCharts.createChart(container, {
@@ -93,7 +90,6 @@ const graphSeries = async (symbol) => {
         },
       },
     });
-    
     chart.applyOptions({
       priceFormat: {
         type: 'custom',
@@ -115,7 +111,6 @@ const graphSeries = async (symbol) => {
         }
       },
     });
-    
     series = chart.addCandlestickSeries({
       upColor: 'rgb(38,166,154)',
       downColor: 'rgb(255,82,82)',
@@ -127,27 +122,21 @@ const graphSeries = async (symbol) => {
       color: 'rgba(74, 80, 191, 0.569)',
       lineWidth: 2,
     });
-    
     umbSeries = chart.addLineSeries({
       color: 'rgba(191, 150, 74, 0.569)',
       lineWidth: 2,
     });
-
-
     umbSeries2 = chart.addLineSeries({
       color: 'rgba(74, 191, 113, 0.569)',
       lineWidth: 2,
     });
-
-
     volumeSeries = chart.addHistogramSeries({
       color: '#26a69984',
       priceFormat: {
         type: 'volume',
       },
       priceScaleId: '',
-    });
-    
+    });    
     chart.priceScale('').applyOptions({
       scaleMargins: {
         top: 0.8,

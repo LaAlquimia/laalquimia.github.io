@@ -82,10 +82,14 @@ a:hover {
 
 p {
 	margin-bottom: 1em;
+
+	font-size: 1.07em;
 }
 
 .prose p {
 	margin-bottom: 2em;
+
+	font-size: 1.07em;
 }
 
 textarea {
