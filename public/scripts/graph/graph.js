@@ -1,10 +1,11 @@
 
 const graph = async (series, symbol, emaSeries, volumeSeries) => {
     set_symbol(symbol);
-    const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=1&limit=1000`;
+    const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=1000`;
     const response = await fetch(url);
     const data = await response.json();
     const kline = data.result.list;
+    console.log(kline);
     const datosConv1 = convertirDatos(kline);
     const numericValues = kline.map(entry => parseFloat(entry[1]));
     const ema = EMA(numericValues, 59).reverse();

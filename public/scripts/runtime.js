@@ -10,9 +10,11 @@ var shortSymbols = [];
 var tickers = null;
 var signal_count = null;
 var interval = '1';
+var gSymbol ='BTCUSDT'
 
 const set_symbol = (symbol) => {
   document.getElementById('symbol').textContent = symbol;
+  gSymbol = symbol;
 }
 
 const signals = (kLine, symbol, emaDist) => {

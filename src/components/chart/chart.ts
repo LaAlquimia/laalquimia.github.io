@@ -4,7 +4,7 @@ import { createChart } from "lightweight-charts";
 import { isLogin } from "../../store"; 
 isLogin.listen((login)=>{
     if (login) {
-        
+
 const chartContainer = document.getElementById("chart")!
 const height = chartContainer.offsetHeight
 const width = chartContainer.offsetHeight

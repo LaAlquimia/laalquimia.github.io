@@ -20,3 +20,11 @@ const populateTable = (tableId, data) => {
     }
   });
 };
+document.getElementById('intervalSelector').addEventListener('change', function() {
+  var selectedInterval = this.value;
+  var selectedIntervalText = this.options[this.selectedIndex].text;
+
+  // Suponiendo que la variable 'interval' ya existe en el alcance global
+  interval = selectedInterval;
+  graph(series, gSymbol, emaSeries, volumeSeries)
+});
