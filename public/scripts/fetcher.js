@@ -1,12 +1,14 @@
 const analyzeCoins = async () => {
   const coinsResponse = await fetch('https://api.bybit.com/v5/market/instruments-info?category=linear');
   const coinsData = await coinsResponse.json();
-  const tickers = await fetchTickers()
+  // const tickers = await fetchTickers()
   const coins = coinsData.result.list.filter(coin => coin.status === 'Trading').map(coin => coin.symbol);
   const results = await Promise.all(coins.map(coin => fetchKline(coin)));
   const positiveDF = results.filter(({ EMA_dist }) => EMA_dist > 0).sort((a, b) => b.EMA_dist - a.EMA_dist);
   const negativeDF = results.filter(({ EMA_dist }) => EMA_dist < 0).sort((a, b) => a.EMA_dist - b.EMA_dist);
+  console.log(positiveDF);
   populateTable('positiveTable', positiveDF.slice(0, 10));
+
   populateTable('negativeTable', negativeDF.slice(0, 10));
 };
 const convertirDatos = (datos) => {

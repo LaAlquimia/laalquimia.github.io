@@ -1,4 +1,3 @@
-import { symbol } from "astro/zod";
 
 const populateTable = (tableId, data) => {
   const tableBody = document.getElementById(tableId).getElementsByTagName('tbody')[0];
