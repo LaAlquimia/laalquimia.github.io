@@ -6,7 +6,7 @@ heroImage: '/emaTendence.png'
 keywords: 'trading, tendencias, medias móviles, regresión lineal, ángulos de inclinación, soportes y resistencias, desviación estándar'
 ---
 
-# Técnicas de reconocimiento de tendencias en el trading
+## Técnicas de reconocimiento de tendencias en el trading
 
 El reconocimiento de tendencias es una habilidad fundamental en el trading. Los traders necesitan identificar la dirección general del mercado para tomar decisiones informadas y maximizar sus ganancias. En este blog, nos enfocaremos en tres herramientas de análisis técnico: medias móviles, regresión lineal y ángulos de inclinación, y cómo utilizarlas para identificar tendencias en el mercado.
 

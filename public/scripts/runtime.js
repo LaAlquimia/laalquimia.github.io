@@ -21,13 +21,13 @@ const signals = (kLine, symbol, emaDist) => {
   const rsi = RSI(ordered.map(entry => entry.open), 28);
   if (rsi[0] < rsi[1] && rsi[1] > 75 && emaDist > 3) {
     const percent = (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2);
-    const signalMessage = 'SHORT ⛔' + symbol + '\nEMA distance: ' + emaDist.toFixed(2) + '%\n 24h PriceChange ' + (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2) + '%';
+    const signalMessage = 'SHORT ⛔' + symbol + '\nEMA distance: ' + emaDist.toFixed(2) + '%\n 24h PriceChange ' + (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2) + ' % ';
     const speech = 'Alquialerta: Short' + symbol + 'Distancia a la media' + emaDist.toFixed(2) + '%';
     speak(speech);
     notifyMe(symbol, signalMessage);
   } else if (rsi[0] > rsi[1] && rsi[1] < 25 && emaDist < -3) {
     const percent = (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2);
-    const signalMessage = 'LONG 🟢' + symbol + '\nEMA distance ' + emaDist.toFixed(2) + '%\n24h PriceChange ' + percent;
+    const signalMessage = 'LONG 🟢' + symbol + '\nEMA distance ' + emaDist.toFixed(2) + '%\n24h PriceChange ' + percent + '% ';
     const speech = 'Alquialerta long' + symbol + 'Distancia a la media' + emaDist.toFixed(2) + '%';
     speak(speech);
     notifyMe(symbol, signalMessage);

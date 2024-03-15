@@ -150,6 +150,13 @@ declare module 'astro:content' {
   collection: "blog";
   data: InferEntrySchema<"blog">
 } & { render(): Render[".md"] };
+"stddev.md": {
+	id: "stddev.md";
+  slug: "stddev";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 "tendences-basic.md": {
 	id: "tendences-basic.md";
   slug: "tendences-basic";
