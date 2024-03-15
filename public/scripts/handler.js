@@ -1,3 +1,5 @@
+import { symbol } from "astro/zod";
+
 const populateTable = (tableId, data) => {
   const tableBody = document.getElementById(tableId).getElementsByTagName('tbody')[0];
   tableBody.innerHTML = '';
@@ -28,3 +30,7 @@ document.getElementById('intervalSelector').addEventListener('change', function(
   interval = selectedInterval;
   graph(series, gSymbol, emaSeries, volumeSeries)
 });
+
+
+
+

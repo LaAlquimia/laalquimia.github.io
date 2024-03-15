@@ -11,25 +11,34 @@
                 </div>
             </span>
             <div class="flex-row md:flex px-3 justify-between">
-            <h4 class="">Historical Chart</h4>
+                <h4 class="">Historical Chart</h4>
+                <select
+                    id="symbolSelector"
+                    class="bg-black border border-gray-600 text-gray-200 py-1 px-5 rounded"
+                >
+                <option value="BTCUSDT">BTCUSDT</option>
+                <option value="ETCUSDT">ETCUSDT</option>
+                <option value="ETHUSDT">ETHUSDT</option>
+                </select>
 
-            <h4 id="symbol" class="">BTCUSDT</h4>
-            <select id="intervalSelector" class="bg-black border border-gray-600 text-gray-200 py-1 px-5 rounded">
-                <option value="1">1m</option>
-                <option value="3">3m</option>
-                <option value="5">5m</option>
-                <option value="15">15m</option>
-                <option value="30">30m</option>
-                <option value="60">1h</option>
-                <option value="120">2h</option>
-                <option value="240">4h</option>
-                <option value="360">6h</option>
-                <option value="720">12h</option>
-                <option value="D">1d</option>
-                <option value="M">1M</option>
-                <option value="W">1W</option>
-            </select>
-
+                <select
+                    id="intervalSelector"
+                    class="bg-black border border-gray-600 text-gray-200 py-1 px-5 rounded"
+                >
+                    <option value="1">1m</option>
+                    <option value="3">3m</option>
+                    <option value="5">5m</option>
+                    <option value="15">15m</option>
+                    <option value="30">30m</option>
+                    <option value="60">1h</option>
+                    <option value="120">2h</option>
+                    <option value="240">4h</option>
+                    <option value="360">6h</option>
+                    <option value="720">12h</option>
+                    <option value="D">1d</option>
+                    <option value="M">1M</option>
+                    <option value="W">1W</option>
+                </select>
             </div>
             <h5 style="color: rgba(74, 80, 191, 0.569); padding-left: 5px;">
                 ema 59
@@ -37,7 +46,7 @@
         </div>
     </div>
     <div class="px-3">
-        <div >
+        <div>
             <h4>SHORT 🔻</h4>
             <table
                 class="w-full text-left rtl:text-right text-gray-500 dark:text-gray-400"
@@ -56,7 +65,7 @@
             </table>
         </div>
 
-        <div >
+        <div>
             <h4>LONG 🔼</h4>
             <table
                 class="w-full text-left rtl:text-right text-gray-500 dark:text-gray-400"

@@ -5,7 +5,6 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
     const response = await fetch(url);
     const data = await response.json();
     const kline = data.result.list;
-    console.log(kline);
     const datosConv1 = convertirDatos(kline);
     const numericValues = kline.map(entry => parseFloat(entry[1]));
     const ema = EMA(numericValues, 59).reverse();
