@@ -136,6 +136,13 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"blog": {
+"linear-regression.md": {
+	id: "linear-regression.md";
+  slug: "linear-regression";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 "mean-in-trading.md": {
 	id: "mean-in-trading.md";
   slug: "mean-in-trading";

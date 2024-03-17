@@ -1,0 +1,31 @@
+---
+import { fetchData } from "./fetchData.js";
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
+
+const data = await fetchData();
+const openingPrices = data && data.map(element => element[1]);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+        <Header />
+        {openingPrices && (
+            <div style="color:white">
+                <h1>Precios de apertura:</h1>
+                <ul>
+                  {openingPrices.map(price => (
+                    <li>{price}</li>
+                  ))}
+                </ul>
+            </div>
+        )}
+        <Footer />
+	</body>
+</html>
