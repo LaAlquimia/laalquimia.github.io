@@ -1,5 +1,5 @@
 ---
-import { fetchData } from "./fetchData.js";
+
 import BaseHead from "../../components/BaseHead.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
@@ -13,7 +13,89 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-        <Header />
-        <Footer />
+		<Header />
+		<div style='color:beige'id="tabla"></div>
+		<script is:inline src="/scripts/fetcher.js"></script>
+		<script
+			is:inline
+			src="https://cdn.jsdelivr.net/npm/ta-lib@0.11.0/index.min.js"
+		></script>
+		<script is:inline>
+		</script>
+		<script is:inline src="/scripts/functions.js">
+		</script>
+		
+		<script is:inline>
+		  async function crearTablaInclinaciones() {
+			const tickers = await tradeableCoins();
+			const inclinaciones = {};
+		
+			const fetchPromises = tickers.map(async (ticker) => {
+			  const klineData = await fetchKlineDev(ticker);
+			  const emaData = klineData.ema.slice(0, 20);
+			  const resultadoRegresion = calcularRegresionLineal(emaData);
+			  console.log(ticker,resultadoRegresion.anguloGrados);
+			  inclinaciones[ticker] = resultadoRegresion.anguloGrados;
+			});
+		
+			await Promise.all(fetchPromises);
+		
+			const tabla = document.createElement("table");
+			tabla.innerHTML = `
+			  <thead>
+				<tr>
+				  <th>Moneda</th>
+				  <th>Inclinación (ángulo en grados)</th>
+				</tr>
+			  </thead>
+			  <tbody>
+				${Object.entries(inclinaciones)
+				  .map(([moneda, inclinacion]) => {
+					return `<tr><td>${moneda}</td><td>${inclinacion.toFixed(2)}</td></tr>`;
+				  })
+				  .join("")}
+			  </tbody>
+			`;
+		
+			const tablaHead = tabla.querySelector("thead");
+			const inclinacionTH = tablaHead.querySelector("th:nth-child(2)");
+		
+			let sortOrder = "asc";
+			inclinacionTH.addEventListener("click", () => {
+			  const tbody = tabla.querySelector("tbody");
+			  const rows = Array.from(tbody.rows);
+		
+			  rows.sort((a, b) => {
+				const aInclinacion = parseFloat(a.cells[1].innerText);
+				const bInclinacion = parseFloat(b.cells[1].innerText);
+		
+				if (sortOrder === "asc") {
+				  return aInclinacion - bInclinacion;
+				} else {
+				  return bInclinacion - aInclinacion;
+				}
+			  });
+		
+			  while (tbody.firstChild) {
+				tbody.removeChild(tbody.firstChild);
+			  }
+		
+			  for (const row of rows) {
+				tbody.appendChild(row);
+			  }
+		
+			  sortOrder = sortOrder === "asc" ? "desc" : "asc";
+			});
+		
+			document.getElementById("tabla").appendChild(tabla);
+		  }
+		
+		  crearTablaInclinaciones();
+		</script>
+		
+		
+		
+		
+		<Footer />
 	</body>
 </html>

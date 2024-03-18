@@ -2,7 +2,7 @@
 title: 'Tutorial  Mean Reversion'
 description: 'Tutorial de cómo usar la estrategia de reversión a la media en los mercados de futuros.'
 pubDate: 'Feb 10 2024'
-heroImage: '/short.png'
+heroImage: '/images/short.png'
 ---
 
 

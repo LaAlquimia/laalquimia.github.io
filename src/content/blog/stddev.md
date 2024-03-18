@@ -2,7 +2,7 @@
 title: 'Desviación estándar en el trading: guía completa'
 description: 'Aprende a utilizar la desviación estándar en el trading para identificar oportunidades de compra y venta, así como para establecer niveles de stop loss y take profit.'
 pubDate: 'mar 15  2024'
-heroImage:  '/maxi.png'
+heroImage:  '/images/maxi.png'
 keywords:  'trading, desviación estándar, volatilidad, stop loss, take profit'
 ---
 ## ¿Qué es la desviación estándar?

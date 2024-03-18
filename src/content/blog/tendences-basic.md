@@ -2,7 +2,7 @@
 title: 'Técnicas de reconocimiento de tendencias en el trading: medias móviles, regresión lineal y ángulos de inclinación'
 description: 'Aprende a utilizar medias móviles, regresión lineal y ángulos de inclinación para identificar tendencias en el mercado. Guía completa.'
 pubDate: 'Mar 14 2024'
-heroImage: '/emaTendence.png'
+heroImage: '/images/emaTendence.png'
 keywords: 'trading, tendencias, medias móviles, regresión lineal, ángulos de inclinación, soportes y resistencias, desviación estándar'
 ---
 

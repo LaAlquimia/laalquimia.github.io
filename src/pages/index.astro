@@ -1,17 +1,34 @@
 ---
-import Layout from "../layouts/BlogPost.astro";
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 ---
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<!-- div principal -->
+		<div class="flex text-center">
+			<div class="flex flex-col items-center justify-center pt-5 md:flex-row md:items-center md:justify-center">
+				<!-- imagen -->
+				<img src="/images/tortugacadenas.png" class="w-2/3 md:w-1/3" alt="tortuga">
+				<!-- texto -->
+				<div>
 
-<Layout
-	title="🐢 La Alquimia "
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date("feb 2024")}
-	heroImage="/tortugacadenas.png"
->
-	<div class="text-center">
-		<h3 class="py-5">Algorithmic Trading</h2>
+				<h2 class="md:pl-4 text-5xl">La Alquimia</h2>
 
-		<hr />
-		<p class="text-2xl py-10">HODL ALQ 🐢</p>
-	</div>
-</Layout>
+				<h4 class="md:pl-4 ">Algorithmic Trading</h4>
+				</div>
+			</div>
+		</div>
+
+		<Footer />
+	</body>
+	</html>
+
+
+

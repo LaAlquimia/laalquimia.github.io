@@ -1,8 +1,8 @@
 ---
 title: 'Regresiones Lineales en el Trading'
 description: 'Descubre cómo utilizar las regresiones lineales para analizar tendencias de precios en el mercado financiero.'
-pubDate: 'Mar 15 2024'
-heroImage: '/graph.png'
+pubDate: 'Mar 18 2024'
+heroImage: '/images/graph.png'
 keywords: 'trading, regresiones lineales, análisis técnico, tendencias de precios'
 ---
 
