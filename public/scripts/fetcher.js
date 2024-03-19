@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const tradeableCoins = async () => {
   const coinsResponse = await fetch('https://api.bybit.com/v5/market/instruments-info?category=linear')
   const coinsData = await coinsResponse.json()
