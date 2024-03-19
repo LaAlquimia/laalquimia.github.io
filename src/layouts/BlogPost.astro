@@ -20,7 +20,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				
 			}
 			.hero-image {
-				width: 100%;
+				margin: auto;
 			}
 			.hero-image img {
 				display: block;
@@ -59,9 +59,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<Header />
 		<main>
 			<article class="">
-				<div class="hero-image py-5">
-					{heroImage && <img width={720} height={520} src={heroImage} alt="" />}
-				</div>
+				
 				<div class="prose">
 					<div class="title">
 						<div class="date">
@@ -73,6 +71,9 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 									</div>
 								)
 							}
+						</div>
+						<div class="hero-image py-5 w-1/2 md:w-1/2">
+							{heroImage && <img width={720} height={520} src={heroImage} alt="" />}
 						</div>
 						<h1>{title}</h1>
 						<hr />

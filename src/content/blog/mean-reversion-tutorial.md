@@ -16,7 +16,7 @@ los rendimientos históricos tenderán hacia un promedio a largo plazo con el ti
 
 #### Ejemplo 
 
-![blog placeholder](/short.png)
+![blog placeholder](/images/short.png)
 
 
 ### Estadística 
@@ -34,7 +34,7 @@ encima de la media móvi entonces hay una mayor probabilidad de que el precio ba
 
 #### Media móvil
 
-![blog placeholder](/movingAverage.png)
+![blog placeholder](/images/movingAverage.png)
 
 ### Distancia a la media 
 
@@ -51,7 +51,7 @@ si este proceso lo hacemos para todas las monedas disponibles en un intercambio 
 
 #### Tablas
 
-![blog placeholder](/table.png)
+![blog placeholder](/images/table.png)
 
 ### Gráfico 
 El gráfico nos permite ver la evolución de la media movil y el porcentaje
@@ -59,7 +59,7 @@ de la distancia del precio actual a la media movil.
 
 
 #### Ejemplo Gráfico
-![blog placeholder](/graph.png)
+![blog placeholder](/images/graph.png)
 
 
 El valor expresado en la marca de agua es el porcentaje de la distancia al ultimo precio de apertura.
