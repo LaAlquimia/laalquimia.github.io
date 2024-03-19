@@ -4,66 +4,83 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 ---
+
 <!doctype html>
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-		
 		<Header />
 		<!-- div principal -->
-		<div class="block text-center">
-			<div class="flex flex-col items-center justify-center py-5 md:py-20 md:flex-row md:items-center md:justify-center">
-				<!-- imagen -->
-				<img src="/images/tortugacadenas.png" class="w-1/3 `m`d:w-1/3" alt="tortuga">
-				<!-- texto -->
-				<div>
+		<div class="block overflow-hidden text-center">
+			<div class="block text-center">
+				<div
+					class="flex hover:scale-105 flex-col items-center justify-center py-5 md:py-10 md:flex-row md:items-center md:justify-center"
+				>
+					<!-- imagen -->
+					<img
+						src="/images/rightlaptop.png"
+						class="w-1/3 `m`d:w-1/3 hover:scale-110"
+						alt="tortuga"
+					/>
+					<!-- texto -->
+					<div>
+						<h2 class="md:pl-4 text-5xl">La Alquimia</h2>
 
-				<h2 class="md:pl-4 text-5xl">La Alquimia</h2>
-
-				<h4 class="md:pl-4 ">Algorithmic Trading 🐢</h4>
-				</div>
-			</div>
-		</div>
-
-		<div class="block text-center">
-			<div class="flex flex-col items-center justify-center pt-5 md:flex-row md:items-center md:justify-center">
-				<div>
-
-					<h2 class="md:pl-4 text-5xl">Spot & Futures </h2>
-	
-					<h4 class="md:pl-4 ">Strategies for trade</h4>
+						<h4 class="md:pl-4">Algorithmic Trading 🐢</h4>
 					</div>
-				<img src="/images/diamondturtle.png" class="w-1/3 md:w-1/3" alt="tortuga">
-				
-				
-			</div>
-		</div>
-
-		<div class="block text-center">
-			<div class="flex flex-col items-center justify-center py-5 md:py-20 md:flex-row md:items-center md:justify-center">
-				<!-- imagen -->
-				<img src="/images/rightlaptop.png" class="w-1/3 `m`d:w-1/3" alt="tortuga">
-				<!-- texto -->
-				<div>
-
-				<h2 class="md:pl-4 text-5xl">Best Trading Bots 🤖</h2>
-
-				<h4 class="md:pl-4 ">Python and JavaScript </h4>
 				</div>
 			</div>
-		</div>
 
+			<div class="block text-center">
+				<div
+					class="hover:scale-110 flex flex-col items-center justify-center pt-5 md:flex-row md:items-center md:justify-center"
+				>
+					<div>
+						<h2 class="md:pl-4 text-5xl">Spot & Futures</h2>
 
-		<div class="flex flex-col items-center justify-center py-10 md:flex-row md:items-center md:justify-center">
+						<h4 class="md:pl-4">Strategies for trade</h4>
+					</div>
+					<img
+						src="/images/diamondturtle.png"
+						class="w-1/3 md:w-1/3"
+						alt="tortuga"
+					/>
+				</div>
+			</div>
 
+			<div class="block text-center hover:scale-105">
+				<div
+					class="flex flex-col items-center justify-center py-5 md:py-20 md:flex-row md:items-center md:justify-center"
+				>
+					<!-- imagen -->
+					<img
+						src="/images/tortugacadenas.png"
+						class="w-1/3 `m`d:w-1/3 hover:scale-110"
+						alt="tortuga"
+					/>
+					<!-- texto -->
+					<div>
+						<h2 class="md:pl-4 text-5xl hover:scale-110">
+							Best Trading Bots 🤖
+						</h2>
 
-			<h2 class="md:pl-4 text-5xl text-center mx-10 ">Trade Algorithms for futures contracts</h2>
+						<h4 class="md:pl-4 hover:scale-110">
+							Python and JavaScript
+						</h4>
+					</div>
+				</div>
+			</div>
+
+			<div
+				class="flex flex-col items-center justify-center py-10 md:flex-row md:items-center md:justify-center"
+			>
+				<h2 class="md:pl-4 text-5xl text-center mx-10">
+					Trade Algorithms for futures contracts
+				</h2>
+			</div>
 		</div>
 		<Footer />
 	</body>
-	</html>
-
-
-
+</html>
