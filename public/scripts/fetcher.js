@@ -1,4 +1,35 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+function calculateRSI(priceData, rsiPeriod) {
+  const chg = priceData.slice(1).map((p, i) => p - priceData[i]);
+
+  const gain = chg.map(c => (c >= 0 ? c : 0));
+  const loss = chg.map(c => (c < 0 ? -c : 0));
+
+  function ewma(data, com, minPeriods) {
+    const result = [];
+    let multiplier = 2 / (com + 1);
+    let sma = data.slice(0, minPeriods - 1).reduce((a, b) => a + b, 0) / minPeriods;
+
+    result.push(sma);
+
+    for (let i = minPeriods; i < data.length; i++) {
+      sma = data[i] * multiplier + sma * (1 - multiplier);
+      result.push(sma);
+    }
+
+    return result;
+  }
+
+  const avgGain = ewma(gain, rsiPeriod - 1, rsiPeriod);
+  const avgLoss = ewma(loss, rsiPeriod - 1, rsiPeriod);
+
+  const rs = avgGain.map((g, i) => Math.abs(g / avgLoss[i]));
+  const rsi = rs.map(r => 100 - (100 / (1 + r)));
+
+  return rsi;
+}
+
+
 
 const tradeableCoins = async () => {
   const coinsResponse = await fetch('https://api.bybit.com/v5/market/instruments-info?category=linear')
@@ -57,6 +88,7 @@ const fetchKlineDev = async (symbol) => {
 const signals = (kLine, symbol, emaDist) => {
   const ordered = convertirDatos(kLine).reverse();
   const rsi = RSI(ordered.map(entry => entry.open), 28);
+  const rsi2 = calculateRSI(ordered.map(entry => entry.close), 28);
   console.log(rsi, rsi2);
   if (rsi[0] < rsi[1] && rsi[1] > 75 && emaDist > 3) {
     const percent = (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2);
