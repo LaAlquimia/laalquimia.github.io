@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
 const tradeableCoins = async () => {
   const coinsResponse = await fetch('https://api.bybit.com/v5/market/instruments-info?category=linear')
   const coinsData = await coinsResponse.json()
@@ -51,4 +52,50 @@ const fetchKlineDev = async (symbol) => {
   const numericValues = kline.map(entry => parseFloat(entry[1]))
   const ema = EMA(numericValues, 59)
   return { symbol, ema }
+}
+
+const signals = (kLine, symbol, emaDist) => {
+  const ordered = convertirDatos(kLine).reverse();
+  const rsi = RSI(ordered.map(entry => entry.open), 28);
+  console.log(rsi, rsi2);
+  if (rsi[0] < rsi[1] && rsi[1] > 75 && emaDist > 3) {
+    const percent = (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2);
+    const signalMessage = 'SHORT ⛔' + symbol + '\nEMA distance: ' + emaDist.toFixed(2) + '%\n 24h PriceChange ' + (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2) + ' % ';
+    const speech = 'Alquialerta: Short' + symbol + 'Distancia a la media' + emaDist.toFixed(2) + '%';
+    speak(speech);
+    notifyMe(symbol, signalMessage);
+  } else if (rsi[0] > rsi[1] && rsi[1] < 25 && emaDist < -3) {
+    const percent = (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2);
+    const signalMessage = 'LONG 🟢' + symbol + '\nEMA distance ' + emaDist.toFixed(2) + '%\n24h PriceChange ' + percent + '% ';
+    const speech = 'Alquialerta long' + symbol + 'Distancia a la media' + emaDist.toFixed(2) + '%';
+    speak(speech);
+    notifyMe(symbol, signalMessage);
+  }
+}
+
+// symbol or 'BTCUSDT'
+const zscore = async (symbol  = 'BTCUSDT' ) => {
+  const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=1`
+  const response = await fetch(url)
+  const data = await response.json()
+  const kline = data.result.list
+  const numericValues = kline.map(entry => parseFloat(entry[1]))
+  const ema = EMA(numericValues, 59)
+  const emaDist = ((numericValues[0] - ema[0]) / numericValues[0]) * 100
+
+  // Calcular la media de los precios de cierre
+  const mean = numericValues.reduce((a, b) => a + b, 0) / numericValues.length;
+
+  // Calcular la desviación estándar de los precios de cierre
+  const variance = numericValues.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / numericValues.length;
+  const stdDeviation = Math.sqrt(variance);
+
+  // Calcular el z-score actual
+  const zScore = (numericValues[0] - mean) / stdDeviation;
+
+  // Generar bandas de z-score (por ejemplo, +/- 2 desviaciones estándar)
+  const upperBand = mean + (2 * stdDeviation);
+  const lowerBand = mean - (2 * stdDeviation);
+  const price24hPcnt = (parseFloat(tickers.find(ticker => ticker.symbol === symbol).price24hPcnt) * 100).toFixed(2)
+  return { symbol, EMA_dist: emaDist, price24hPcnt, zScore, upperBand, lowerBand }
 }
