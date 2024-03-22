@@ -1,39 +1,48 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-function calculateRSI(priceData, rsiPeriod) {
-  const chg = priceData.slice(1).map((p, i) => p - priceData[i]);
 
-  const gain = chg.map(c => (c >= 0 ? c : 0));
-  const loss = chg.map(c => (c < 0 ? -c : 0));
 
-  function ewma(data, com, minPeriods) {
-    const result = [];
-    let multiplier = 2 / (com + 1);
-    let sma = data.slice(0, minPeriods - 1).reduce((a, b) => a + b, 0) / minPeriods;
 
-    result.push(sma);
+function calculateRSI(closes, period) {
+  const rsis = [];
+  const gains = [];
+  const losses = [];
 
-    for (let i = minPeriods; i < data.length; i++) {
-      sma = data[i] * multiplier + sma * (1 - multiplier);
-      result.push(sma);
+  for (let i = 0; i < closes.length; i++) {
+    const diff = closes[i] - closes[i + 1];
+    if (diff > 0) {
+      gains.push(diff);
+      losses.push(0);
+    } else {
+      gains.push(0);
+      losses.push(Math.abs(diff));
     }
-
-    return result;
   }
 
-  const avgGain = ewma(gain, rsiPeriod - 1, rsiPeriod);
-  const avgLoss = ewma(loss, rsiPeriod - 1, rsiPeriod);
-
-  const rs = avgGain.map((g, i) => Math.abs(g / avgLoss[i]));
-  const rsi = rs.map(r => 100 - (100 / (1 + r)));
-
-  return rsi;
+  for (let i = 0; i < closes.length; i++) {
+    if (i >= closes.length - period) {
+      rsis.push(0);
+    } else {
+      const avgGain = gains.slice(i, i + period).reduce((a, b) => a + b, 0) / period;
+      const avgLoss = losses.slice(i, i + period).reduce((a, b) => a + b, 0) / period;
+      const rs = avgGain / avgLoss;
+      const rsi = 100 - (100 / (1 + rs));
+      rsis.push(rsi);
+    }
+  }
+  return rsis;
 }
+
+
+
+
 
 
 
 const tradeableCoins = async () => {
   const coinsResponse = await fetch('https://api.bybit.com/v5/market/instruments-info?category=linear')
+
   const coinsData = await coinsResponse.json()
+  console.log(coinsData);
   const coins = coinsData.result.list.filter(coin => coin.status === 'Trading').map(coin => coin.symbol)
   return coins
 }
@@ -42,7 +51,7 @@ const analyzeCoins = async () => {
   const results = await Promise.all(coins.map(async coin => await fetchKline(coin)))
   const positiveDF = results.filter(({ EMA_dist }) => EMA_dist > 0).sort((a, b) => b.EMA_dist - a.EMA_dist)
   const negativeDF = results.filter(({ EMA_dist }) => EMA_dist < 0).sort((a, b) => a.EMA_dist - b.EMA_dist)
-  console.log(positiveDF)
+  
   populateTable('positiveTable', positiveDF.slice(0, 10))
 
   populateTable('negativeTable', negativeDF.slice(0, 10))
@@ -88,20 +97,23 @@ const fetchKlineDev = async (symbol) => {
 const signals = (kLine, symbol, emaDist) => {
   const ordered = convertirDatos(kLine).reverse();
   const rsi = RSI(ordered.map(entry => entry.open), 28);
-  const rsi2 = calculateRSI(ordered.map(entry => entry.close), 28);
-  console.log(rsi, rsi2);
+  // const rsi2 = calculateRSI(ordered.map(entry => entry.open), 28);
+  const emafx = emaDist.toFixed(2)
   if (rsi[0] < rsi[1] && rsi[1] > 75 && emaDist > 3) {
     const percent = (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2);
-    const signalMessage = 'SHORT ⛔' + symbol + '\nEMA distance: ' + emaDist.toFixed(2) + '%\n 24h PriceChange ' + (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2) + ' % ';
-    const speech = 'Alquialerta: Short' + symbol + 'Distancia a la media' + emaDist.toFixed(2) + '%';
+    const signalMessage = 'SHORT ⛔' + symbol + '\nEMA distance: ' + emafx + '%\n 24h PriceChange ' + (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2) + ' % ';
+    const speech = 'Alquialerta: Short' + symbol + 'Distancia a la media' + emafx + '%';
     speak(speech);
     notifyMe(symbol, signalMessage);
+    saveSignal(symbol,ordered[0].time, 2, ordered[0].open, emafx);
   } else if (rsi[0] > rsi[1] && rsi[1] < 25 && emaDist < -3) {
     const percent = (tickers.find(ticker => ticker.symbol === symbol).price24hPcnt * 100).toFixed(2);
-    const signalMessage = 'LONG 🟢' + symbol + '\nEMA distance ' + emaDist.toFixed(2) + '%\n24h PriceChange ' + percent + '% ';
-    const speech = 'Alquialerta long' + symbol + 'Distancia a la media' + emaDist.toFixed(2) + '%';
+    const signalMessage = 'LONG 🟢' + symbol + '\nEMA distance ' + emafx + '%\n24h PriceChange ' + percent + '% ';
+    const speech = 'Alquialerta long' + symbol + 'Distancia a la media' + emafx + '%';
     speak(speech);
     notifyMe(symbol, signalMessage);
+    saveSignal(symbol,ordered[0].time, 1, ordered[0].open, emafx);
+    
   }
 }
 

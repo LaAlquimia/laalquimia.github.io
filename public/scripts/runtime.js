@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
+var signaltime = null;
 var chart = null;
 var series = null;
 var emaSeries = null;

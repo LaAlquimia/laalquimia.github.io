@@ -4,7 +4,7 @@ function notifyMe(symbol, message) {
     else {
       // add symbol to notification
      var notification = new Notification('La Alquimia '+ symbol+' Alert 🚨! ⚠️', {
-      icon: '/assets/favicon.ico',
+      icon: '/favicon.ico',
       body: ''+message + 'BUY ALQ 🚀',
      });
      notification.onclick = function() {
