@@ -1,10 +1,14 @@
 import { ethers } from 'ethers'
 import { isLogin } from '../store.js'
-
+import { isLoginPersistent } from '../store.js'
+import { checkTokenBalance } from '../scripts/login.js'
 const btn = document.getElementById('login')
 let signer = null
 let provider
 let address
+const tokenAddress = '0x4b48c0db4e460c894bfc031d602a5c3b57a26857'
+// abi for balance of token
+
 
 // Función asíncrona para el inicio de sesión
 async function login () {
@@ -17,10 +21,24 @@ async function login () {
     signer = await provider.getSigner()
     address = await signer.getAddress()
     isLogin.set(true)
+    isLoginPersistent.set(true)
     localStorage.setItem('accountAddress', address)
   }
+  const blc = await checkTokenBalance(tokenAddress, address)
+  btn.innerText = address.slice(0, 3) + '...' + address.slice(-4)+' '+parseFloat(blc).toFixed(2)
+  // append a button to parent btn container
+  const btnParent = btn.parentElement
+  const logoutBtn = document.createElement('button')
+  logoutBtn.innerText = 'Logout'
+  logoutBtn.addEventListener('click', logOut)
+  btnParent.appendChild(logoutBtn)
+}
 
-  btn.innerText = address.slice(0, 3) + '...' + address.slice(-4)
+async function logOut () {
+  isLogin.set(false)
+  isLoginPersistent.set(false)
+  localStorage.removeItem('accountAddress')
+  btn.innerText = 'Login'
 }
 
 // Agregar el controlador de eventos al botón
@@ -29,5 +47,9 @@ btn.addEventListener('click', login)
 // Verificar si existe una dirección almacenada en el localStorage al cargar la página
 const storedAddress = localStorage.getItem('accountAddress')
 if (storedAddress) {
-  btn.innerText = storedAddress.slice(0, 3) + '...' + storedAddress.slice(-4)
+  const balance = await checkTokenBalance(tokenAddress, storedAddress)  
+
+  btn.innerText = storedAddress.slice(0, 3) + '...' + storedAddress.slice(-4)+' '+parseFloat(balance).toFixed(2)
 }
+
+

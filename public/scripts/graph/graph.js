@@ -52,11 +52,6 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
         type: 'custom',
         precision: symbolDecimals,
         minMove: Math.pow(10, -symbolDecimals).toString(),
-        formatter: (price) => {
-          if (price < 0.001) return parseFloat(price).toFixed(symbolDecimals)
-          else if (price >= 0.001 && price < 1) return parseFloat(price).toFixed(symbolDecimals)
-          else return parseFloat(price)
-        }
       }
       , priceScale: {
         autoScale: true,
@@ -74,8 +69,8 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
     chart.priceScale('right').applyOptions({autoScale : true}) 
     chart.timeScale().scrollToPosition(20 , false );
     volumeSeries.setData(volumeData);
-    umbSeries.setData(umbdata);
-    umbSeries2.setData(umbdata2);
+    // umbSeries.setData(umbdata);
+    // umbSeries2.setData(umbdata2);
     emaSeries.setData(emaData);
     series.setData(datosConv1);
     updateMarkers(symbol);
@@ -128,15 +123,17 @@ const graphSeries = async (symbol) => {
     });
 
     chart.applyOptions({
+      handleScale: {
+        axisPressedMouseMove: {
+          time: false,
+          price: false,
+        },
+      },
+
       priceFormat: {
         type: 'custom',
         precision: symbolDecimals,
         minMove: moveMin,
-        formatter: (price) => {
-          if (price < 0.001) return parseFloat(price).toFixed(symbolDecimals)
-          else if (price >= 0.001 && price < 1) return parseFloat(price).toFixed(symbolDecimals)
-          else return parseFloat(price)
-        }
       }
       , priceScale: {
         autoScale: true,
@@ -146,6 +143,8 @@ const graphSeries = async (symbol) => {
         priceFormatter: (price) => {
           if (price < 0.001) return parseFloat(price).toFixed(symbolDecimals)
           else if (price >= 0.001 && price < 1) return parseFloat(price).toFixed(symbolDecimals)
+          // else if (price >= 10) return parseFloat(price).toFixed(2)
+        
           else return parseFloat(price).toFixed(symbolDecimals)
         }
       },
@@ -173,7 +172,6 @@ const graphSeries = async (symbol) => {
       color: '#26a69984',
       priceFormat: {
         type: 'volume',
-        precision: 3,
       },
       priceScaleId: '',
     });    
@@ -182,7 +180,8 @@ const graphSeries = async (symbol) => {
         top: 0.8,
         bottom: 0,
       },
-    });
+    
+  });
     new ResizeObserver(entries => {
       if (entries.length === 0 || entries[0].target !== container) { return; }
       const newRect = entries[0].contentRect;

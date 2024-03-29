@@ -28,8 +28,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 		<script is:inline>
 		  async function crearTablaInclinaciones() {
 			const tickers = await tradeableCoins();
-			const inclinaciones = {};
-		
+			const inclinaciones = {};		
 			const fetchPromises = tickers.map(async (ticker) => {
 			  const klineData = await fetchKlineDev(ticker);
 			  const emaData = klineData.ema.slice(0, 20);

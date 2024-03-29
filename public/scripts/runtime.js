@@ -36,7 +36,7 @@ const loopFunction = () => {
   const currentSymbol = gSymbol;
   graph(series, currentSymbol, emaSeries, volumeSeries);
 }
-window.onload = (event) => {
+const runFunction = () => {
   graphSeries('BTCUSDT');
   const symbolSelector = document.getElementById('symbolSelector');
 
@@ -62,3 +62,13 @@ window.onload = (event) => {
   setInterval(loopFunction, 60000);  
 
 };
+
+if (chart == null){
+    setTimeout(runFunction, 1000)
+    if (!Notification) {
+      alert('Desktop notifications not available in your browser.');
+    }
+  
+    if (Notification.permission !== 'granted')
+      Notification.requestPermission();
+}

@@ -3,8 +3,6 @@ import { isLogin } from '../../store'
 isLogin.listen((login) => {
   if (login) {
     const chartContainer = document.getElementById('chart')!
-    const height = chartContainer.offsetHeight
-    const width = chartContainer.offsetHeight
 
     const chart = createChart(chartContainer, {
       width: chartContainer.offsetWidth,
@@ -41,7 +39,6 @@ isLogin.listen((login) => {
         }
       }
     })
-
     const lineSeries = chart.addLineSeries()
     lineSeries.setData([
       { time: '2019-04-11', value: 80.01 },
@@ -73,3 +70,4 @@ isLogin.listen((login) => {
     }).observe(chartContainer)
   }
 })
+
