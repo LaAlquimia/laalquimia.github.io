@@ -69,11 +69,11 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
     chart.priceScale('right').applyOptions({autoScale : true}) 
     chart.timeScale().scrollToPosition(20 , false );
     volumeSeries.setData(volumeData);
-    umbSeries.setData(umbdata);
-    umbSeries2.setData(umbdata2);
+    // umbSeries.setData(umbdata);
+    // umbSeries2.setData(umbdata2);
     emaSeries.setData(emaData);
     series.setData(datosConv1);
-    updateMarkers(symbol);
+    // updateMarkers(symbol);
   
   
   }

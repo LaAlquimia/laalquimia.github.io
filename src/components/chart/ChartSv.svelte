@@ -419,14 +419,14 @@
     </div>
 
     <script
-        src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js"
+        src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"
     ></script>
-    <script is:inline src="/scripts/fetcher.js"></script>
+    <script is:inline src="/xab1/fetcher.js"></script>
     <script is:inline src="/notification.js"></script>
-    <script is:inline src="/scripts/handler.js"></script>
-    <script is:inline src="/scripts/notification.js"></script>
-    <script is:inline src="/scripts/runtime.js"></script>
-    <script is:inline src="/scripts/graph/graph.js"></script>
+    <script is:inline src="/xab1/handler.js"></script>
+    <script is:inline src="/xab1/notification.js"></script>
+    <script is:inline src="/xab1/runtime.js"></script>
+    <script is:inline src="/xab1/graph/graph.js"></script>
 
     <script
         is:inline
