@@ -329,5 +329,5 @@
     
 {/if}
 {#if !$isLoginPersistent }
-<h2 class="text-center"> Por Favor Inicia Sesion </h2>
+<h2 class="text-center"> Por Favor Inicia Sesión </h2>
 {/if}
