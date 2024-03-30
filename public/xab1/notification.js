@@ -14,7 +14,7 @@ function notifyMe(symbol, message) {
    };
 function speak(text, languaje= 'es-US') {
     var msg = new SpeechSynthesisUtterance();
-    msg.text = text;
+    msg.text = text +'Compra ALQ';
     msg.lang = languaje;        
-    window.speechSynthesis.speak(msg+'Compra ALQ');
+    window.speechSynthesis.speak(msg);
 };
