@@ -1,9 +1,8 @@
 // En login.js
 
 import { ethers } from 'ethers';
-
 // Definir la función checkTokenBalance
-async function checkTokenBalance(tokenAddress, holderAddress) {
+async function checkTokenBalance( holderAddress) {
     const abi = [
         // Método para obtener el saldo del token para una dirección específica
         {
@@ -19,6 +18,7 @@ async function checkTokenBalance(tokenAddress, holderAddress) {
       const signer = await provider.getSigner();
       
       // Crear una instancia del contrato del token
+      const tokenAddress = '0x4b48c0db4e460c894bfc031d602a5c3b57a26857';  
       const tokenContract = new ethers.Contract(tokenAddress, abi, signer);
       
       // Llamar al método balanceOf para obtener el saldo del token

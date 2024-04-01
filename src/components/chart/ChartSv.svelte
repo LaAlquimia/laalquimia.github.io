@@ -4,6 +4,7 @@
     import { isLoginPersistent } from "../../store";
     import { botConfig } from "../../store";
     import { onMount } from "svelte";
+    import { userInfo } from "../../store";
 </script>
 {#if $isLoginPersistent}
 <slot />

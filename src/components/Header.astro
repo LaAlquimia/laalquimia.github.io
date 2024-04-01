@@ -1,6 +1,7 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
+import Balance from './balance/Balance.svelte';
 ---
 
 <header  class="sticky top-0 z-10 w-full bg-gray-700 text-gray-100">
@@ -12,8 +13,7 @@ import { SITE_TITLE } from '../consts';
 			<HeaderLink href="/bot">Bot</HeaderLink>
 		</div>
 		<div class="social-links">
-			<button id="login">Login</button>
-			<script src = './login.js'></script>			
+			<Balance client:only/>		
 		</div>
 	</nav>
 </header>
