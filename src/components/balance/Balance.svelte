@@ -13,7 +13,7 @@
 
 {#if $userInfo.balance}
 <nav class="select-none px-2 bg-gray-900 rounded-xl flex items-center space-x-2 mx-2 hover:scale-105">
-    <img src="favicon.ico" alt="tortuga" class="w-6 h-6" />     
+    <img src="/favicon.ico" alt="tortuga" class="w-6 h-6" />     
     <p class="my-auto " >
         {$userInfo.balance} 
     </p>
