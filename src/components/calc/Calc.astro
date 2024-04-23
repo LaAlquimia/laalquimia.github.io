@@ -1,0 +1,69 @@
+
+<div class="text-center overflow-hidden bg-black border-2 border-gray-200 max-w-3xl mx-auto rounded-3xl">
+    <h3>Calculadora de Entradas 1%</h3>
+    <div class="flex flex-col space-y-5">
+        <div class="flex flex-row justify-center space-x-5">
+            <h4>Tamaño de Cuenta</h4>
+            <input type="number" min="0" value="1000" max="100000" id="accountsize" class="text-center" />
+        </div>
+
+        <div class="flex flex-col">
+            <div class="flex flex-row justify-center space-x-5">
+                <h4>Precio Moneda</h4>
+                <input type="number" id="coinprice" value="1" class="text-center" />
+            </div>
+        </div>
+
+        <div class="flex flex-row justify-center space-x-5">
+            <h4>Porcentaje</h4>
+            <input type="number" id="percent" value="1" class="text-center" />
+        </div>
+
+        <div class="flex flex-row justify-center space-x-5">
+            <h4>Apalancamiento</h4>
+            <input type="number" id="leverage" value="10" class="text-center" />
+        </div>
+        <div class="flex flex-row justify-center space-x-5">
+            <h4>Tamaño de Posición</h4>
+            <h4 id="positionsize">...$</h4>
+        </div>
+
+
+        <div class="flex flex-row justify-center space-x-5">
+            <h4>Cantidad de Monedas</h4>
+            <h4 id="coinamount">xALQ</h4>
+        </div>
+        
+    </div>
+    <button
+        onclick="calculate()"
+        class="bg-black border hover:scale-105 border-gray-600 text-gray-200 py-1 px-5 rounded"
+        >Calcular</button
+    >
+</div>
+
+<script is:inline>
+    // function to get the value of an element
+    const accountsize = document.getElementById("accountsize");
+    const coinprice = document.getElementById("coinprice");
+    const percent = document.getElementById("percent");
+    const leverage = document.getElementById("leverage");
+    accountsize.addEventListener("input", calculate);
+    coinprice.addEventListener("input", calculate);
+    percent.addEventListener("input", calculate);
+    leverage.addEventListener("input", calculate);
+    function getValue() {
+        const accountsize = document.getElementById("accountsize").value;
+        const coinprice = document.getElementById("coinprice").value;
+        const percent = document.getElementById("percent").value;
+        const leverage = document.getElementById("leverage").value;
+        return [accountsize, coinprice, percent, leverage];
+    }
+    function calculate() {
+        const [accountsize, coinprice, percent, leverage] = getValue();
+        const positionsize = (accountsize * percent) / 100;
+        const coinamount = positionsize / coinprice * leverage;
+        document.getElementById("positionsize").innerHTML = positionsize + " $";
+        document.getElementById("coinamount").innerHTML = coinamount
+    }
+</script>
