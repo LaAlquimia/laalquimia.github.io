@@ -1,69 +1,248 @@
+---
+import BaseHead from "../BaseHead.astro";
+---
 
-<div class="text-center overflow-hidden bg-black border-2 border-gray-200 max-w-3xl mx-auto rounded-3xl">
+<BaseHead title="Calculadora" description="Calculadora" />
+<style>
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: default;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        padding: 0.25em 0.5em;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 0.25em;
+        white-space: nowrap;
+
+        /* Position the tooltip */
+        position: absolute;
+        z-index: 1;
+        top: 100%;
+        left: 100%;
+        transition-property: visibility;
+        transition-delay: 0s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        transition-delay: 0.3s;
+    }
+</style>
+<div
+    class="text-center overflow-hidden bg-black border-2 border-gray-200 max-w-3xl mx-auto items-center justify-center rounded-3xl"
+>
     <h3>Calculadora de Entradas 1%</h3>
-    <div class="flex flex-col space-y-5">
-        <div class="flex flex-row justify-center space-x-5">
+    <div class="flex flex-col space-y-5 mx-5 px-5">
+        <div class="flex flex-row space-between justify-between">
             <h4>Tamaño de Cuenta</h4>
-            <input type="number" min="0" value="1000" max="100000" id="accountsize" class="text-center" />
+            <input
+                type="number"
+                min="0"
+                value="1000"
+                max="100000"
+                id="accountsize"
+                class="text-right bg-transparent text-white font-bold text-3xl"
+            />
         </div>
 
-        <div class="flex flex-col">
-            <div class="flex flex-row justify-center space-x-5">
-                <h4>Precio Moneda</h4>
-                <input type="number" id="coinprice" value="1" class="text-center" />
+        <div class="flex flex-row space-between justify-between">
+            <h4>Precio Moneda</h4>
+            <input
+                type="number"
+                id="coinprice"
+                value="1"
+                class="text-right bg-transparent text-white font-bold text-3xl"
+            />
+        </div>
+        <div class="flex flex-row space-between justify-between">
+            <h4>Porcentaje</h4>
+            <input
+                type="number"
+                id="percent"
+                value="1"
+                class="text-right bg-transparent text-white font-bold text-3xl"
+            />
+        </div>
+        <div class="flex flex-row space-between justify-between">
+            <h4>Apalancamiento</h4>
+            <input
+                type="number"
+                id="leverage"
+                value="10"
+                class="text-right bg-transparent text-white font-bold text-3xl"
+            />
+        </div>
+        <div class="flex flex-row space-between justify-between">
+            <h4>Tamaño de Posición</h4>
+            <h4
+                id="positionsize"
+                class="text-right text-white font-bold text-3xl"
+            >
+                ...$
+            </h4>
+        </div>
+        <div class="flex flex-row space-between justify-between">
+            <h4>Cantidad de Monedas</h4>
+            <h4 id="coinamount" class="text-white font-bold text-3xl">xALQ</h4>
+        </div>
+    </div>
+    <div class="">
+        <div class="justify-center">
+            <select
+                id="sideSelector"
+                class="bg-black border border-gray-600 text-gray-200 py-1 px-5 rounded"
+            >
+                <option value="buy">Comprar</option>
+                <option value="sell">Vender</option>
+            </select>
+        </div>
+        <div class="flex flex-col space-y-5 mx-5 px-5">
+            <div class="flex flex-row space-between justify-between">
+                <div class="tooltip">
+                    <h4 class="text-4xl py-5">Stop loss (?)</h4>
+                    <span class="tooltiptext">% De la Cuenta</span>
+                </div>
+
+                <div class="flex flex-row">
+                    <input
+                        type="number"
+                        min="0"
+                        value="1"
+                        max="100"
+                        id="stoplosspercent"
+                        class="text-right bg-transparent text-white font-bold text-3xl"
+                    />
+                    <div class="text-4xl text-white font-bold py-5">%</div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col space-y-5 mx-5 px-5">
+            <div class="flex flex-row space-between justify-between">
+                <h4>Stop loss Price</h4>
+                <div class="flex flex-row">
+                    <h4 id="stoploss" class="text-white font-bold text-3xl">
+                    </h4>
+                    <h4 class="text-white font-bold text-3xl">$</h4>
+                </div>
             </div>
         </div>
 
-        <div class="flex flex-row justify-center space-x-5">
-            <h4>Porcentaje</h4>
-            <input type="number" id="percent" value="1" class="text-center" />
-        </div>
-
-        <div class="flex flex-row justify-center space-x-5">
-            <h4>Apalancamiento</h4>
-            <input type="number" id="leverage" value="10" class="text-center" />
-        </div>
-        <div class="flex flex-row justify-center space-x-5">
-            <h4>Tamaño de Posición</h4>
-            <h4 id="positionsize">...$</h4>
-        </div>
-
-
-        <div class="flex flex-row justify-center space-x-5">
-            <h4>Cantidad de Monedas</h4>
-            <h4 id="coinamount">xALQ</h4>
-        </div>
-        
+       
     </div>
-    <button
-        onclick="calculate()"
-        class="bg-black border hover:scale-105 border-gray-600 text-gray-200 py-1 px-5 rounded"
-        >Calcular</button
-    >
-</div>
+    
+    <div class="">
+        <div class="flex flex-col space-y-5 mx-5 px-5">
+            <div class="flex flex-row space-between justify-between">
+                <div class="tooltip">
+                    <h4 class="text-4xl py-5">Take Profit Ratio (?)</h4>
+                    <span class="tooltiptext">Ratio de Ganancia 1 = 1:1</span>
+                </div>
 
-<script is:inline>
-    // function to get the value of an element
-    const accountsize = document.getElementById("accountsize");
-    const coinprice = document.getElementById("coinprice");
-    const percent = document.getElementById("percent");
-    const leverage = document.getElementById("leverage");
-    accountsize.addEventListener("input", calculate);
-    coinprice.addEventListener("input", calculate);
-    percent.addEventListener("input", calculate);
-    leverage.addEventListener("input", calculate);
-    function getValue() {
-        const accountsize = document.getElementById("accountsize").value;
-        const coinprice = document.getElementById("coinprice").value;
-        const percent = document.getElementById("percent").value;
-        const leverage = document.getElementById("leverage").value;
-        return [accountsize, coinprice, percent, leverage];
-    }
-    function calculate() {
-        const [accountsize, coinprice, percent, leverage] = getValue();
-        const positionsize = (accountsize * percent) / 100;
-        const coinamount = positionsize / coinprice * leverage;
-        document.getElementById("positionsize").innerHTML = positionsize + " $";
-        document.getElementById("coinamount").innerHTML = coinamount
-    }
-</script>
+                <div class="flex flex-row">
+                    <input
+                        type="number"
+                        min="0"
+                        value="1"
+                        max="100"
+                        id="takeprofitRatio"
+                        class="text-right bg-transparent text-white font-bold text-3xl"
+                    />
+                    <div class="text-4xl text-white font-bold py-5"></div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col space-y-5 mx-5 px-5">
+            <div class="flex flex-row space-between justify-between">
+                <h4>Take Profit Price</h4>
+                <div class="flex flex-row">
+                    <h4 id="takeprofitprice" class="text-white font-bold text-3xl">
+                    </h4>
+                    <h4 class="text-white font-bold text-3xl">$</h4>
+                </div>
+            </div>
+        </div>
+
+       
+    </div>
+     <button
+            onclick="calculate()"
+            class="bg-black border hover:scale-105 border-gray-600 text-gray-200 py-1 p-5 my-5 rounded"
+            >Calcular</button
+        >
+</div>
+    <script is:inline>
+        // function to get the value of an element
+        const accountsize = document.getElementById("accountsize");
+        const coinprice = document.getElementById("coinprice");
+        const percent = document.getElementById("percent");
+        const leverage = document.getElementById("leverage");
+        const side = document.getElementById("sideSelector");
+        const takeprofitRatio = document.getElementById("takeprofitRatio");
+        takeprofitRatio.addEventListener("input", calculate);
+        side.addEventListener("input", calculate);
+        accountsize.addEventListener("input", calculate);
+        coinprice.addEventListener("input", calculate);
+        percent.addEventListener("input", calculate);
+        leverage.addEventListener("input", calculate);
+        function getValue() {
+            const accountsize = document.getElementById("accountsize").value;
+            const coinprice = Number(
+                document.getElementById("coinprice").value,
+            );
+            const percent = document.getElementById("percent").value;
+            const leverage = document.getElementById("leverage").value;
+            const stoplosspercent =
+                document.getElementById("stoplosspercent").value;
+            const side = document.getElementById("sideSelector").value;
+            const takeprofitRatio = document.getElementById("takeprofitRatio").value;
+            return [
+                accountsize,
+                coinprice,
+                percent,
+                leverage,
+                stoplosspercent,
+                side,
+                takeprofitRatio
+
+            ];
+        }
+        function calculate() {
+            const [
+                accountsize,
+                coinprice,
+                percent,
+                leverage,
+                stoplosspercent,
+                side,
+                takeprofitRatio
+            ] = getValue();
+            const positionsize = (accountsize * percent) / 100;
+            const coinamount = (positionsize / coinprice) * leverage;
+            const stoplossAmount = (accountsize * stoplosspercent) / 100;
+
+            var stoplossPrice = 0;
+            var takeprofitPrice = 0;
+            if (side == "buy") {
+                stoplossPrice = coinprice - stoplossAmount / coinamount;
+                takeprofitPrice = coinprice + takeprofitRatio * (coinprice - stoplossPrice);
+            } else {
+                stoplossPrice = coinprice + stoplossAmount / coinamount;
+                takeprofitPrice = coinprice - takeprofitRatio * (stoplossPrice - coinprice);
+            }
+
+            document.getElementById("positionsize").innerHTML =
+                positionsize + " $";
+            document.getElementById("coinamount").innerHTML =
+                coinamount.toFixed(3);
+            document.getElementById("stoploss").innerHTML =
+                stoplossPrice.toFixed(3);
+            document.getElementById("takeprofitprice").innerHTML =
+                takeprofitPrice.toFixed(3);
+        }
+    </script>
+
