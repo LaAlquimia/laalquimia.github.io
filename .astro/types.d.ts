@@ -171,6 +171,20 @@ declare module 'astro:content' {
   collection: "blog";
   data: InferEntrySchema<"blog">
 } & { render(): Render[".md"] };
+"trading-nivel-0.md": {
+	id: "trading-nivel-0.md";
+  slug: "trading-nivel-0";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"trading-nivel-1.md": {
+	id: "trading-nivel-1.md";
+  slug: "trading-nivel-1";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 };
 
 	};
