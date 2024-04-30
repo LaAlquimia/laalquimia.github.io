@@ -1,0 +1,98 @@
+---
+import BaseHead from "../../../components/BaseHead.astro";
+
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+---
+
+<html lang="es">
+    <head>
+        <BaseHead title="La Alquimia - Arbitraje" description="Arbitraje" />
+    </head>
+    <body>
+        <Header />
+        <main class="text-center h-full">
+            <h1>Arbitraje</h1>
+            <div id="wss" class="flex flex-col items-center justify-center">
+                <div id="bybit">
+                    <div id="bybit-table" class="text-3xl text-white flex flex-row items-center justify-center text-center">
+                        <div>Bybit Price : </div>
+                        <div id="bybit-price">$</div>
+                    </div>
+                </div>
+                
+                <div id="lbank">
+                    <div id="lbank-table" class="text-3xl text-white flex flex-row items-center justify-center text-center">
+                        <div>Lbank Price : </div>
+                        <div id="lbank-price">$</div>
+                    </div>
+                </div>
+                <div id ="diference">
+                    <div id="diference-table" class="text-3xl text-white flex flex-row items-center justify-center text-center">
+                        <div>Diference : </div>
+                        <div id="diference-price">$</div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                const bybitws = new WebSocket(
+                    "wss://stream.bybit.com/v5/public/spot",
+                );
+                function comparePrice(){
+                    const bybitPrice = Number(document.getElementById("bybit-price")!.innerHTML);
+                    const lbankPrice = Number(document.getElementById("lbank-price")!.innerHTML);
+                    const diferencePrice = document.getElementById("diference-price")!;
+                    const diference =( (bybitPrice - lbankPrice) /lbankPrice ) * 100;
+                    if (bybitPrice  && lbankPrice){
+                        diferencePrice.innerHTML = `${diference.toFixed(2)  } %`;
+                    }
+                }
+                // on message
+                // on suscribe
+                bybitws.onopen = () => {
+                    bybitws.send(
+                        JSON.stringify({
+                            op: "subscribe",
+                            args: ["publicTrade.BRETTUSDT"],
+                        }),
+                    );
+                };
+                bybitws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    const priceElement = document.getElementById("bybit-price")!;
+                    if (data?.data) {
+                        data.data.forEach((element: any) => {
+                            priceElement.innerHTML = element.p ;
+                            comparePrice();
+                            
+                        })
+                    }
+                };
+                const lbankws = new WebSocket(
+                    "wss://www.lbkex.net/ws/V2/",
+                );
+                // on start
+                lbankws.onopen = () => {
+                    lbankws.send(
+                        JSON.stringify({
+                            action : "subscribe",
+                            subscribe : "trade",
+                            pair : "BRETT_USDT"
+                        }),
+                    );
+                };
+                lbankws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    const priceElement = document.getElementById("lbank-price")!;
+                    if (data?.trade) {
+                        priceElement.innerHTML = data.trade.price ;
+                        comparePrice();
+                    }
+
+                };
+                
+            </script>
+        </main>
+        <Footer />
+    </body>
+</html>

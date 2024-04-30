@@ -1,0 +1,260 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<html lang="es">
+    <head>
+        <BaseHead title="La Alquimia - Arbitraje" description="Arbitraje" />
+        <style>
+            .order-book-container {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .order-book {
+                margin: 0 10px;
+                border: 1px ETHid #ccc;
+                padding: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <Header />
+        <div id="ppal" class="flex flex-col items-center justify-center w-full">
+            <h3>Arbitraje</h3>
+            <div class="order-book-container text-white">
+                <div id="btcusdttable" class="order-book">
+                    <h4>BTCUSDT</h4>
+                    <div id="BTCUSDTaskprice">
+                        <p>Ask</p>
+                    </div>
+                    <div id="BTCUSDTbidprice">
+                        <p>Bid</p>
+                    </div>
+                </div>
+                <div id="ETHBTCtable" class="order-book">
+                    <h4>ETHBTC</h4>
+                    <div id="ETHBTCaskprice">
+                        <p>Ask</p>
+                    </div>
+                    <div id="ETHBTCbidprice">
+                        <p>Bid</p>
+                    </div>
+                </div>
+                <div id="ETHusdttable" class="order-book">
+                    <h4>ETHUSDT</h4>
+                    <div id="ETHUSDTaskprice">
+                        <p>Ask</p>
+                    </div>
+                    <div id="ETHUSDTbidprice">
+                        <p>Bid</p>
+                    </div>
+                </div>
+            </div>
+            <div id="arbitrageResult" class="flex flex-col items-center justify-center text-white w-full mt-5"></div>
+
+        </div>
+
+        <Footer />
+        <script>
+            type Market = "BTCUSDT" | "ETHUSDT" | "ETHBTC";
+
+            const orderBook = {
+                bids: new Map(),
+                asks: new Map(),
+            };
+
+            const orderBooks = {
+                BTCUSDT: { bids: new Map(), asks: new Map() },
+                ETHUSDT: { bids: new Map(), asks: new Map() },
+                ETHBTC: { bids: new Map(), asks: new Map() },
+            };
+            const btcusdt = new WebSocket(
+                "wss://stream.bybit.com/v5/public/spot",
+            );
+            //
+            btcusdt.onopen = () => {
+                btcusdt.send(
+                    JSON.stringify({
+                        op: "subscribe",
+                        args: [
+                            "orderbook.1.BTCUSDT",
+                            "orderbook.1.ETHUSDT",
+                            "orderbook.1.ETHBTC",
+                        ],
+                    }),
+                );
+                conETHe.log("connected");
+            };
+
+            btcusdt.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                const market: Market = data.data?.s;
+
+                const priceElement = document.getElementById(
+                    `${market}askprice`,
+                )!;
+                const bidElement = document.getElementById(
+                    `${market}bidprice`,
+                )!;
+
+                if (data?.type === "snapshot") {
+                    priceElement.innerHTML = "";
+                    bidElement.innerHTML = "";
+
+                    // Iterar sobre los datos del snapshot y actualizar el orderBook
+                    for (const [price, quantity] of data.data.a) {
+                        // match orderBook with market symbol
+                        const existingOrder =
+                            orderBooks[market]?.asks.get(price);
+
+                        if (existingOrder) {
+                            existingOrder.quantity = quantity;
+                        } else {
+                            orderBooks[market]?.asks.set(price, {
+                                price,
+                                quantity,
+                            });
+                        }
+                    }
+
+                    for (const [price, quantity] of data.data.b) {
+                        const existingOrder =
+                            orderBooks[market]?.bids.get(price);
+                        if (existingOrder) {
+                            existingOrder.quantity = quantity;
+                        } else {
+                            orderBooks[market]?.bids.set(price, {
+                                price,
+                                quantity,
+                            });
+                        }
+                    }
+
+                    // Mostrar el orderBook en el HTML
+                    updateOrderBookUI(
+                        orderBooks[market],
+                        priceElement,
+                        bidElement,
+                    );
+                } else if (data?.type === "delta") {
+                    // Actualizar el orderBook con los cambios del delta
+                    for (const [price, quantity] of data.data.a) {
+                        const existingOrder =
+                            orderBooks[market]?.asks.get(price);
+                        if (existingOrder) {
+                            if (quantity === "0") {
+                                orderBooks[market].asks.delete(price);
+                            } else {
+                                existingOrder.quantity = quantity;
+                            }
+                        } else {
+                            orderBooks[market]?.asks.set(price, {
+                                price,
+                                quantity,
+                            });
+                        }
+                    }
+
+                    for (const [price, quantity] of data.data.b) {
+                        const existingOrder =
+                            orderBooks[market]?.bids.get(price);
+                        if (existingOrder) {
+                            if (quantity === "0") {
+                                orderBooks[market]?.bids.delete(price);
+                            } else {
+                                existingOrder.quantity = quantity;
+                            }
+                        } else {
+                            orderBooks[market]?.bids.set(price, {
+                                price,
+                                quantity,
+                            });
+                        }
+                    }
+
+                    // Mostrar el orderBook actualizado en el HTML
+                    updateOrderBookUI(
+                        orderBooks[market],
+                        priceElement,
+                        bidElement,
+                    );
+                }
+                checkArbitrage(
+                    orderBooks["BTCUSDT"],
+                    orderBooks["ETHUSDT"],
+                    
+                    orderBooks["ETHBTC"],
+                );
+            };
+
+            btcusdt.onclose = () => {
+                btcusdt.close();
+            };
+
+            // Función para actualizar el HTML con los datos del orderBook
+            function updateOrderBookUI(orderBook, priceElement, bidElement) {
+                // Limpiar el HTML antes de actualizarlo
+                priceElement.innerHTML = "";
+                bidElement.innerHTML = "";
+
+                // Iterar sobre los asks y mostrarlos en el HTML
+                if (orderBook.asks || orderBook.bids) {
+                    for (const [price, order] of orderBook.asks) {
+                        const askRow = document.createElement("div");
+                        askRow.textContent = ` ${order.price}`;
+                        priceElement.appendChild(askRow);
+                    }
+
+                    // Iterar sobre los bids y mostrarlos en el HTML
+                    for (const [price, order] of orderBook.bids) {
+                        const bidRow = document.createElement("div");
+                        bidRow.textContent = `${order.price}`;
+                        bidElement.appendChild(bidRow);
+                    }
+                }
+            }
+            function checkArbitrage(usdtbtc, usdthETH, ETHbtc) {
+                // Obtener el mejor precio de compra de BTC en USDT
+                const [bestAskUSDTBTC] = usdtbtc.asks.entries();
+                const [bestBidUSDTBTC] = usdtbtc.bids.entries();
+                // Obtener el mejor precio de compra de ETHen USDT
+                const [bestBidUSDTETH] = usdthETH.bids.entries();
+                const [bestAskUSDTETH] = usdthETH.asks.entries();
+                // Obtener el mejor precio de compra de ETHen BTC
+                const [bestAskETHBTC] = ETHbtc.asks.entries();
+                const [bestBidETHBTC] = ETHbtc.bids.entries();
+
+                // Calcular el precio de compra de 1 BTC en ETH(USDT -> BTC -> ETH-> USDT)
+                const usdtToBtcToETHToUsdt =
+                    ((1/bestAskUSDTBTC[1].price) / bestAskETHBTC[1].price) *
+                    bestBidUSDTETH[1].price;
+                // Calcular el precio de compra de 1 BTC en USDT (USDT -> ETH-> BTC -> USDT)
+                const usdtToETHToBtcToUsdt =
+                (1/bestAskUSDTETH[1].price)  *  bestBidETHBTC[1].price *
+                    bestBidUSDTBTC[1].price;
+                // Diferencia de precios entre las dos rutas posibles
+                
+                // Si la diferencia es positiva, hay una oportunidad de arbitraje
+                // inserta este arbitrage a la poagina
+                const arbitrageResult = document.getElementById("arbitrageResult")!;
+                if (usdtToBtcToETHToUsdt > 1 ) {
+                    arbitrageResult.innerHTML = `
+                        <h4>Oportunidad de Arbitraje:</h4>
+                        <p>USDT -> BTC -> ETH-> USDT: ${usdtToBtcToETHToUsdt.toFixed(6)}</p>
+                    `;
+                } else if (usdtToETHToBtcToUsdt >1 ) {
+                    arbitrageResult.innerHTML = `
+                        <h4>Oportunidad de Arbitraje:</h4>
+                        <p>USDT -> ETH-> BTC -> USDT: ${usdtToETHToBtcToUsdt.toFixed(6)}</p>   
+                    `;
+                } else {
+                }
+            }
+
+        </script>
+    </body>
+</html>
