@@ -87,7 +87,7 @@ import Footer from "../../components/Footer.astro";
                         ],
                     }),
                 );
-                conETHe.log("connected");
+                console.log("connected");
             };
 
             btcusdt.onmessage = (event) => {
@@ -196,7 +196,7 @@ import Footer from "../../components/Footer.astro";
             };
 
             // Función para actualizar el HTML con los datos del orderBook
-            function updateOrderBookUI(orderBook, priceElement, bidElement) {
+            function updateOrderBookUI(orderBook : any , priceElement : any, bidElement: any) {
                 // Limpiar el HTML antes de actualizarlo
                 priceElement.innerHTML = "";
                 bidElement.innerHTML = "";
@@ -217,7 +217,7 @@ import Footer from "../../components/Footer.astro";
                     }
                 }
             }
-            function checkArbitrage(usdtbtc, usdthETH, ETHbtc) {
+            function checkArbitrage(usdtbtc : any, usdthETH : any, ETHbtc : any) {
                 // Obtener el mejor precio de compra de BTC en USDT
                 const [bestAskUSDTBTC] = usdtbtc.asks.entries();
                 const [bestBidUSDTBTC] = usdtbtc.bids.entries();
