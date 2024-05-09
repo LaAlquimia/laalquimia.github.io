@@ -42,7 +42,7 @@ const tradeableCoins = async () => {
   const coinsResponse = await fetch('https://api.bybit.com/v5/market/instruments-info?category=linear')
 
   const coinsData = await coinsResponse.json()
-  console.log(coinsData);
+
   const coins = coinsData.result.list.filter(coin => coin.status === 'Trading').map(coin => coin.symbol)
   return coins
 }

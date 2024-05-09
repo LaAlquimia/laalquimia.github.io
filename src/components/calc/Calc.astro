@@ -38,6 +38,14 @@ import BaseHead from "../BaseHead.astro";
 >
     <h3>Calculadora de Entradas 1%</h3>
     <div class="flex flex-col space-y-5 mx-5 px-5">
+        
+        <div class="justify-center">
+            <select
+                id="calcSymbol"
+                class="bg-black border border-gray-600 text-gray-200 py-1 px-5 rounded"
+            >
+            </select>
+        </div>
         <div class="flex flex-row space-between justify-between">
             <h4>Tamaño de Cuenta</h4>
             <input
@@ -176,7 +184,32 @@ import BaseHead from "../BaseHead.astro";
         >
 </div>
     <script is:inline>
+        const tickerInfo = async () => {
+            const fetched = await fetch('https://api.bybit.com/v5/market/tickers?category=linear').then(res => res.json())
+            const prices = {}
+            fetched.result.list.map(ticker => {
+                prices[ticker.symbol] = ticker.lastPrice
+            }) 
+            
+            
+        }
+        const updatePrices = async () => {
+            const fetched = await fetch('https://api.bybit.com/v5/market/tickers?category=linear').then(res => res.json())
+            const prices = {}
+            fetched.result.list.map(ticker => {
+                prices[ticker.symbol] = ticker.lastPrice
+                const option = document.createElement('option');
+                option.value = ticker.lastPrice;
+                option.textContent = ticker.symbol;
+                calcSymbol.appendChild(option);
+            }) 
+        }
+        const update = updatePrices()
+        const prices = tickerInfo()
         // function to get the value of an element
+        
+            
+        const calcSymbol = document.getElementById('calcSymbol');
         const accountsize = document.getElementById("accountsize");
         const coinprice = document.getElementById("coinprice");
         const percent = document.getElementById("percent");
@@ -189,6 +222,12 @@ import BaseHead from "../BaseHead.astro";
         coinprice.addEventListener("input", calculate);
         percent.addEventListener("input", calculate);
         leverage.addEventListener("input", calculate);
+        calcSymbol.addEventListener("input",
+            ()=>{               
+                const value = calcSymbol.value
+                coinprice.value = value
+                calculate()
+            });
         function getValue() {
             const accountsize = document.getElementById("accountsize").value;
             const coinprice = Number(
