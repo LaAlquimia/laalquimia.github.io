@@ -40,7 +40,7 @@
                 stakingABI,
                 signer,
             );
-            
+
             checkApproval();
             updateBalance();
         }
@@ -89,31 +89,34 @@
     }
 </script>
 
-<div class="staking-container text-white bg-gray-900 ">
-    {#if !$userInfo.address}
-        <button on:click={handleLogin} class="button">Login</button>
-    {/if}
-
-    {#if $userInfo.address}
-        <p>ALQ Address: {$userInfo.address}</p>
-        <p>ALQ Balance: {$userInfo.balance}</p>
-        <p>ALQ Staked : {$userInfo.staked}</p>
-        <p>ALQ Reward : {$userInfo.rewards}</p>
-
-        {#if !$approved}
-            <button on:click={approve} class="button">Approve ALQ</button>
+<div class="flex flex-col items-center space-y-5 mx-5 px-5 py-5">
+    <div
+        class="shadow-lg px-5  staking-container text-white bg-black max-w-3xl py-5 rounded-xl"
+    >
+        {#if !$userInfo.address}
+            <button on:click={handleLogin} class="button">Login</button>
         {/if}
 
-        {#if $approved}
-            <input
-                class="text-black input"
-                type="string"
-                bind:value={$stakingAmount}
-                placeholder="Amount to stake"
-            />
-            <button on:click={stake} class="button">Stake ALQ</button>
+        {#if $userInfo.address}
+            <p>ALQ Balance: {$userInfo.balance}</p>
+            <p>ALQ Staked : {$userInfo.staked}</p>
+            <p>ALQ Reward : {$userInfo.rewards}</p>
+
+            {#if !$approved}
+                <button on:click={approve} class="button">Approve ALQ</button>
+            {/if}
+
+            {#if $approved}
+                <input
+                    class="text-black input"
+                    type="string"
+                    bind:value={$stakingAmount}
+                    placeholder="Amount to stake"
+                />
+                <button on:click={stake} class="button">Stake ALQ</button>
+            {/if}
         {/if}
-    {/if}
+    </div>
 </div>
 
 <style>
