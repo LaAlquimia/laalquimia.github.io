@@ -82,6 +82,12 @@
         updateBalance();
     }
 
+    async function unstake() {
+        const tx = await stakingContract.unstake();
+        await tx.wait();
+        updateBalance();
+    }
+
     async function handleLogin() {
         if (!$isLoginPersistent) {
             // login();
@@ -91,16 +97,19 @@
 
 <div class="flex flex-col items-center space-y-5 mx-5 px-5 py-5">
     <div
-        class="shadow-lg px-5  staking-container text-white bg-black max-w-3xl py-5 rounded-xl"
-    >
+        class="shadow-lg px-5 staking-container text-white bg-black max-w-3xl py-5 rounded-xl"
+    >   
+            <h3>ALQ STAKING</h3>
+            <h5>20% APR</h5>
         {#if !$userInfo.address}
-            <button on:click={handleLogin} class="button">Login</button>
+            <p> Please connect wallet </p>
         {/if}
 
         {#if $userInfo.address}
             <p>ALQ Balance: {$userInfo.balance}</p>
             <p>ALQ Staked : {$userInfo.staked}</p>
-            <p>ALQ Reward : {$userInfo.rewards}</p>
+            <p>ALQ Reward : </p>
+            <p>{$userInfo.rewards}</p>
 
             {#if !$approved}
                 <button on:click={approve} class="button">Approve ALQ</button>
@@ -113,7 +122,18 @@
                     bind:value={$stakingAmount}
                     placeholder="Amount to stake"
                 />
-                <button on:click={stake} class="button">Stake ALQ</button>
+                <div>
+                    
+                <button on:click={stake} 
+                class="button bg-green-300 hover:bg-green-500 rounded py-1 px-5 my-5 text-black font-black">Stake ALQ</button>
+
+                {#if $userInfo.staked}
+                    <button on:click={unstake} 
+                        class="button bg-red-300 hover:bg-red-500 rounded py-1 px-5 my-5 text-black font-black" 
+                        >Unstake ALQ</button
+                    >
+                {/if}
+                </div>
             {/if}
         {/if}
     </div>
