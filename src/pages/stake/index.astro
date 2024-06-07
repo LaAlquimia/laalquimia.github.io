@@ -1,0 +1,16 @@
+---
+
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import Staking from "../../components/staking/Staking.svelte";
+const  SITE_TITLE = "Stake";
+const SITE_DESCRIPTION = "Stake ALQ EARN Rewards";
+// import '../../../src/styles/global.css';
+
+---
+<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+
+<Header />
+
+<Staking client:only />
