@@ -117,7 +117,7 @@
 
             {#if $approved}
                 <input
-                    class="text-black input"
+                    class="text-black input bg-transparent text-white font-bold text-center "
                     type="string"
                     bind:value={$stakingAmount}
                     placeholder="Amount to stake"
