@@ -17,10 +17,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install, build, and upload site
-        uses: withastro/action@v3
+      - name: Install dependencies
+        run: npm install
 
-      - name: List build output (debugging)
+      - name: Build Astro project
+        run: npm run build
+
+      - name: Debug: List build output
         run: ls -R dist || echo "No dist directory found"
 
       - name: Upload artifact
@@ -28,7 +31,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: astro-build
-          path: dist/ # Verifica si la carpeta es correcta
+          path: dist/
+          retention-days: 1 # Mantiene el artefacto por 1 día
 
   deploy:
     needs: build
@@ -43,7 +47,7 @@ jobs:
           name: astro-build
           path: dist/
 
-      - name: List downloaded files (debugging)
+      - name: Debug: List downloaded files
         run: ls -R dist || echo "No files in dist"
 
       - name: Deploy to GitHub Pages
