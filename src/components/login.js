@@ -29,7 +29,6 @@ export async function login () {
   }
   const blc = await checkTokenBalance(address)
   userInfo.setKey('balance', parseFloat(blc).toFixed(2) )
-  btn.innerText = address.slice(0, 3) + '...' + address.slice(-4)
   // append a button to parent btn container
 
 }
@@ -37,11 +36,12 @@ export async function login () {
 
 
 
-async function logOut () {
+export async function logOut () {
   isLogin.set(false)
   isLoginPersistent.set(false)
+  
   localStorage.removeItem('accountAddress')
-  btn.innerText = 'Login'
+  location.reload()
 }
 
 

@@ -1,7 +1,8 @@
 <script>
     import { userInfo } from "../../store.js";
     import { checkTokenBalance } from "../../scripts/login.js";
-    import { login } from "../login.js";
+    import { login, logOut } from "../login.js";
+    
     const user = localStorage.getItem('accountAddress') || null
     if (user) {
         const balance = checkTokenBalance(user).then((balance) => {
@@ -18,8 +19,10 @@
         {$userInfo.balance} 
     </p>
     <p class="my-auto " >
-        {$userInfo.address.slice(0, 3) + '...' + $userInfo.address.slice(-4)} 
+        {$userInfo.address.slice(0, 4) + '...' + $userInfo.address.slice(-4)} 
     </p>
+    <!-- log out button -->
+     <button id="logout" on:click={logOut}>Log Out</button>
 </nav>
 {/if}
 {#if !$userInfo.address}
