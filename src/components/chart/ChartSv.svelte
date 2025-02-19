@@ -14,7 +14,9 @@
     
     balances = await checkBalances();
     console.log(balances);
-    nftBalance= balances[1];
+    // balance on 1 or 2
+
+    nftBalance= balances[1]  || balances[2];
     console.log(nftBalance);
     
   } catch (error) {
