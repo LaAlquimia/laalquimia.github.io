@@ -45,10 +45,17 @@
   {#each tokenIds as id}
     <div class="bot-card flex-col shadow-xl rounded-xl hover:scale-105 bg-black">
       <a>Bot {botUrl[id-1]}</a>
+      <img
+						src="/images/botMeanRev1.png"
+						class="w-full h-18"
+						alt="tortuga"
+					/>
       {#if balances[id] > 0}
         <a class="green" href="/bot/{botUrl[id-1]}">Entrar</a>
+        
+
       {:else}
-        <a class="red" href="{openseaLink}/{id}" target="_blank">Comprar en OpenSea</a>
+        <a class="red" href="{openseaLink}/{id}" target="_blank">Conseguir en OpenSea</a>
       {/if}
     </div>
   {/each}
