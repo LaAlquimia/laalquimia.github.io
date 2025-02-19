@@ -2,7 +2,9 @@ import { ethers } from "ethers";
 
 const contractAddress = "0xd78be833ed889929b50d2ad3ab7ba94f76a9a8bf";
 const tokenIds = [1,2,3];
-const botUrl = [ `meanRev`,`meanRev`,`meanRev`]
+const botUrl = [ `meanRev`,`BinanceMeanRev`,`TraderBot`] ;
+const botNames = [ `Bybit Mean Rev`,`Binance Mean Rev`,`Trader`] ;
+const botImages = [ `botMeanRev1.png`, `BinanceMRBot.png`, `TraderBot.png`] ;
 const openseaLink = `https://opensea.io/assets/base/${contractAddress}`;
 const rpcUrl = `https://0xrpc.io/base`
 const abi = [
@@ -37,4 +39,4 @@ export async function checkBalances() {
   }
 }
 
-export { tokenIds, openseaLink, botUrl };
+export { tokenIds, openseaLink, botUrl, botNames, botImages };

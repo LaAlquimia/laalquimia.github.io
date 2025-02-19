@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { checkBalances, tokenIds, botUrl, openseaLink } from "./botBalance.js";
+  import { checkBalances, tokenIds, botUrl, openseaLink, botNames, botImages } from "./botBalance.js";
 
   let balances = {};
 
@@ -43,10 +43,15 @@
 
 <div class="bot-container pt-10 pb-10">
   {#each tokenIds as id}
-    <div class="bot-card flex-col shadow-xl rounded-xl hover:scale-105 bg-black">
-      <a>Bot {botUrl[id-1]}</a>
+    <a class="bot-card flex-col shadow-xl rounded-xl hover:scale-105 bg-black"
+    href="/bot/{botUrl[id-1]}">
+      <a href="/bot/{botUrl[id-1]}"
+        class="text-center text-lg font-bold"
+      >
+        Bot {botNames[id-1]}
+      </a>
       <img
-						src="/images/botMeanRev1.png"
+						src="/images/{botImages[id-1]}"
 						class="w-full h-18"
 						alt="tortuga"
 					/>
@@ -57,6 +62,6 @@
       {:else}
         <a class="red" href="{openseaLink}/{id}" target="_blank">Conseguir en OpenSea</a>
       {/if}
-    </div>
+    </a>
   {/each}
 </div>
