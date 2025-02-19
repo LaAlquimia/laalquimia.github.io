@@ -8,6 +8,7 @@
     import { checkBalances } from "../bots/botBalance.js";
     let balances = {};
     let nftBalance ;
+    let nft2Balance ;
     onMount(async () => {
   try {
     console.log("Iniciando el selector de bots");
@@ -16,7 +17,8 @@
     console.log(balances);
     // balance on 1 or 2
 
-    nftBalance= balances[1]  || balances[2];
+    nftBalance= balances[1] 
+    nft2Balance= balances[2]
     console.log(nftBalance);
     
   } catch (error) {
@@ -27,7 +29,7 @@
 </script>
 
 <!-- if  -->
-{#if  nftBalance > 0}
+{#if  nftBalance > 0 || nft2Balance > 0}
 
 <div class="pb-3 px-3 text-gray-200 w-full lg:flex ">
     <div class="bg-black lg:w-3/5 my-3 rounded-xl mx-3">
