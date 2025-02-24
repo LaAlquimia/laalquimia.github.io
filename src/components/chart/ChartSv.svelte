@@ -53,8 +53,7 @@
                     <option value="ETCUSDT">ETCUSDT</option>
                     </select>
     
-                    <select
-                        id="intervalSelector"
+                    <select id="intervalSelector"
                         class="bg-black border border-gray-600 text-gray-200 py-1 px-5 rounded"
                     >
                         <option value="1">1m</option>
@@ -72,6 +71,7 @@
                         <option value="W">1W</option>
                     </select>
                 </div>
+                <!-- aqui van las configuraciones y los agregados  -->
                 <h5 class="text-[#1412b0ae] px-5 ">
                     ema 59
                 </h5>
