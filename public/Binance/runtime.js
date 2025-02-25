@@ -63,7 +63,7 @@ const runFunction = () => {
 
   analyzeCoins();
 
-  // setInterval(loopFunction, 60000);  
+  setInterval(loopFunction, 60000);  
 
 };
 
