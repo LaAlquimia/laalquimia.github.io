@@ -2,6 +2,11 @@
 
 
 
+const BinanceApi = 'https://fapi.binance.com/'
+const marketInfo = 'fapi/v1/exchangeInfo'
+const h24Ticker = 'fapi/v1/ticker/24hr'
+
+
 function calculateRSI(closes, period) {
   const rsis = [];
   const gains = [];
@@ -37,7 +42,6 @@ function calculateRSI(closes, period) {
 
 
 
-
 const tradeableCoins = async () => {
   const coinsResponse = await fetch('https://api.bybit.com/v5/market/instruments-info?category=linear')
 
@@ -47,8 +51,10 @@ const tradeableCoins = async () => {
   return coins
 }
 const analyzeCoins = async () => {
-  const coins = await tradeableCoins()
-  const results = await Promise.all(coins.map(async coin => await fetchKline(coin)))
+  console.log("Binance");
+  
+  const coins = await BinanceTradeableCoins()
+  const results = await Promise.all(coins.map(async coin => await FetchBinaceKline(coin)))
   const positiveDF = results.filter(({ EMA_dist }) => EMA_dist > 0).sort((a, b) => b.EMA_dist - a.EMA_dist)
   const negativeDF = results.filter(({ EMA_dist }) => EMA_dist < 0).sort((a, b) => a.EMA_dist - b.EMA_dist)
   
@@ -64,7 +70,7 @@ const convertirDatos = (datos) => {
     low: parseFloat(arr[3]),
     close: parseFloat(arr[4]),
     volume: parseFloat(arr[5])
-  })).reverse()
+  }));
 }
 const fetchTickers = async () => {
   const response = await fetch('https://api.bybit.com//v5/market/tickers?category=linear')
@@ -72,6 +78,55 @@ const fetchTickers = async () => {
   tickers = data.result.list
   return data.result.list
 }
+
+// Fetch Binance market info
+const BinanceTradeableCoins = async () => {
+  const coinsResponse = await fetch(BinanceApi + marketInfo )
+  const data = await coinsResponse.json()
+  const symbols = data.symbols
+  const coins = symbols.filter(coin => coin.status === 'TRADING').map(coin => coin.symbol)
+  return coins
+}
+
+const fetchBinanceMarketInfo = async () => {
+  const response = await fetch(BinanceApi + marketInfo)
+  const data = await response.json()
+  const symbols = data.symbols
+  const tickerResponse = await fetch(BinanceApi + h24Ticker)
+  const tickerData = await tickerResponse.json()
+  // console.log(tickerData)
+  binanceMarketInfo = symbols
+  tickers = tickerData
+  return symbols
+}
+
+const FetchBinaceKline = async (symbol) => {
+  const url = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m`
+  const response = await fetch(url)
+  const data = await response.json()
+  const kline = data
+  const numericValues = kline.map(entry => parseFloat(entry[1]))
+  const ema = EMA(numericValues.reverse(), 59)
+  const emaDist = ((numericValues[0] - ema[0]) / numericValues[0]) * 100
+  signals(kline, symbol, emaDist);
+  // console.log(kline);
+  
+  const price24hPcnt = parseFloat(
+    tickers.find(ticker => ticker.symbol === symbol)?.priceChangePercent || 0
+  ).toFixed(2);
+
+
+  // console.log(price24hPcnt);
+  
+  return { symbol, EMA_dist: emaDist, price24hPcnt }
+  
+  
+}
+
+
+
+
+
 const fetchKline = async (symbol) => {
   const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=1`
   const response = await fetch(url)
@@ -82,24 +137,10 @@ const fetchKline = async (symbol) => {
   const emaDist = ((numericValues[0] - ema[0]) / numericValues[0]) * 100
   signals(kline, symbol, emaDist)
   const price24hPcnt = (parseFloat(tickers.find(ticker => ticker.symbol === symbol).price24hPcnt) * 100).toFixed(2)
+
+  
   return { symbol, EMA_dist: emaDist, price24hPcnt }
 }
-
-
-// binance Kline
-const fetchKlineBinance = async (symbol) => {
-  const url = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m`
-  const response = await fetch(url)
-  const data = await response.json()
-  const kline = data.map(entry => entry[1])
-  const numericValues = kline.map(entry => parseFloat(entry))
-  const ema = EMA(numericValues, 59)
-  const emaDist = ((numericValues[0] - ema[0]) / numericValues[0]) * 100
-  signals(kline, symbol, emaDist)
-  const price24hPcnt = (parseFloat(tickers.find(ticker => ticker.symbol === symbol).price24hPcnt) * 100).toFixed(2)
-  return { symbol, EMA_dist: emaDist, price24hPcnt }
-}
-
 const fetchKlineDev = async (symbol) => {
   const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=1&limit=200`
   const response = await fetch(url)

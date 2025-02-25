@@ -81,6 +81,7 @@ const fetchKline = async (symbol) => {
   const ema = EMA(numericValues, 59)
   const emaDist = ((numericValues[0] - ema[0]) / numericValues[0]) * 100
   signals(kline, symbol, emaDist)
+  console.log(kline);
   const price24hPcnt = (parseFloat(tickers.find(ticker => ticker.symbol === symbol).price24hPcnt) * 100).toFixed(2)
   return { symbol, EMA_dist: emaDist, price24hPcnt }
 }

@@ -43,7 +43,7 @@
             </span>
             <span class="py-3 font-bold">
                 <div class="flex-row md:flex px-3 justify-between py-3 px-5">
-                    <h4 class="">BYBIT</h4>
+                    <h4 class="">BINANCE </h4>
                     <select
                         id="symbolSelector"
                         class="bg-black border border-gray-600 text-gray-200 py-1 px-5 rounded"
@@ -123,12 +123,11 @@
         src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js"
     ></script>
     
-    <script data-is-inline src="/scripts/fetcher.js"></script>
     <script data-is-inline src="/notification.js"></script>
-    <script data-is-inline src="/scripts/handler.js"></script>
-    <script data-is-inline src="/scripts/notification.js"></script>
-    <script data-is-inline src="/scripts/runtime.js"></script>
-    <script data-is-inline src="/scripts/graph/graph.js"></script>
+    <script data-is-inline src="/Binance/fetcher.js"></script>
+    <script data-is-inline src="/Binance/handler.js"></script>
+    <script data-is-inline src="/Binance/runtime.js"></script>
+    <script data-is-inline src="/Binance/graph/graph.js"></script>
 
     <script
     data-is-inline

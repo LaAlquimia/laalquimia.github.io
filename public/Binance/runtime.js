@@ -10,9 +10,10 @@ var volumeSeries = null;
 var longSymbols = [];
 var shortSymbols = [];
 var tickers = null;
+var binanceMarketInfo = null;
 var signal_count = null;
-var interval = '1';
-var gSymbol = 'BTCUSDT';
+var interval = '1m';
+var gSymbol = 'BTCUSDT'
 
 const set_symbol = (symbol) => {
   gSymbol = symbol;
@@ -37,17 +38,19 @@ const loopFunction = () => {
   graph(series, currentSymbol, emaSeries, volumeSeries);
 }
 const runFunction = () => {
-  graphSeries('BTCUSDT');
   const symbolSelector = document.getElementById('symbolSelector');
 
-  fetchTickers().then((tickers) => {
+  fetchBinanceMarketInfo().then((tickers) => {
     tickers.forEach((ticker) => {
       const option = document.createElement('option');
       option.value = ticker.symbol;
       option.textContent = ticker.symbol;
       symbolSelector.appendChild(option);
     });
+    
+    graphSeries('BTCUSDT'); 
   });
+  
 
   symbolSelector.addEventListener('change', async (event) => {
     const selectedSymbol = event.target.value;
@@ -59,7 +62,8 @@ const runFunction = () => {
   });
 
   analyzeCoins();
-  setInterval(loopFunction, 60000);  
+
+  // setInterval(loopFunction, 60000);  
 
 };
 
