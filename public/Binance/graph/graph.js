@@ -129,7 +129,10 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
       },
   });
 
-  chart.priceScale('right').applyOptions({ autoScale: true });
+  chart.priceScale('right').applyOptions({ 
+    autoScale: true,
+    minimumWidth: 180
+  });
   chart.timeScale().scrollToPosition(20, false);
 
   volumeSeries.setData(volumeData);
@@ -248,9 +251,11 @@ const graphSeries = async (symbol) => {
   
       rightPriceScale: {
         borderColor: '#D1D4DC',
+        minimumWidth: 180,
       },
       layout: {
         fontSize: 24,
+        fontFamily: 'Courier New, monospace',
         background: {
           type: 'solid',
           color: '#000',
@@ -302,14 +307,17 @@ const graphSeries = async (symbol) => {
     emaSeries = chart.addLineSeries({
       color: 'rgba(74, 80, 191, 0.569)',
       lineWidth: 2,
+      lastValueVisible: false,
     });
     umbSeries = chart.addLineSeries({
       color: 'rgba(191, 150, 74, 0.569)',
       lineWidth: 2,
+      lastValueVisible: false,
     });
     umbSeries2 = chart.addLineSeries({
       color: 'rgba(74, 191, 113, 0.569)',
       lineWidth: 2,
+      lastValueVisible: false,
     });
     volumeSeries = chart.addHistogramSeries({
       color: '#26a69984',
@@ -317,6 +325,7 @@ const graphSeries = async (symbol) => {
         type: 'volume',
       },
       priceScaleId: '',
+      lastValueVisible: false,
     });    
     chart.priceScale('').applyOptions({
       scaleMargins: {
