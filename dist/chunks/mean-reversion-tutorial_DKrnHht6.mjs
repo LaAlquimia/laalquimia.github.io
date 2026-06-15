@@ -1,0 +1,12 @@
+const id = "mean-reversion-tutorial.md";
+						const collection = "blog";
+						const slug = "mean-reversion-tutorial";
+						const body = "\n\n\nLa reversión a la media es una teoría financiera que sugiere que los precios de los activos\neventualmente volverán a su media o promedio a largo plazo.\n\n### Concepto\nEste concepto se basa en la creencia de que los precios de los activos y\nlos rendimientos históricos tenderán hacia un promedio a largo plazo con el tiempo.\n\n#### Ejemplo \n\n![blog placeholder](/images/short.png)\n\n\n### Estadística \nCuanto mayor sea la desviación de esta media, mayor será la probabilidad de\nque el precio del activo se acerque a ella en el futuro\n\n\n### Porcentajes \n\nUna vez que tenemos la media móvil, podemos calcular la distancia del\nprecio actual a la media y compararlo con la distancia del precio actual a la media móvil. Si el\nprecio actual está por\nencima de la media móvi entonces hay una mayor probabilidad de que el precio baje a la media móvil.\n\n\n#### Media móvil\n\n![blog placeholder](/images/movingAverage.png)\n\n### Distancia a la media \n\n\nFinalmente si calculamos la diferencia entre el ultimo precio de apertura y\nla media móvil y obtenemos un porcentaje de este valor en funcion de el precio.\n\nTenemos una fácil manera de saber si el precio actual está por encima o por\ndebajo de la media movil en una magnitud conocida por el trader.\n\n### Tabulado de datos \n\nsi este proceso lo hacemos para todas las monedas disponibles en un intercambio y tabulamos en dos tablas la información de mayor a menor en las distancias positivas y negativas. \n\n#### Tablas\n\n![blog placeholder](/images/table.png)\n\n### Gráfico \nEl gráfico nos permite ver la evolución de la media movil y el porcentaje\nde la distancia del precio actual a la media movil.\n\n\n#### Ejemplo Gráfico\n![blog placeholder](/images/graph.png)\n\n\nEl valor expresado en la marca de agua es el porcentaje de la distancia al ultimo precio de apertura.";
+						const data = {title:"Tutorial  Mean Reversion",description:"Tutorial de cómo usar la estrategia de reversión a la media en los mercados de futuros.",pubDate:new Date(1707541200000),heroImage:"/images/short.png"};
+						const _internal = {
+							type: 'content',
+							filePath: "/Users/laalquimia/Projects/laalquimia.github.io/src/content/blog/mean-reversion-tutorial.md",
+							rawData: undefined,
+						};
+
+export { _internal, body, collection, data, id, slug };

@@ -4,57 +4,86 @@ import { SITE_TITLE } from '../consts';
 import Balance from './balance/Balance.svelte';
 ---
 
-<header  class="sticky top-0 z-10 w-full bg-gray-700 text-gray-100">
+<header class="sticky top-0 z-50 w-full glass-header">
 	<nav>
-		<h2 class="hover:scale-105"><a class="font-black " href="/">{SITE_TITLE}</a></h2>		
+		<h2 class="brand-title"><a href="/">{SITE_TITLE}</a></h2>		
 		<div class="internal-links">
 			<HeaderLink href="/">Home</HeaderLink>
 			<HeaderLink href="/blog">Blog</HeaderLink>
 			<HeaderLink href="/bot">Bot</HeaderLink>
-			<HeaderLink href="/stake">Stake</HeaderLink>
+			<!-- <HeaderLink href="/stake">Stake</HeaderLink> -->
 		</div>
 		<div class="social-links">
 			<Balance client:only/>		
 		</div>
 	</nav>
 </header>
-<style>
-	header {
-		margin: 0;
-		padding: 0 1em;
-		box-shadow: 0 2px 8px rgba(var(--black), 5%);
-	}
-	h2 {
-		margin: 0;
-		font-size: 1em;
-	}
 
-	h2 a,
-	h2 a.active {
+<style>
+	.glass-header {
+		margin: 0;
+		padding: 0 1.5em;
+		background: rgba(11, 15, 25, 0.7);
+		backdrop-filter: blur(16px) saturate(180%);
+		-webkit-backdrop-filter: blur(16px) saturate(180%);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+	}
+	.brand-title {
+		margin: 0;
+		font-size: 1.25rem;
+		font-weight: 800;
+	}
+	.brand-title a {
+		background: linear-gradient(120deg, #fff 40%, #40cde0 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
 		text-decoration: none;
 	}
 	nav {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		max-width: 1200px;
+		margin: 0 auto;
+		height: 70px;
 	}
-	nav a {
-		padding: 1em 0.5em;
-		color: var(--black);
-		border-bottom: 4px solid transparent;
-		text-decoration: none;
-	}
-	nav a.active {
-		text-decoration: none;
-		border-bottom-color: var(--accent);
-	}
-	.social-links,
-	.social-links a {
+	.internal-links {
 		display: flex;
+		gap: 1.5rem;
+	}
+	nav :global(a) {
+		padding: 0.5rem 0.75rem;
+		color: rgba(255, 255, 255, 0.7);
+		text-decoration: none;
+		font-weight: 600;
+		font-size: 0.95rem;
+		border-radius: 8px;
+		transition: all 0.3s ease;
+	}
+	nav :global(a:hover) {
+		color: #fff;
+		background: rgba(255, 255, 255, 0.05);
+	}
+	nav :global(a.active) {
+		color: #40cde0;
+		background: rgba(64, 205, 224, 0.1);
+		border: 1px solid rgba(64, 205, 224, 0.2);
+	}
+	.social-links {
+		display: flex;
+		align-items: center;
 	}
 	@media (max-width: 720px) {
 		.social-links {
 			display: none;
+		}
+		.internal-links {
+			gap: 0.75rem;
+		}
+		nav :global(a) {
+			font-size: 0.85rem;
+			padding: 0.4rem 0.6rem;
 		}
 	}
 </style>

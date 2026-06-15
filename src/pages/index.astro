@@ -12,75 +12,77 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 	</head>
 	<body>
 		<Header />
-		<!-- div principal -->
-		<div class="block overflow-hidden text-center">
-			<div class="block text-center">
-				<div
-					class="flex hover:scale-105 flex-col items-center justify-center py-5 md:py-10 md:flex-row md:items-center md:justify-center"
-				>
-					<!-- imagen -->
+		
+		<main class="py-12 px-4 max-w-5xl mx-auto space-y-12">
+			<!-- Hero section inside liquid glass card -->
+			<div class="liquid-glass-card flex flex-col md:flex-row items-center justify-between gap-8 p-8 md:p-12">
+				<div class="flex-1 text-left space-y-4">
+					<h1 class="text-5xl md:text-6xl font-black tracking-tight">La Alquimia</h1>
+					<h3 class="text-xl md:text-2xl text-cyan-400 font-semibold">Algorithmic Trading 🐢</h3>
+					<p class="text-gray-300 text-lg leading-relaxed max-w-xl">
+						Desarrollo de sistemas de trading avanzados y automatizados utilizando las mejores estrategias cuantitativas.
+					</p>
+					<div class="pt-4 flex gap-4">
+						<a href="/bot" class="button bg-cyan-500/20 hover:bg-cyan-500/30 border-cyan-500/30 text-cyan-400 font-bold px-6 py-3 rounded-xl transition-all">Ver Bots 🤖</a>
+						<!-- <a href="/stake" class="button font-bold px-6 py-3 rounded-xl transition-all">Staking ALQ 💰</a> -->
+					</div>
+				</div>
+				<div class="flex-1 flex justify-center">
 					<img
 						src="/images/rightlaptop.webp"
-						class="w-1/3 `m`d:w-1/3 hover:scale-110"
-						alt="tortuga"
-					/>
-					<!-- texto -->
-					<div>
-						<h2 class="md:pl-4 font-black text-5xl hover:scale-110" >La Alquimia</h2>
-
-						<h4 class="md:pl-4  hover:scale-105 ">Algorithmic Trading 🐢</h4>
-					</div>
-				</div>
-			</div>
-
-			<div class="block text-center">
-				<div
-					class="hover:scale-110 flex flex-col items-center justify-center pt-5 md:flex-row md:items-center md:justify-center"
-				>
-					<div>
-						<h2 class="md:pl-4 text-5xl font-bold hover:scale-105 ">Spot & Futures</h2>
-
-						<h4 class="md:pl-4 hover:scale-105  ">Strategies for trade</h4>
-					</div>
-					<img
-						src="/images/diamondturtle.png"
-						class="w-1/3 md:w-1/3"
-						alt="tortuga"
+						class="w-full max-w-xs md:max-w-sm hover:scale-105 transition-transform duration-500 filter drop-shadow-[0_0_25px_rgba(64,205,224,0.2)]"
+						alt="laptop"
 					/>
 				</div>
 			</div>
 
-			<div class="block text-center hover:scale-105">
-				<div
-					class="flex flex-col items-center justify-center py-5 md:py-20 md:flex-row md:items-center md:justify-center"
-				>
-					<!-- imagen -->
-					<img
-						src="/images/tortugacadenas.png"
-						class="w-1/3 `m`d:w-1/3 hover:scale-110"
-						alt="tortuga"
-					/>
-					<!-- texto -->
-					<div>
-						<h2 class="md:pl-4 text-5xl hover:scale-110">
-							Best Trading Bots 🤖
-						</h2>
+			<!-- Grid features with liquid glass -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<!-- Spot & Futures Card -->
+				<div class="liquid-glass-card flex flex-col justify-between p-8 gap-6">
+					<div class="space-y-3">
+						<h2 class="text-3xl font-bold">Spot & Futures</h2>
+						<h4 class="text-cyan-400 font-semibold text-lg">Strategies for trade</h4>
+						<p class="text-gray-400">
+							Ejecución precisa de algoritmos adaptados para mercados spot y de futuros, maximizando retornos y controlando riesgos.
+						</p>
+					</div>
+					<div class="flex justify-center pt-4">
+						<img
+							src="/images/diamondturtle.png"
+							class="h-44 object-contain hover:rotate-3 transition-transform duration-300 filter drop-shadow-[0_0_15px_rgba(165,177,244,0.15)]"
+							alt="diamond turtle"
+						/>
+					</div>
+				</div>
 
-						<h4 class="md:pl-4 hover:scale-110">
-							Python and JavaScript
-						</h4>
+				<!-- Best Trading Bots Card -->
+				<div class="liquid-glass-card flex flex-col justify-between p-8 gap-6">
+					<div class="space-y-3">
+						<h2 class="text-3xl font-bold">Best Trading Bots 🤖</h2>
+						<h4 class="text-cyan-400 font-semibold text-lg">Python and JavaScript</h4>
+						<p class="text-gray-400">
+							Nuestros sistemas están construidos sobre infraestructuras rápidas y seguras que corren 24/7 de forma ininterrumpida.
+						</p>
+					</div>
+					<div class="flex justify-center pt-4">
+						<img
+							src="/images/tortugacadenas.png"
+							class="h-44 object-contain hover:scale-105 transition-transform duration-300"
+							alt="tortuga cadenas"
+						/>
 					</div>
 				</div>
 			</div>
 
-			<div
-				class="flex flex-col items-center justify-center py-10 md:flex-row md:items-center md:justify-center"
-			>
-				<h2 class="md:pl-4 text-5xl text-center mx-10">
-					Trade Algorithms for futures contracts
+			<!-- Banner Section -->
+			<div class="liquid-glass-card text-center p-8 md:p-12">
+				<h2 class="text-3xl md:text-4xl max-w-3xl mx-auto leading-snug">
+					Algoritmos de trading diseñados profesionalmente para contratos de futuros.
 				</h2>
 			</div>
-		</div>
+		</main>
+
 		<Footer />
 	</body>
 </html>

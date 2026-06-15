@@ -59,22 +59,28 @@ const isLoginValue = isLogin.get();
 
 <style>
 	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
+		padding: 4em 1.5em 5em 1.5em;
+		background: rgba(11, 15, 25, 0.5);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border-top: 1px solid rgba(255, 255, 255, 0.05);
+		color: rgba(255, 255, 255, 0.5);
 		text-align: center;
+		font-size: 0.95rem;
 	}
 	.social-links {
 		display: flex;
 		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
+		gap: 1.5em;
+		margin-top: 1.5em;
 	}
 	.social-links a {
 		text-decoration: none;
-		color: rgb(var(--gray));
+		color: rgba(255, 255, 255, 0.5);
+		transition: all 0.3s ease;
 	}
 	.social-links a:hover {
-		color: rgb(var(--gray-dark));
+		color: #40cde0;
+		transform: translateY(-2px);
 	}
 </style>

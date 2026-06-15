@@ -1,0 +1,28 @@
+import { a as createComponent, r as renderTemplate, m as maybeRenderHead, u as unescapeHTML } from './astro_DKsuLc-H.mjs';
+import 'kleur/colors';
+import 'clsx';
+
+const html = "<p>La reversión a la media es una teoría financiera que sugiere que los precios de los activos\neventualmente volverán a su media o promedio a largo plazo.</p>\n<h3 id=\"concepto\">Concepto</h3>\n<p>Este concepto se basa en la creencia de que los precios de los activos y\nlos rendimientos históricos tenderán hacia un promedio a largo plazo con el tiempo.</p>\n<h4 id=\"ejemplo\">Ejemplo</h4>\n<p><img src=\"/images/short.png\" alt=\"blog placeholder\"></p>\n<h3 id=\"estadística\">Estadística</h3>\n<p>Cuanto mayor sea la desviación de esta media, mayor será la probabilidad de\nque el precio del activo se acerque a ella en el futuro</p>\n<h3 id=\"porcentajes\">Porcentajes</h3>\n<p>Una vez que tenemos la media móvil, podemos calcular la distancia del\nprecio actual a la media y compararlo con la distancia del precio actual a la media móvil. Si el\nprecio actual está por\nencima de la media móvi entonces hay una mayor probabilidad de que el precio baje a la media móvil.</p>\n<h4 id=\"media-móvil\">Media móvil</h4>\n<p><img src=\"/images/movingAverage.png\" alt=\"blog placeholder\"></p>\n<h3 id=\"distancia-a-la-media\">Distancia a la media</h3>\n<p>Finalmente si calculamos la diferencia entre el ultimo precio de apertura y\nla media móvil y obtenemos un porcentaje de este valor en funcion de el precio.</p>\n<p>Tenemos una fácil manera de saber si el precio actual está por encima o por\ndebajo de la media movil en una magnitud conocida por el trader.</p>\n<h3 id=\"tabulado-de-datos\">Tabulado de datos</h3>\n<p>si este proceso lo hacemos para todas las monedas disponibles en un intercambio y tabulamos en dos tablas la información de mayor a menor en las distancias positivas y negativas.</p>\n<h4 id=\"tablas\">Tablas</h4>\n<p><img src=\"/images/table.png\" alt=\"blog placeholder\"></p>\n<h3 id=\"gráfico\">Gráfico</h3>\n<p>El gráfico nos permite ver la evolución de la media movil y el porcentaje\nde la distancia del precio actual a la media movil.</p>\n<h4 id=\"ejemplo-gráfico\">Ejemplo Gráfico</h4>\n<p><img src=\"/images/graph.png\" alt=\"blog placeholder\"></p>\n<p>El valor expresado en la marca de agua es el porcentaje de la distancia al ultimo precio de apertura.</p>";
+
+				const frontmatter = {"title":"Tutorial  Mean Reversion","description":"Tutorial de cómo usar la estrategia de reversión a la media en los mercados de futuros.","pubDate":"Feb 10 2024","heroImage":"/images/short.png"};
+				const file = "/Users/laalquimia/Projects/laalquimia.github.io/src/content/blog/mean-reversion-tutorial.md";
+				const url = undefined;
+				function rawContent() {
+					return "\n\n\nLa reversión a la media es una teoría financiera que sugiere que los precios de los activos\neventualmente volverán a su media o promedio a largo plazo.\n\n### Concepto\nEste concepto se basa en la creencia de que los precios de los activos y\nlos rendimientos históricos tenderán hacia un promedio a largo plazo con el tiempo.\n\n#### Ejemplo \n\n![blog placeholder](/images/short.png)\n\n\n### Estadística \nCuanto mayor sea la desviación de esta media, mayor será la probabilidad de\nque el precio del activo se acerque a ella en el futuro\n\n\n### Porcentajes \n\nUna vez que tenemos la media móvil, podemos calcular la distancia del\nprecio actual a la media y compararlo con la distancia del precio actual a la media móvil. Si el\nprecio actual está por\nencima de la media móvi entonces hay una mayor probabilidad de que el precio baje a la media móvil.\n\n\n#### Media móvil\n\n![blog placeholder](/images/movingAverage.png)\n\n### Distancia a la media \n\n\nFinalmente si calculamos la diferencia entre el ultimo precio de apertura y\nla media móvil y obtenemos un porcentaje de este valor en funcion de el precio.\n\nTenemos una fácil manera de saber si el precio actual está por encima o por\ndebajo de la media movil en una magnitud conocida por el trader.\n\n### Tabulado de datos \n\nsi este proceso lo hacemos para todas las monedas disponibles en un intercambio y tabulamos en dos tablas la información de mayor a menor en las distancias positivas y negativas. \n\n#### Tablas\n\n![blog placeholder](/images/table.png)\n\n### Gráfico \nEl gráfico nos permite ver la evolución de la media movil y el porcentaje\nde la distancia del precio actual a la media movil.\n\n\n#### Ejemplo Gráfico\n![blog placeholder](/images/graph.png)\n\n\nEl valor expresado en la marca de agua es el porcentaje de la distancia al ultimo precio de apertura.";
+				}
+				function compiledContent() {
+					return html;
+				}
+				function getHeadings() {
+					return [{"depth":3,"slug":"concepto","text":"Concepto"},{"depth":4,"slug":"ejemplo","text":"Ejemplo"},{"depth":3,"slug":"estadística","text":"Estadística"},{"depth":3,"slug":"porcentajes","text":"Porcentajes"},{"depth":4,"slug":"media-móvil","text":"Media móvil"},{"depth":3,"slug":"distancia-a-la-media","text":"Distancia a la media"},{"depth":3,"slug":"tabulado-de-datos","text":"Tabulado de datos"},{"depth":4,"slug":"tablas","text":"Tablas"},{"depth":3,"slug":"gráfico","text":"Gráfico"},{"depth":4,"slug":"ejemplo-gráfico","text":"Ejemplo Gráfico"}];
+				}
+
+				const Content = createComponent((result, _props, slots) => {
+					const { layout, ...content } = frontmatter;
+					content.file = file;
+					content.url = url;
+
+					return renderTemplate`${maybeRenderHead()}${unescapeHTML(html)}`;
+				});
+
+export { Content, compiledContent, Content as default, file, frontmatter, getHeadings, rawContent, url };

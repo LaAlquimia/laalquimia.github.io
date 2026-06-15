@@ -1,0 +1,17 @@
+---
+import TraderChartSv from "./TraderChartSv.svelte"
+import Toolbar from "../toolbar/ToolBar.astro"
+import Calc from "../calc/Calc.astro"
+---
+<TraderChartSv client:only="svelte">
+    
+    <Toolbar/>
+
+</TraderChartSv>
+
+<Calc />
+
+<script
+    is:inline
+    src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js"
+></script>

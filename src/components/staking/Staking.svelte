@@ -95,44 +95,62 @@
     }
 </script>
 
-<div class="flex flex-col items-center space-y-5 mx-5 px-5 py-5">
-    <div
-        class="shadow-lg px-5 staking-container text-white bg-black max-w-3xl py-5 rounded-xl"
-    >   
-            <h3>ALQ STAKING</h3>
-            <h5>20% APR</h5>
+<div class="py-12 px-4 max-w-lg mx-auto">
+    <div class="liquid-glass-card w-full p-8 text-center space-y-6">   
+        <div>
+            <h2 class="text-3xl font-extrabold tracking-tight">ALQ STAKING</h2>
+            <h5 class="text-cyan-400 font-bold mt-1 text-lg">20% APR</h5>
+        </div>
+
         {#if !$userInfo.address}
-            <p> Please connect wallet </p>
+            <div class="p-6 bg-red-500/10 border border-red-500/20 rounded-xl">
+                <p class="text-red-400 m-0 font-medium">Please connect your wallet to stake ALQ</p>
+            </div>
         {/if}
 
         {#if $userInfo.address}
-            <p>ALQ Balance: {$userInfo.balance}</p>
-            <p>ALQ Staked : {$userInfo.staked}</p>
-            <p>ALQ Reward : </p>
-            <p>{$userInfo.rewards}</p>
+            <div class="grid grid-cols-2 gap-4 text-left border-y border-white/5 py-6 my-4">
+                <div class="space-y-1">
+                    <span class="text-xs uppercase text-gray-500 tracking-wider font-semibold">ALQ Balance</span>
+                    <p class="text-xl font-bold text-white">{$userInfo.balance || '0.00'}</p>
+                </div>
+                <div class="space-y-1">
+                    <span class="text-xs uppercase text-gray-500 tracking-wider font-semibold">ALQ Staked</span>
+                    <p class="text-xl font-bold text-white">{$userInfo.staked || '0.00'}</p>
+                </div>
+                <div class="col-span-2 space-y-1 pt-3 border-t border-white/5">
+                    <span class="text-xs uppercase text-gray-500 tracking-wider font-semibold">Earned Rewards</span>
+                    <p class="text-2xl font-extrabold text-emerald-400">{$userInfo.rewards || '0.00'}</p>
+                </div>
+            </div>
 
             {#if !$approved}
-                <button on:click={approve} class="button">Approve ALQ</button>
+                <button on:click={approve} class="button w-full bg-cyan-500/20 hover:bg-cyan-500/30 border-cyan-500/30 text-cyan-400 py-3 rounded-xl font-bold transition-all">
+                    Approve ALQ
+                </button>
             {/if}
 
             {#if $approved}
-                <input
-                    class="text-black input bg-transparent text-white font-bold text-center "
-                    type="string"
-                    bind:value={$stakingAmount}
-                    placeholder="Amount to stake"
-                />
-                <div>
-                    
-                <button on:click={stake} 
-                class="button bg-green-300 hover:bg-green-500 rounded py-1 px-5 my-5 text-black font-black">Stake ALQ</button>
+                <div class="space-y-4">
+                    <input
+                        class="w-full text-center font-bold text-lg"
+                        type="text"
+                        bind:value={$stakingAmount}
+                        placeholder="Amount to stake"
+                    />
+                    <div class="flex gap-4">
+                        <button on:click={stake} 
+                            class="button flex-1 bg-cyan-500/20 hover:bg-cyan-500/30 border-cyan-500/30 text-cyan-400 py-3 rounded-xl font-bold transition-all">
+                            Stake ALQ
+                        </button>
 
-                {#if $userInfo.staked}
-                    <button on:click={unstake} 
-                        class="button bg-red-300 hover:bg-red-500 rounded py-1 px-5 my-5 text-black font-black" 
-                        >Unstake ALQ</button
-                    >
-                {/if}
+                        {#if $userInfo.staked && parseFloat($userInfo.staked) > 0}
+                            <button on:click={unstake} 
+                                class="button flex-1 bg-red-500/20 hover:bg-red-500/30 border-red-500/30 text-red-400 py-3 rounded-xl font-bold transition-all">
+                                Unstake ALQ
+                            </button>
+                        {/if}
+                    </div>
                 </div>
             {/if}
         {/if}
