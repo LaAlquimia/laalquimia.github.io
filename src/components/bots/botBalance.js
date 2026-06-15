@@ -31,10 +31,6 @@ async function getWorkingProvider() {
 }
 
 export async function checkBalances() {
-  if (!window.ethereum) {
-    console.error("MetaMask no detectado");
-    return {};
-  }
 
   try {
     const provider = await getWorkingProvider();

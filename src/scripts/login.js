@@ -1,8 +1,27 @@
 // En login.js
 
 import { ethers } from 'ethers';
+const bscRpcUrls = [
+  "https://bsc-dataseed.binance.org",
+  "https://binance.llamarpc.com",
+  "https://rpc.ankr.com/bsc"
+];
+
+async function getBscProvider() {
+  for (let rpc of bscRpcUrls) {
+    try {
+      const provider = new ethers.JsonRpcProvider(rpc);
+      await provider.getBlockNumber();
+      return provider;
+    } catch (e) {
+      console.warn(`BSC RPC failed: ${rpc}`, e.message);
+    }
+  }
+  throw new Error("No BSC RPC available");
+}
+
 // Definir la función checkTokenBalance
-async function checkTokenBalance( holderAddress) {
+async function checkTokenBalance(holderAddress) {
     const abi = [
         // Método para obtener el saldo del token para una dirección específica
         {
@@ -14,23 +33,19 @@ async function checkTokenBalance( holderAddress) {
         }
       ];
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const provider = await getBscProvider();
       
       // Crear una instancia del contrato del token
       const tokenAddress = '0x4b48c0db4e460c894bfc031d602a5c3b57a26857';  
-      const tokenContract = new ethers.Contract(tokenAddress, abi, signer);
+      const tokenContract = new ethers.Contract(tokenAddress, abi, provider);
       
       // Llamar al método balanceOf para obtener el saldo del token
-      const bal= await tokenContract.balanceOf(holderAddress);
+      const bal = await tokenContract.balanceOf(holderAddress);
       const balance = ethers.formatUnits(bal, 18);
-      console.log(balance);
-    // 18 decimales para Ethereum
+      console.log("ALQ balance on BSC:", balance);
       return balance;
-      // Manejar el saldo aquí, por ejemplo, mostrarlo en la interfaz de usuario
     } catch (error) {
-      console.error('Error:', error);
-      // Manejar errores
+      console.error('Error fetching BSC token balance:', error);
     }
 }
 
