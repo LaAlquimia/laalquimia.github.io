@@ -174,9 +174,9 @@
         src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js"
     ></script>
     
-    <script data-is-inline src="/scripts/fetcher.js"></script>
+    <script data-is-inline src="/scripts/fetcher.js?v=3"></script>
     <script data-is-inline src="/notification.js"></script>
-    <script data-is-inline src="/scripts/handler.js"></script>
+    <script data-is-inline src="/scripts/handler.js?v=3"></script>
     <script data-is-inline src="/scripts/notification.js"></script>
     <script data-is-inline src="/scripts/runtime.js"></script>
     <script data-is-inline src="/scripts/graph/graph.js"></script>

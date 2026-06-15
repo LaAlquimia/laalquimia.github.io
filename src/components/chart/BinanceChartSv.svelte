@@ -175,8 +175,8 @@
     ></script>
     
     <script data-is-inline src="/notification.js"></script>
-    <script data-is-inline src="/Binance/fetcher.js"></script>
-    <script data-is-inline src="/Binance/handler.js"></script>
+    <script data-is-inline src="/Binance/fetcher.js?v=3"></script>
+    <script data-is-inline src="/Binance/handler.js?v=3"></script>
     <script data-is-inline src="/Binance/runtime.js"></script>
     <script data-is-inline src="/Binance/graph/graph.js"></script>
 

@@ -55,34 +55,38 @@ const BinanceTradeableCoins = async () => {
 }
 
 const updateProgressBar = (current, total) => {
-  let bar = document.getElementById('loading-bar-container');
-  let label = document.getElementById('loading-bar-label');
-  if (!bar) {
+  let container = document.getElementById('loading-bar-wrapper');
+  if (!container) {
     const parent = document.getElementById('tables');
     if (!parent) return;
-    
-    label = document.createElement('div');
+
+    container = document.createElement('div');
+    container.id = 'loading-bar-wrapper';
+    container.style.cssText = 'width: 100%; height: 18px; margin-top: -4px; margin-bottom: 8px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; transition: opacity 0.3s ease;';
+
+    const label = document.createElement('div');
     label.id = 'loading-bar-label';
-    label.style.cssText = 'font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 4px; font-weight: 500; display: flex; justify-content: space-between; width: 100%;';
+    label.style.cssText = 'font-size: 9px; color: rgba(255,255,255,0.4); font-weight: 500; display: flex; justify-content: space-between; width: 100%; line-height: 1;';
     label.innerHTML = '<span>Cargando datos históricos...</span><span id="loading-bar-text">0%</span>';
     
-    bar = document.createElement('div');
+    const bar = document.createElement('div');
     bar.id = 'loading-bar-container';
-    bar.style.cssText = 'width: 100%; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-bottom: 15px; overflow: hidden; position: relative;';
+    bar.style.cssText = 'width: 100%; height: 2px; background: rgba(255,255,255,0.05); border-radius: 1px; overflow: hidden; position: relative;';
     
     const fill = document.createElement('div');
     fill.id = 'loading-bar-fill';
     fill.style.cssText = 'height: 100%; background: linear-gradient(90deg, #40cde0, #a5b1f4); width: 0%; transition: width 0.2s ease;';
     bar.appendChild(fill);
     
+    container.appendChild(label);
+    container.appendChild(bar);
+
     // Insert right after the Filters header
     const firstChild = parent.firstElementChild;
     if (firstChild && firstChild.nextSibling) {
-      parent.insertBefore(label, firstChild.nextSibling);
-      parent.insertBefore(bar, firstChild.nextSibling.nextSibling);
+      parent.insertBefore(container, firstChild.nextSibling);
     } else {
-      parent.appendChild(label);
-      parent.appendChild(bar);
+      parent.appendChild(container);
     }
   }
   
@@ -96,12 +100,10 @@ const updateProgressBar = (current, total) => {
     
     if (current >= total) {
       setTimeout(() => {
-        if (bar) bar.style.display = 'none';
-        if (label) label.style.display = 'none';
+        if (container) container.style.opacity = '0';
       }, 1500);
     } else {
-      bar.style.display = 'block';
-      label.style.display = 'flex';
+      container.style.opacity = '1';
     }
   }
 };

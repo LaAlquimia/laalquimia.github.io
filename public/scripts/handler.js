@@ -63,28 +63,55 @@ const clearSignals = (symbol) => {
 
 
 const populateTable = (tableId, data) => {
-  const tableBody = document.getElementById(tableId).getElementsByTagName('tbody')[0];
-  tableBody.innerHTML = '';
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const tableBody = table.getElementsByTagName('tbody')[0];
+  if (!tableBody) return;
 
-  data.forEach(({ symbol, EMA_dist, price24hPcnt }) => {
-    const row = tableBody.insertRow();
+  // Adjust number of rows
+  while (tableBody.rows.length < data.length) {
+    const row = document.createElement('tr');
     row.classList.add('cellrow');
-    const cell1 = row.insertCell(0);
-    const cell2 = row.insertCell(1);
-    const cell3 = row.insertCell(2);
+    row.style.cursor = 'pointer';
+    
+    const cell1 = document.createElement('td');
+    const cell2 = document.createElement('td');
+    const cell3 = document.createElement('td');
+    
+    row.appendChild(cell1);
+    row.appendChild(cell2);
+    row.appendChild(cell3);
+    tableBody.appendChild(row);
+  }
+
+  while (tableBody.rows.length > data.length) {
+    tableBody.deleteRow(tableBody.rows.length - 1);
+  }
+
+  // Update cell values in place
+  data.forEach(({ symbol, EMA_dist, price24hPcnt }, index) => {
+    const row = tableBody.rows[index];
+    const cell1 = row.cells[0];
+    const cell2 = row.cells[1];
+    const cell3 = row.cells[2];
+
     cell1.textContent = symbol;
-    row.onclick = () => {
-      graph(series, symbol, emaSeries, volumeSeries)
-      document.getElementById('symbolSelector').value = symbol
-    };
     cell2.textContent = `${EMA_dist.toFixed(2)}%`;
     cell3.textContent = `${price24hPcnt}%`;
-    row.style.cursor = 'pointer';
-    if (0 < price24hPcnt) {
+
+    if (price24hPcnt > 0) {
       cell3.className = 'positive';
     } else {
       cell3.className = 'negative';
     }
+
+    row.onclick = () => {
+      graph(series, symbol, emaSeries, volumeSeries);
+      const symbolSelector = document.getElementById('symbolSelector');
+      if (symbolSelector) {
+        symbolSelector.value = symbol;
+      }
+    };
   });
 };
 document.getElementById('intervalSelector').addEventListener('change', function() {
