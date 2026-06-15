@@ -54,6 +54,58 @@ const BinanceTradeableCoins = async () => {
   }
 }
 
+const updateProgressBar = (current, total) => {
+  let bar = document.getElementById('loading-bar-container');
+  let label = document.getElementById('loading-bar-label');
+  if (!bar) {
+    const parent = document.getElementById('tables');
+    if (!parent) return;
+    
+    label = document.createElement('div');
+    label.id = 'loading-bar-label';
+    label.style.cssText = 'font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 4px; font-weight: 500; display: flex; justify-content: space-between; width: 100%;';
+    label.innerHTML = '<span>Cargando datos históricos...</span><span id="loading-bar-text">0%</span>';
+    
+    bar = document.createElement('div');
+    bar.id = 'loading-bar-container';
+    bar.style.cssText = 'width: 100%; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-bottom: 15px; overflow: hidden; position: relative;';
+    
+    const fill = document.createElement('div');
+    fill.id = 'loading-bar-fill';
+    fill.style.cssText = 'height: 100%; background: linear-gradient(90deg, #40cde0, #a5b1f4); width: 0%; transition: width 0.2s ease;';
+    bar.appendChild(fill);
+    
+    // Insert right after the Filters header
+    const firstChild = parent.firstElementChild;
+    if (firstChild && firstChild.nextSibling) {
+      parent.insertBefore(label, firstChild.nextSibling);
+      parent.insertBefore(bar, firstChild.nextSibling.nextSibling);
+    } else {
+      parent.appendChild(label);
+      parent.appendChild(bar);
+    }
+  }
+  
+  const fill = document.getElementById('loading-bar-fill');
+  const labelText = document.getElementById('loading-bar-text');
+  
+  if (fill && labelText) {
+    const pct = Math.min(100, Math.round((current / total) * 100));
+    fill.style.width = pct + '%';
+    labelText.textContent = `${current}/${total} (${pct}%)`;
+    
+    if (current >= total) {
+      setTimeout(() => {
+        if (bar) bar.style.display = 'none';
+        if (label) label.style.display = 'none';
+      }, 1500);
+    } else {
+      bar.style.display = 'block';
+      label.style.display = 'flex';
+    }
+  }
+};
+
 const initWebSocket = async () => {
   if (ws) {
     try {
@@ -153,6 +205,8 @@ const initWebSocket = async () => {
     // 3. Fetch historical klines in the background slowly (1 coin every 2000ms)
     // This runs asynchronously in the background and does not block the WebSocket or the UI
     (async () => {
+      let loadedHistoryCount = 0;
+      updateProgressBar(0, topCoins.length);
       for (const symbol of topCoins) {
         try {
           const url = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m&limit=150`;
@@ -182,6 +236,9 @@ const initWebSocket = async () => {
         } catch (e) {
           console.error(`Error loading history for ${symbol}:`, e);
         }
+        loadedHistoryCount++;
+        updateProgressBar(loadedHistoryCount, topCoins.length);
+        analyzeCoins();
         // Sleep 2000ms between calls to guarantee we don't trigger the API rate limit on startup
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
@@ -192,7 +249,7 @@ const initWebSocket = async () => {
     console.error("Error initializing WebSocket scanner:", error);
     setTimeout(initWebSocket, 10000);
   }
-}
+};
 
 const analyzeCoins = async () => {
   console.log("Binance (WS-backed Scanner)");

@@ -46,16 +46,93 @@ const tradeableCoins = async () => {
   const coins = coinsData.result.list.filter(coin => coin.status === 'Trading').map(coin => coin.symbol)
   return coins
 }
-const analyzeCoins = async () => {
-  const coins = await tradeableCoins()
-  const results = await Promise.all(coins.map(async coin => await fetchKline(coin)))
-  const positiveDF = results.filter(({ EMA_dist }) => EMA_dist > 0).sort((a, b) => b.EMA_dist - a.EMA_dist)
-  const negativeDF = results.filter(({ EMA_dist }) => EMA_dist < 0).sort((a, b) => a.EMA_dist - b.EMA_dist)
+const updateProgressBar = (current, total) => {
+  let bar = document.getElementById('loading-bar-container');
+  let label = document.getElementById('loading-bar-label');
+  if (!bar) {
+    const parent = document.getElementById('tables');
+    if (!parent) return;
+    
+    label = document.createElement('div');
+    label.id = 'loading-bar-label';
+    label.style.cssText = 'font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 4px; font-weight: 500; display: flex; justify-content: space-between; width: 100%;';
+    label.innerHTML = '<span>Escaneando mercado...</span><span id="loading-bar-text">0%</span>';
+    
+    bar = document.createElement('div');
+    bar.id = 'loading-bar-container';
+    bar.style.cssText = 'width: 100%; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-bottom: 15px; overflow: hidden; position: relative;';
+    
+    const fill = document.createElement('div');
+    fill.id = 'loading-bar-fill';
+    fill.style.cssText = 'height: 100%; background: linear-gradient(90deg, #40cde0, #a5b1f4); width: 0%; transition: width 0.2s ease;';
+    bar.appendChild(fill);
+    
+    // Insert right after the Filters header
+    const firstChild = parent.firstElementChild;
+    if (firstChild && firstChild.nextSibling) {
+      parent.insertBefore(label, firstChild.nextSibling);
+      parent.insertBefore(bar, firstChild.nextSibling.nextSibling);
+    } else {
+      parent.appendChild(label);
+      parent.appendChild(bar);
+    }
+  }
   
-  populateTable('positiveTable', positiveDF.slice(0, 10))
+  const fill = document.getElementById('loading-bar-fill');
+  const labelText = document.getElementById('loading-bar-text');
+  
+  if (fill && labelText) {
+    const pct = Math.min(100, Math.round((current / total) * 100));
+    fill.style.width = pct + '%';
+    labelText.textContent = `${current}/${total} (${pct}%)`;
+    
+    if (current >= total) {
+      setTimeout(() => {
+        if (bar) bar.style.display = 'none';
+        if (label) label.style.display = 'none';
+      }, 1500);
+    } else {
+      bar.style.display = 'block';
+      label.style.display = 'flex';
+    }
+  }
+};
 
-  populateTable('negativeTable', negativeDF.slice(0, 10))
-}
+const analyzeCoins = async () => {
+  const coins = await tradeableCoins();
+  const total = coins.length;
+  let current = 0;
+  const results = [];
+
+  const updateTables = () => {
+    const positiveDF = results.filter(({ EMA_dist }) => EMA_dist > 0).sort((a, b) => b.EMA_dist - a.EMA_dist);
+    const negativeDF = results.filter(({ EMA_dist }) => EMA_dist < 0).sort((a, b) => a.EMA_dist - b.EMA_dist);
+    populateTable('positiveTable', positiveDF.slice(0, 10));
+    populateTable('negativeTable', negativeDF.slice(0, 10));
+  };
+
+  updateProgressBar(0, total);
+
+  // Process in batches of 10
+  const batchSize = 10;
+  for (let i = 0; i < coins.length; i += batchSize) {
+    const batch = coins.slice(i, i + batchSize);
+    await Promise.all(
+      batch.map(async (coin) => {
+        try {
+          const res = await fetchKline(coin);
+          results.push(res);
+        } catch (e) {
+          console.error(`Error scanning ${coin}:`, e);
+        } finally {
+          current++;
+        }
+      })
+    );
+    updateProgressBar(current, total);
+    updateTables();
+  }
+};
 const convertirDatos = (datos) => {
   return datos.map(arr => ({
     time: parseInt(parseFloat(arr[0]) / 1000),
