@@ -81,25 +81,10 @@ const fetchKline = async (symbol) => {
   const ema = EMA(numericValues, 59)
   const emaDist = ((numericValues[0] - ema[0]) / numericValues[0]) * 100
   signals(kline, symbol, emaDist)
+  console.log(kline);
   const price24hPcnt = (parseFloat(tickers.find(ticker => ticker.symbol === symbol).price24hPcnt) * 100).toFixed(2)
   return { symbol, EMA_dist: emaDist, price24hPcnt }
 }
-
-
-// binance Kline
-const fetchKlineBinance = async (symbol) => {
-  const url = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m`
-  const response = await fetch(url)
-  const data = await response.json()
-  const kline = data.map(entry => entry[1])
-  const numericValues = kline.map(entry => parseFloat(entry))
-  const ema = EMA(numericValues, 59)
-  const emaDist = ((numericValues[0] - ema[0]) / numericValues[0]) * 100
-  signals(kline, symbol, emaDist)
-  const price24hPcnt = (parseFloat(tickers.find(ticker => ticker.symbol === symbol).price24hPcnt) * 100).toFixed(2)
-  return { symbol, EMA_dist: emaDist, price24hPcnt }
-}
-
 const fetchKlineDev = async (symbol) => {
   const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=1&limit=200`
   const response = await fetch(url)
