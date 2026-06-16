@@ -1,15 +1,12 @@
 ---
-import TraderChartSv from "./TraderChartSv.svelte"
-import Toolbar from "../toolbar/ToolBar.astro"
-import Calc from "../calc/Calc.astro"
+import TraderChartSv from "./TraderChartSv.svelte";
+import Toolbar from "../toolbar/ToolBar.astro";
+import Calc from "../calc/Calc.astro";
 ---
+
 <TraderChartSv client:only="svelte">
-    
-    <Toolbar/>
-
+    <Toolbar />
 </TraderChartSv>
-
-<Calc />
 
 <script
     is:inline
