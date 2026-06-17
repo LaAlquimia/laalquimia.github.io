@@ -217,11 +217,41 @@
     }
   }
 
-  async function fetchKlines(symbol, interval, limit = 200) {
-    const response = await fetch(`https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=${limit}`);
-    const data = await response.json();
-    if (!data.result || !data.result.list) return [];
-    return data.result.list.map(arr => ({
+  async function fetchKlines(symbol, interval, targetLimit = 200) {
+    let allKlines = [];
+    let endTimestamp = null;
+    let limitRemaining = targetLimit;
+
+    while (limitRemaining > 0) {
+      const fetchLimit = Math.min(limitRemaining, 1000);
+      let url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=${fetchLimit}`;
+      if (endTimestamp) {
+        url += `&end=${endTimestamp}`;
+      }
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (!data.result || !data.result.list || data.result.list.length === 0) break;
+        
+        const list = data.result.list;
+        allKlines = allKlines.concat(list);
+        
+        // El último elemento devuelto es el más antiguo del lote
+        const oldestCandle = list[list.length - 1];
+        const oldestTimeMs = parseInt(oldestCandle[0]);
+        endTimestamp = oldestTimeMs - 1;
+        
+        limitRemaining -= list.length;
+        if (list.length < fetchLimit) {
+          break;
+        }
+      } catch (e) {
+        console.error("Error fetching klines batch", e);
+        break;
+      }
+    }
+
+    return allKlines.map(arr => ({
       time: parseInt(parseFloat(arr[0]) / 1000),
       open: parseFloat(arr[1]),
       high: parseFloat(arr[2]),
@@ -231,7 +261,7 @@
     })).reverse();
   }
 
-  async function fetchOpenInterest(symbol, limit = 5) {
+  async function fetchOpenInterest(symbol, limit = 200) {
     try {
       const response = await fetch(`https://api.bybit.com/v5/market/open-interest?category=linear&symbol=${symbol}&intervalTime=5min&limit=${limit}`);
       const data = await response.json();
@@ -245,9 +275,9 @@
   async function calculateStrategyForCoin(symbol) {
     try {
       const [klines5M, klines1H, oiList] = await Promise.all([
-        fetchKlines(symbol, "5", 100),
-        fetchKlines(symbol, "60", 250),
-        fetchOpenInterest(symbol, 5)
+        fetchKlines(symbol, "5", 2000),
+        fetchKlines(symbol, "60", 500),
+        fetchOpenInterest(symbol, 200)
       ]);
 
       if (klines5M.length < 50 || klines1H.length < 210) return null;
@@ -258,21 +288,45 @@
       const ema200_1H = EMA(closePrices1H, 200);
       const bb_1H = BollingerBands(closePrices1H, 20, 2);
 
-      const last1HClose = closePrices1H[closePrices1H.length - 1];
-      const lastEma50_1H = ema50_1H[ema50_1H.length - 1];
-      const lastEma200_1H = ema200_1H[ema200_1H.length - 1];
-      const lastBB_1H = bb_1H[bb_1H.length - 1];
-      const prevBB_1H = bb_1H[bb_1H.length - 2];
-
-      // Calculate historical bandwidths to get the 20th percentile
+      // Calcular percentil 20 de ancho de banda históricamente
       const bandwidths = bb_1H.map(b => b.bandwidth).slice(20);
       bandwidths.sort((a, b) => a - b);
       const percentile20 = bandwidths[Math.floor(bandwidths.length * 0.2)] || 0;
 
-      const macroDirection = lastEma50_1H > lastEma200_1H;
-      const macroSupport = last1HClose > lastEma200_1H;
-      const macroAntiChoppy = lastBB_1H.bandwidth > prevBB_1H.bandwidth || lastBB_1H.bandwidth > percentile20;
-      const macroEnabled = macroDirection && macroSupport && macroAntiChoppy;
+      // Mapear filtros macro de 1H por timestamp
+      const macroMap = {};
+      for (let j = 0; j < klines1H.length; j++) {
+        const time1H = klines1H[j].time;
+        const close1H = closePrices1H[j];
+        const ema50 = ema50_1H[j];
+        const ema200 = ema200_1H[j];
+        const bb = bb_1H[j];
+        const prevBB = j > 0 ? bb_1H[j - 1] : bb;
+
+        const macroDirection = ema50 > ema200;
+        const macroSupport = close1H > ema200;
+        const macroAntiChoppy = bb.bandwidth > prevBB.bandwidth || bb.bandwidth > percentile20;
+        const macroEnabled = macroDirection && macroSupport && macroAntiChoppy;
+
+        macroMap[time1H] = {
+          macroDirection,
+          macroSupport,
+          macroAntiChoppy,
+          macroEnabled,
+          bandwidth: bb.bandwidth,
+          bandwidthPrev: prevBB.bandwidth,
+          bandwidthP20: percentile20
+        };
+      }
+
+      // Mapear Open Interest
+      const oiMap = {};
+      if (oiList && oiList.length > 0) {
+        for (let j = 0; j < oiList.length; j++) {
+          const oiTime = Math.floor(parseInt(oiList[j].timestamp) / 1000 / 300) * 300;
+          oiMap[oiTime] = parseFloat(oiList[j].openInterest);
+        }
+      }
 
       // 2. 5M Trigger Metrics
       const closePrices5M = klines5M.map(k => k.close);
@@ -283,7 +337,7 @@
       const smaVol20 = SMA(volumes5M, 20);
       const atr5M = ATR(klines5M, 14);
 
-      // Construct vectors for Spread, Delta, Acceleration, Score
+      // Vectores de Spread, Delta, Aceleración, Score y RVOL
       const spreads = [];
       for (let i = 0; i < klines5M.length; i++) {
         spreads.push(ema20_5M[i] - ema50_5M[i]);
@@ -311,64 +365,110 @@
         }
       }
 
-      // RVOL
-      const lastVol = volumes5M[volumes5M.length - 1];
-      const lastSmaVol20 = smaVol20[smaVol20.length - 1];
-      const rvol = lastSmaVol20 !== 0 ? lastVol / lastSmaVol20 : 0;
+      const rvols = [];
+      for (let i = 0; i < klines5M.length; i++) {
+        const vol = volumes5M[i];
+        const sma = smaVol20[i];
+        rvols.push(sma !== 0 ? vol / sma : 0);
+      }
 
-      // Open Interest
-      const oiCurrent = oiList && oiList[0] ? parseFloat(oiList[0].openInterest) : 0;
-      const oiPrev = oiList && oiList[1] ? parseFloat(oiList[1].openInterest) : 0;
-      const oiChangePct = oiPrev !== 0 ? ((oiCurrent - oiPrev) / oiPrev) * 100 : 0;
+      // Escaneo histórico de señales en el array cargado (últimos ~6.9 días)
+      const historicalSignals = [];
+      for (let i = 50; i < klines5M.length; i++) {
+        const t = klines5M[i].time;
+        const currentPrice = closePrices5M[i];
+        const currentAtr = atr5M[i];
+        const ema20Val = ema20_5M[i];
+        const rvolVal = rvols[i];
+        
+        // Mapear macro correspondiente (1H)
+        const hourTime = Math.floor(t / 3600) * 3600;
+        const macroInfo = macroMap[hourTime] || { macroEnabled: false };
 
-      // Current values
+        const spreadVal = spreads[i];
+        const deltaVal = deltas[i];
+        const deltaPrevVal = deltas[i - 1];
+        const accelVal = accelerations[i];
+        const scoreVal = scores[i];
+        const scorePrevVal = scores[i - 1];
+
+        const oiCurrentVal = oiMap[t] || 0;
+        const oiPrevVal = oiMap[t - 300] || 0;
+
+        const cond_macro = macroInfo.macroEnabled;
+        const cond_giro = deltaVal > 0 && deltaPrevVal < 0;
+        const cond_inercia = accelVal > 0;
+        const cond_momentum = scoreVal > 0 && scoreVal > scorePrevVal;
+        const cond_price = currentPrice > ema20Val;
+        const cond_rvol = rvolVal > 1.5;
+        
+        // Para datos históricos lejanos (> 16 horas), el OI no estará disponible.
+        // Damos fallback a true si no tenemos datos de OI históricos para esa vela.
+        const hasOI = oiCurrentVal > 0 && oiPrevVal > 0;
+        const cond_oi = hasOI ? (oiCurrentVal > oiPrevVal) : true;
+
+        if (cond_macro && cond_giro && cond_inercia && cond_momentum && cond_price && cond_rvol && cond_oi) {
+          historicalSignals.push({
+            symbol,
+            time: t,
+            price: currentPrice,
+            score: scoreVal,
+            rvol: rvolVal,
+            timestamp: new Date(t * 1000).toLocaleString('es-ES', { 
+              day: '2-digit', 
+              month: '2-digit', 
+              hour: '2-digit', 
+              minute: '2-digit',
+              second: '2-digit' 
+            })
+          });
+        }
+      }
+
+      // Valores del estado actual (último vela)
       const len = klines5M.length;
-      const spread = spreads[len - 1];
-      const delta = deltas[len - 1];
-      const deltaPrev = deltas[len - 2];
-      const acceleration = accelerations[len - 1];
-      const score = scores[len - 1];
-      const scorePrev = scores[len - 2];
-
-      const currentPrice = closePrices5M[len - 1];
-      const currentAtr = atr5M[len - 1];
-      const sl = currentPrice - (currentAtr * 1.5);
-
-      // Check signal
-      let signal = "NEUTRAL";
+      const lastPrice = closePrices5M[len - 1];
+      const lastAtr = atr5M[len - 1];
+      const sl = lastPrice - (lastAtr * 1.5);
       
-      const cond_macro = macroEnabled;
-      const cond_giro = delta > 0 && deltaPrev < 0;
-      const cond_inercia = acceleration > 0;
-      const cond_momentum = score > 0 && score > scorePrev;
-      const cond_price = currentPrice > ema20_5M[len - 1];
-      const cond_rvol = rvol > 1.5;
-      const cond_oi = oiCurrent > oiPrev;
+      const lastHourTime = Math.floor(klines5M[len - 1].time / 3600) * 3600;
+      const lastMacro = macroMap[lastHourTime] || {
+        macroDirection: false,
+        macroSupport: false,
+        bandwidth: 0,
+        bandwidthPrev: 0,
+        bandwidthP20: 0,
+        macroAntiChoppy: false,
+        macroEnabled: false
+      };
 
-      if (cond_macro && cond_giro && cond_inercia && cond_momentum && cond_price && cond_rvol && cond_oi) {
+      // Verificar señal en vela actual para UI principal
+      let signal = "NEUTRAL";
+      const newestSignal = historicalSignals.find(s => s.time === klines5M[len - 1].time);
+      if (newestSignal) {
         signal = "LONG 🟢";
       }
 
       return {
         symbol,
-        price: currentPrice,
-        spread,
-        delta,
-        deltaPrev,
-        acceleration,
-        score,
-        scorePrev,
-        rvol,
-        oiCurrent,
-        oiPrev,
-        oiChangePct,
-        macroDirection,
-        macroSupport,
-        macroBandwidth: lastBB_1H.bandwidth,
-        macroBandwidthPrev: prevBB_1H.bandwidth,
-        macroBandwidthP20: percentile20,
-        macroAntiChoppy,
-        macroEnabled,
+        price: lastPrice,
+        spread: spreads[len - 1],
+        delta: deltas[len - 1],
+        deltaPrev: deltas[len - 2],
+        acceleration: accelerations[len - 1],
+        score: scores[len - 1],
+        scorePrev: scores[len - 2],
+        rvol: rvols[len - 1],
+        oiCurrent: oiList && oiList[0] ? parseFloat(oiList[0].openInterest) : 0,
+        oiPrev: oiList && oiList[1] ? parseFloat(oiList[1].openInterest) : 0,
+        oiChangePct: oiList && oiList[1] && parseFloat(oiList[1].openInterest) !== 0 ? ((parseFloat(oiList[0].openInterest) - parseFloat(oiList[1].openInterest)) / parseFloat(oiList[1].openInterest)) * 100 : 0,
+        macroDirection: lastMacro.macroDirection,
+        macroSupport: lastMacro.macroSupport,
+        macroBandwidth: lastMacro.bandwidth,
+        macroBandwidthPrev: lastMacro.bandwidthPrev,
+        macroBandwidthP20: lastMacro.bandwidthP20,
+        macroAntiChoppy: lastMacro.macroAntiChoppy,
+        macroEnabled: lastMacro.macroEnabled,
         signal,
         sl,
         ema20: ema20_5M[len - 1],
@@ -377,7 +477,8 @@
           ...k,
           ema20: ema20_5M[idx],
           ema50: ema50_5M[idx]
-        }))
+        })),
+        historicalSignals
       };
     } catch (e) {
       console.error("Error calculating strategy for " + symbol, e);
@@ -414,7 +515,10 @@
 
     activeSymbolData = data;
 
-    // Update charts
+    // Actualizar log de señales con todo el historial encontrado en reversa (más nuevo primero)
+    signalLogs = [...data.historicalSignals].reverse();
+
+    // Actualizar gráfico
     if (chart) {
       const decimals = await getDecimals(selectedSymbol);
       
@@ -436,26 +540,18 @@
         color: k.close >= k.open ? "rgba(38,166,154,0.5)" : "rgba(255,82,82,0.5)"
       })));
 
-      // Add signal marker if long triggered
-      if (data.signal.includes("LONG")) {
-        const logExists = signalLogs.find(l => l.symbol === selectedSymbol && l.time === chartData[chartData.length - 1].time);
-        if (!logExists) {
-          const newSignal = {
-            symbol: selectedSymbol,
-            time: chartData[chartData.length - 1].time,
-            price: data.price,
-            score: data.score,
-            rvol: data.rvol,
-            timestamp: new Date().toLocaleTimeString()
-          };
-          signalLogs = [newSignal, ...signalLogs];
+      // Alerta de voz si hay señal en la última vela
+      const lastCandleTime = chartData[chartData.length - 1].time;
+      const newestSignal = data.historicalSignals.find(s => s.time === lastCandleTime);
+      if (newestSignal) {
+        if (!window.lastSpokenTime || window.lastSpokenTime !== lastCandleTime) {
+          window.lastSpokenTime = lastCandleTime;
           speakAlert(`Alquialerta: Compra en largo detectada en ${selectedSymbol}`);
         }
       }
 
-      // Update markers
-      const symbolSignals = signalLogs.filter(s => s.symbol === selectedSymbol);
-      const markers = symbolSignals.map(s => ({
+      // Dibujar todos los marcadores históricos en el gráfico
+      const markers = data.historicalSignals.map(s => ({
         time: s.time,
         position: 'belowBar',
         color: '#10b981',
@@ -777,18 +873,6 @@
       </div>
     </div>
 
-    <!-- Scanner Progress Bar -->
-    {#if isScanning}
-    <div class="w-full bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
-      <div class="flex justify-between items-center text-xs text-cyan-400 font-semibold">
-        <span>Escaneando el Mercado...</span>
-        <span>{scanProgress} / {scanTotal} Tokens</span>
-      </div>
-      <div class="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
-        <div class="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 transition-all duration-300" style="width: {(scanProgress / scanTotal) * 100}%"></div>
-      </div>
-    </div>
-    {/if}
 
     <!-- Main Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -829,11 +913,16 @@
         </div>
 
         <!-- Scanner / Watchlist -->
-        <div class="glass-card p-6 flex flex-col gap-4">
+        <div class="glass-card p-6 flex flex-col gap-4 relative overflow-hidden">
+          {#if isScanning}
+            <div class="absolute top-0 left-0 w-full h-[3px] bg-black/40">
+              <div class="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 transition-all duration-300" style="width: {(scanProgress / scanTotal) * 100}%"></div>
+            </div>
+          {/if}
           <div class="flex justify-between items-center">
             <h3 class="text-lg font-bold text-gray-200">Scanner Multiactivo</h3>
             <button class="px-4 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all rounded-lg glow-violet" on:click={triggerScan} disabled={isScanning}>
-              {isScanning ? "Escaneando..." : "Escanear Ahora"}
+              {isScanning ? `Escaneando (${scanProgress}/${scanTotal})...` : "Escanear Ahora"}
             </button>
           </div>
           <div class="overflow-x-auto">
