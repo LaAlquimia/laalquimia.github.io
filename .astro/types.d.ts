@@ -136,6 +136,34 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"blog": {
+"cash-carry-risk-management.md": {
+	id: "cash-carry-risk-management.md";
+  slug: "cash-carry-risk-management";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"delta-neutral-arbitrage.md": {
+	id: "delta-neutral-arbitrage.md";
+  slug: "delta-neutral-arbitrage";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"funding-rate-mechanics.md": {
+	id: "funding-rate-mechanics.md";
+  slug: "funding-rate-mechanics";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"futures-spot-hedge.md": {
+	id: "futures-spot-hedge.md";
+  slug: "futures-spot-hedge";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 "linear-regression.md": {
 	id: "linear-regression.md";
   slug: "linear-regression";

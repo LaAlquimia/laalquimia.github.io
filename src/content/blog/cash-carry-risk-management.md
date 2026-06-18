@@ -2,7 +2,7 @@
 title: '🛠️ Guía Práctica de Gestión de Riesgo para Estrategias Cash & Carry en Cripto'
 description: 'Saber ganar dinero es fácil, saber conservarlo es el verdadero arte. Analizamos liquidaciones, desbalanceos, caídas del mercado y el imperativo del margen.'
 pubDate: 'Jun 21 2026'
-heroImage: '/images/emaTendence.png'
+heroImage: '/images/graph.png'
 ---
 # 🛠️ Guía Práctica de Gestión de Riesgo para Estrategias Cash & Carry en Cripto
 

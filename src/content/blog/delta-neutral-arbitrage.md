@@ -2,7 +2,7 @@
 title: '⚖️ Descifrando el Delta Neutral: Cómo Proteger tu Portafolio en Arbitrajes de Tasas'
 description: 'Guía paso a paso sobre el concepto de Delta Neutral, cómo estructurar posiciones perfectas uno a uno y neutralizar por completo el riesgo de precio.'
 pubDate: 'Jun 19 2026'
-heroImage: '/images/emaTendence.png'
+heroImage: '/images/short.png'
 ---
 # ⚖️ Descifrando el Delta Neutral: Cómo Proteger tu Portafolio en Arbitrajes de Tasas
 

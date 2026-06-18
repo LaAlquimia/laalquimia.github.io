@@ -2,7 +2,7 @@
 title: '🐳 Dinámica de las Tasas de Financiación: El Corazón del Mercado de Perpetuos'
 description: 'Explora a fondo cómo funcionan los Funding Rates en Binance, Bybit y dYdX. Aprende a predecir picos de tasas de interés y a explotar sus asimetrías.'
 pubDate: 'Jun 20 2026'
-heroImage: '/images/emaTendence.png'
+heroImage: '/images/movingAverage.png'
 ---
 # 🐳 Dinámica de las Tasas de Financiación: El Corazón del Mercado de Perpetuos
 
