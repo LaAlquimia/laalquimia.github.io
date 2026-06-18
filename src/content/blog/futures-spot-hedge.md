@@ -1,3 +1,9 @@
+---
+title: '💰 Maximizando la Subida: Cómo Usar el Hedge Spot-Futures para Capturar el Funding Rate'
+description: 'Una estrategia avanzada que combina mercados Spot y Futures para mantener una posición neutra al riesgo direccional mientras se genera flujo de caja constante.'
+pubDate: 'Jun 18 2026'
+heroImage: '/images/emaTendence.png'
+---
 # 💰 Maximizando la Subida: Cómo Usar el Hedge Spot-Futures para Capturar el Funding Rate
 
 En el dinámico ecosistema cripto, los traders están constantemente buscando no solo subir de precio (beta), sino también capturar todo tipo de rendimientos disponibles. Una estrategia avanzada que emerge en este contexto es el *hedge* (cobertura) combinando mercados **Spot** y **Futures**. Esta combinación no solo busca exacerbar las ganancias con una subida de precios, sino que le permite generar flujo de caja adicional operando la famosa **Taxa de Financiación (Funding Rate)**.
