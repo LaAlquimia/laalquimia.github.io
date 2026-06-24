@@ -213,6 +213,20 @@ declare module 'astro:content' {
   collection: "blog";
   data: InferEntrySchema<"blog">
 } & { render(): Render[".md"] };
+"uniswap-multichain-mining.md": {
+	id: "uniswap-multichain-mining.md";
+  slug: "uniswap-multichain-mining";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
+"uniswap-v3-l2-impermanent-loss-mitigation.md": {
+	id: "uniswap-v3-l2-impermanent-loss-mitigation.md";
+  slug: "uniswap-v3-l2-impermanent-loss-mitigation";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 };
 
 	};
