@@ -2,7 +2,7 @@
 title: 'Medias Móviles en el Trading'
 description: 'Medias Móviles en el Trading: Una Guía Completa.'
 pubDate: 'Mar 1 2024'
-heroImage: '/images/movingAverage.png'
+heroImage: '/images/movingAverage.webp'
 ---
 
 ### Introducción a las Medias Móviles

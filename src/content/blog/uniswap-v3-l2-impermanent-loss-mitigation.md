@@ -2,7 +2,7 @@
 title: '⚡ Guía de Optimización del Impermanent Loss en Pools de Uniswap v3 L2'
 description: 'La clave para el éxito en multi-chain no es solo cobrar comisiones, es mitigar el Impermanent Loss. Descubre las herramientas de cobertura necesarias.'
 pubDate: 'Jun 23 2026'
-heroImage: '/images/arbitrum-base-pool.jpg'
+heroImage: '/images/arbitrum-base-pool.webp'
 ---
 # ⚡ Guía de Optimización del Impermanent Loss en Pools de Uniswap v3 L2
 
@@ -10,7 +10,7 @@ La introducción de la *liquidez concentrada* en **Uniswap v3** multiplicó el p
 
 En esta guía te enseñamos cómo dominar las dinámicas de Impermanent Loss en pools ultra-estrechos y estables como `USDC/USDT` combinando la velocidad multichain a tu favor.
 
-![Visualización de Estructuras y Rangos de Red](/images/arbitrum-base-pool.jpg)
+![Visualización de Estructuras y Rangos de Red](/images/arbitrum-base-pool.webp)
 
 ## ¿Por qué el IL es diferente en Uniswap v3 y Redes Multi-Chain?
 
@@ -36,7 +36,7 @@ Cuando tu posición va perdiendo balance (acumulando más USDC que USDT) debido 
 Aprovecha redes integradas con dApps programables en L2. Herramientas como **Aperture Finance** te permiten diseñar e implementar automatizaciones nativas en pools estables delegando la ejecución del backend:
 * **Autorebalanceo:** Al cruzar un límite (ej. `0.9992 - 1.0008`), el Smart Contract ejecuta el retiro, balancea con la stablecoin adecuada y re-deposita la liquidez de manera automática.
 
-![Optimización de Data y Flujo](/images/uniswap-chart-analysis.jpg)
+![Optimización de Data y Flujo](/images/uniswap-chart-analysis.webp)
 
 ---
 

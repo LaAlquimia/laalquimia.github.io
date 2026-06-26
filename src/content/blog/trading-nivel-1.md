@@ -2,7 +2,7 @@
 title: 'Trading Nivel 1 | Herramientas de Trading'
 description: ''
 pubDate: 'Apr 21 2024'
-heroImage: '/images/graph.png'
+heroImage: '/images/graph.webp'
 keywords: 'trading, análisis técnico, tendencias de precios, herramientas de trading'
 ---
 # Herramientas para el Trader: Dominando el Arte del Análisis Técnico

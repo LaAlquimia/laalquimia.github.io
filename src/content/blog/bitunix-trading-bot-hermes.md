@@ -2,7 +2,7 @@
 title: '⚡ Guía Paso a Paso: Cómo Crear un Bot de Trading Algorítmico en Bitunix con Python y Hermes'
 description: 'Aprende a estructurar un bot de futuros perpetuos robusto para Bitunix. Analizamos el motor de doble firma SHA-256 en Python y una estrategia agresiva de volumen con grilla TP.'
 pubDate: 'Jun 25 2026'
-heroImage: '/images/TraderBot.png'
+heroImage: '/images/TraderBot.webp'
 ---
 # ⚡ El Arte del Trading Algorítmico: Creando un Bot de Futuros para Bitunix con Python y Hermes
 
@@ -10,7 +10,7 @@ El trading algorítmico en mercados de futuros perpetuos exige rapidez, precisi�
 
 En esta guía técnica analizamos la arquitectura de producción de nuestro repositorio de ejemplo [la-alquimia-bitunix-trading-bot](https://github.com/LaAlquimia/la-alquimia-bitunix-trading-bot), revelando cómo construir un motor de ejecución automatizado que soporte cambios en caliente de estrategias, empleando a nuestro asistente de IA **Hermes** para acelerar el desarrollo y corregir errores complejos.
 
-![Bot de Trading Algorítmico en Bitunix](/images/TraderBot.png)
+![Bot de Trading Algorítmico en Bitunix](/images/TraderBot.webp)
 
 ---
 

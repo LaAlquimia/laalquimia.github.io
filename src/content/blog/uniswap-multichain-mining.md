@@ -2,7 +2,7 @@
 title: '🌾 Liquidity Mining en Uniswap Multi-Chain: Capturando Tasas con Estructuras USDC/USDT'
 description: 'Guía práctica para proveer liquidez en pools estables (USDC/USDT) a través de múltiples redes como Arbitrum, Base, BSC y Monad manejando rangos ultra-estrechos.'
 pubDate: 'Jun 22 2026'
-heroImage: '/images/uniswap-chart-analysis.jpg'
+heroImage: '/images/uniswap-chart-analysis.webp'
 ---
 # 🌾 Liquidity Mining en Uniswap Multi-Chain: Capturando Tasas con Estructuras USDC/USDT
 
@@ -10,7 +10,7 @@ El Liquidity Mining en **Uniswap v3** ha dejado de ser exclusivo de Ethereum Mai
 
 Al utilizar **rangos de precios extremadamente estrechos** en estas redes de bajo costo de transacción, simulamos el comportamiento de un multiplicador de rendimiento masivo, reduciendo a cero el Impermanent Loss direccional y optimizando las comisiones de swap.
 
-![Uniswap Multi-Chain Pro Dashboard](/images/uniswap-chart-analysis.jpg)
+![Uniswap Multi-Chain Pro Dashboard](/images/uniswap-chart-analysis.webp)
 
 ---
 
@@ -30,7 +30,7 @@ Si dejas que la liquidez se distribuya en rangos amplios populares, tu retorno s
 
 Al concentrar la liquidez en este micro-rango, capturas prácticamente el $90\%$ de todas las transacciones del pool. El beneficio de operarlo en redes multi-chain es que, si el pool fluctúa levemente y te "saca de rango" (dejándote temporalmente en $100\%$ de una de las dos monedas), el costo de gas en L2 para retirar, balancear y volver a abrir la posición es de apenas centavos.
 
-![Nodos y Redes Multi-Chain](/images/arbitrum-base-pool.jpg)
+![Nodos y Redes Multi-Chain](/images/arbitrum-base-pool.webp)
 
 ---
 
@@ -47,12 +47,12 @@ Arbitrum concentra la liquidez DeFi más profunda del ecosistema L2. En esta red
 ### 3. BNB Chain (BSC)
 Con transacciones rápidas y baratas, BSC es un ecosistema natural para el trading de stablecoins. Su pool de estables en Uniswap se retroalimenta del constante flujo de remesas, bots de arbitraje de Binance y el volumen masivo de proyectos satélite, garantizando un rendimiento superior si te mantienes activo.
 
-![Infraestructura de Servicios BSC y L2](/images/bsc-bnb-nodes.jpg)
+![Infraestructura de Servicios BSC y L2](/images/bsc-bnb-nodes.webp)
 
 ### 4. Monad (La Nueva Frontera de Ultra-Ejecución Paralela)
 **Monad** marca una revolución histórica al traer ejecución paralela totalmente compatible con la EVM. En Monad, el tiempo de bloque de apenas un segundo y costos virtuales nulos permiten a los traders e instituciones de alta frecuencia (HFT) realizar arbitrajes extremos en milisegundos. En este entorno, los proveedores de liquidez que configuran rangos ultra-estrechos de `USDC/USDT` actúan como verdaderos proveedores de liquidez instantáneos para el mercado de alta velocidad, multiplicando el cobro de tarifas de forma parabólica.
 
-![Consenso de Ultra Alta Velocidad en Monad](/images/monad-ultra-speed.jpg)
+![Consenso de Ultra Alta Velocidad en Monad](/images/monad-ultra-speed.webp)
 
 ---
 

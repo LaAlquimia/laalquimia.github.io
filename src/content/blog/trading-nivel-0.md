@@ -2,7 +2,7 @@
 title: 'Trading Nivel 0 | El Precio'
 description: ''
 pubDate: 'Apr 20 2024'
-heroImage: '/images/graph.png'
+heroImage: '/images/graph.webp'
 keywords: 'trading, análisis técnico, tendencias de precios'
 ---
 ## ¿Qué es el Precio?

@@ -2,7 +2,7 @@
 title: '💰 Maximizando la Subida: Cómo Usar el Hedge Spot-Futures para Capturar el Funding Rate'
 description: 'Una estrategia avanzada que combina mercados Spot y Futures para mantener una posición neutra al riesgo direccional mientras se genera flujo de caja constante.'
 pubDate: 'Jun 18 2026'
-heroImage: '/images/emaTendence.png'
+heroImage: '/images/emaTendence.webp'
 ---
 # 💰 Maximizando la Subida: Cómo Usar el Hedge Spot-Futures para Capturar el Funding Rate
 
