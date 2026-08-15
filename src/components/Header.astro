@@ -76,41 +76,44 @@ import Balance from './balance/Balance.svelte';
 	}
 	@media (max-width: 768px) {
 		.glass-header {
-			padding: 0 0.75rem;
+			padding: 0 1rem;
 		}
 		nav {
-			height: 60px;
-			gap: 0.5rem;
+			height: 64px;
+			gap: 0.75rem;
 		}
 		.brand-title {
-			font-size: 1.05rem;
+			font-size: 1.1rem;
 		}
 		.internal-links {
-			gap: 0.25rem;
+			gap: 0.5rem;
 		}
 		nav :global(a) {
-			font-size: 0.8rem;
-			padding: 0.35rem 0.5rem;
+			font-size: 0.85rem;
+			padding: 0.4rem 0.6rem;
 		}
 		.social-links {
 			display: flex;
-			transform: scale(0.9);
-			transform-origin: right center;
+			align-items: center;
 		}
 	}
 	@media (max-width: 480px) {
 		.glass-header {
-			padding: 0 0.5rem;
+			padding: 0 0.6rem;
+		}
+		nav {
+			height: 58px;
+			gap: 0.35rem;
 		}
 		.brand-title {
 			font-size: 0.95rem;
 		}
-		nav :global(a) {
-			font-size: 0.75rem;
-			padding: 0.25rem 0.35rem;
+		.internal-links {
+			gap: 0.15rem;
 		}
-		.social-links {
-			transform: scale(0.85);
+		nav :global(a) {
+			font-size: 0.78rem;
+			padding: 0.3rem 0.45rem;
 		}
 	}
 </style>
