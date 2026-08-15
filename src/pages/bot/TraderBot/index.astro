@@ -4,18 +4,18 @@ import Header from "../../../components/Header.astro";
 import Footer from "../../../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../../../consts";
 import TraderChart from "../../../components/chart/TraderChart.astro";
-import BotSelector from "../../../components/bots/BotSelector.astro";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Quant Trader V2 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-        <Header />
-        <TraderChart />
+		<Header />
+		<main class="w-full max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-4">
+			<TraderChart />
+		</main>
 		<Footer />
-				
 	</body>
 </html>

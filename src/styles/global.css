@@ -205,10 +205,19 @@ tr:hover td {
 
 /* Chart container */
 .chart {
-	height: 60dvh;
+	min-height: 360px;
+	height: 52vh;
+	max-height: 540px;
 	width: 100%;
-	border-radius: 16px;
+	border-radius: 14px;
 	overflow: hidden;
+}
+
+@media (max-width: 640px) {
+	.chart {
+		min-height: 320px;
+		height: 44vh;
+	}
 }
 
 /* Buttons style */

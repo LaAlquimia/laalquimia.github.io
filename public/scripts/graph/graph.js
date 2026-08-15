@@ -56,13 +56,14 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
         return;
     }
 
+    const isMobile = window.innerWidth < 640;
     chart.applyOptions({
       watermark: {
         visible: true,
-        fontSize: 60,
+        fontSize: isMobile ? 22 : 40,
         horzAlign: 'center',
         vertAlign: 'center',
-        color: 'rgba(87, 112, 181, 0.308)',
+        color: 'rgba(87, 112, 181, 0.25)',
         text: symbol + ' ' + emaDist.toFixed(2) + '%',
       },
       priceFormat: {
@@ -85,9 +86,9 @@ const graph = async (series, symbol, emaSeries, volumeSeries) => {
 
     chart.priceScale('right').applyOptions({
       autoScale: true,
-      minimumWidth: 180
+      minimumWidth: isMobile ? 65 : 85
     });
-    chart.timeScale().scrollToPosition(20, false);
+    chart.timeScale().scrollToPosition(10, false);
     volumeSeries.setData(volumeData);
     umbSeries.setData(umbdata);
     umbSeries2.setData(umbdata2);
@@ -184,43 +185,44 @@ const graphSeries = async (symbol) => {
 
     const moveMin = Math.pow(10, -symbolDecimals).toString();
 
+    const isMobile = window.innerWidth < 640;
     chart = LightweightCharts.createChart(container, {
       width: container.offsetWidth,
       height: container.offsetHeight,
       watermark: {
         visible: true,
-        fontSize: 50,
+        fontSize: isMobile ? 22 : 40,
         horzAlign: 'center',
         vertAlign: 'center',
-        color: 'rgba(171, 71, 188, 0.5)',
+        color: 'rgba(171, 71, 188, 0.35)',
         text: 'La Alquimia',
       },
       timeScale: {
         timeVisible: true,
         autoScale: true,
-        borderColor: '#D1D4DC',
-        rightOffset: 20,
+        borderColor: 'rgba(255,255,255,0.08)',
+        rightOffset: 12,
       },
   
       rightPriceScale: {
-        borderColor: '#D1D4DC',
-        minimumWidth: 180,
+        borderColor: 'rgba(255,255,255,0.08)',
+        minimumWidth: isMobile ? 65 : 85,
       },
       layout: {
-        fontSize: 24,
-        fontFamily: 'Courier New, monospace',
+        fontSize: isMobile ? 11 : 13,
+        fontFamily: 'Outfit, -apple-system, BlinkMacSystemFont, sans-serif',
         background: {
           type: 'solid',
-          color: '#000',
+          color: 'transparent',
         },
-        textColor: '#FFFFFF',
+        textColor: '#cbd5e1',
       },
       grid: {
         horzLines: {
-          color: '#ffffff20',
+          color: 'rgba(255, 255, 255, 0.05)',
         },
         vertLines: {
-          color: '#f0f3fa1a',
+          color: 'rgba(255, 255, 255, 0.03)',
         },
       },
     });

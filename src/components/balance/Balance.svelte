@@ -144,17 +144,17 @@
   <div class="relative inline-block text-left select-none">
     <button
       on:click={() => (showDropdown = !showDropdown)}
-      class="px-4 py-2 bg-gradient-to-r from-gray-900 via-gray-800 to-black border border-gray-700 hover:border-gray-500 text-gray-100 rounded-xl flex items-center space-x-2 shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
+      class="px-2.5 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-gray-900 via-gray-800 to-black border border-gray-700 hover:border-gray-500 text-gray-100 rounded-lg sm:rounded-xl flex items-center space-x-1.5 sm:space-x-2 shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
     >
-      <img src="/favicon.ico" alt="tortuga" class="w-5 h-5 animate-pulse" />
-      <span class="font-semibold text-sm">
+      <img src="/favicon.ico" alt="tortuga" class="w-4 h-4 sm:w-5 sm:h-5 animate-pulse flex-shrink-0" />
+      <span class="font-semibold text-xs sm:text-sm whitespace-nowrap">
         {$userInfo.balance ? `${$userInfo.balance} $ALQ` : "0.00 $ALQ"}
       </span>
-      <span class="text-gray-500 font-bold">|</span>
-      <span class="text-xs font-mono bg-gray-800 px-2 py-0.5 rounded border border-gray-700">
-        {$userInfo.address.slice(0, 5) + "..." + $userInfo.address.slice(-4)}
+      <span class="text-gray-500 font-bold hidden sm:inline">|</span>
+      <span class="text-[10px] sm:text-xs font-mono bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700 whitespace-nowrap">
+        {$userInfo.address.slice(0, 4) + "..." + $userInfo.address.slice(-3)}
       </span>
-      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
       </svg>
     </button>
@@ -164,14 +164,14 @@
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div class="fixed inset-0 z-20" on:click={() => (showDropdown = false)}></div>
 
-      <div class="absolute right-0 mt-2 w-52 bg-gray-950 border border-gray-800 rounded-xl shadow-2xl z-30 overflow-hidden transform origin-top-right transition-all">
+      <div class="absolute right-0 mt-2 w-48 sm:w-52 bg-gray-950 border border-gray-800 rounded-xl shadow-2xl z-30 overflow-hidden transform origin-top-right transition-all">
         <div class="p-3 border-b border-gray-900 bg-gray-900/40">
-          <p class="text-xs text-gray-400">Wallet Conectada</p>
-          <p class="text-xs font-mono text-gray-300 truncate mt-0.5">{$userInfo.address}</p>
+          <p class="text-[11px] sm:text-xs text-gray-400">Wallet Conectada</p>
+          <p class="text-[11px] sm:text-xs font-mono text-gray-300 truncate mt-0.5">{$userInfo.address}</p>
         </div>
         <button
           on:click={disconnect}
-          class="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 flex items-center space-x-2 transition-colors duration-200"
+          class="w-full text-left px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-red-400 hover:bg-red-500/10 flex items-center space-x-2 transition-colors duration-200"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -184,7 +184,7 @@
 {:else}
   <button
     on:click={() => (showModal = true)}
-    class="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95"
+    class="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 whitespace-nowrap"
   >
     Conectar Wallet
   </button>
@@ -199,13 +199,13 @@
   >
     <!-- Contenedor del Modal -->
     <div
-      class="bg-gradient-to-b from-gray-900 to-black border border-gray-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl relative transform scale-100 transition-all duration-300"
+      class="bg-gradient-to-b from-gray-900 to-black border border-gray-800 rounded-2xl w-full max-w-sm p-4 sm:p-6 shadow-2xl relative transform scale-100 transition-all duration-300"
       on:click|stopPropagation
     >
       <!-- Botón de Cerrar -->
       <button
         on:click={() => (showModal = false)}
-        class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+        class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 text-gray-400 hover:text-white transition-colors"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

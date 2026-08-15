@@ -4,18 +4,18 @@ import Header from "../../../components/Header.astro";
 import Footer from "../../../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../../../consts";
 import BinanceChart from "../../../components/chart/BinanceChart.astro";
-import BotSelector from "../../../components/bots/BotSelector.astro";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Binance Mean Reversion | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-        <Header />
-        <BinanceChart />
+		<Header />
+		<main class="w-full max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-4">
+			<BinanceChart />
+		</main>
 		<Footer />
-				
 	</body>
 </html>

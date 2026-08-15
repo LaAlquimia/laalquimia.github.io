@@ -3,19 +3,31 @@ import BaseHead from "../../components/BaseHead.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
-import Chart from "../../components/chart/Chart.astro";
 import BotSelector from "../../components/bots/BotSelector.astro";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Bots de Trading | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-        <Header />
-		<BotSelector />
+		<Header />
+		<main class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+			<div class="text-center mb-8 sm:mb-12">
+				<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/50 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4">
+					<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+					Algoritmos Cuantitativos
+				</div>
+				<h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-3">
+					Bots de Trading
+				</h1>
+				<p class="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto">
+					Monitorea y opera con nuestros algoritmos en tiempo real para Bybit y Binance. Conéctate con tu wallet para acceder a cada estrategia.
+				</p>
+			</div>
+			<BotSelector />
+		</main>
 		<Footer />
-				
 	</body>
 </html>

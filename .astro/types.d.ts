@@ -136,6 +136,13 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"blog": {
+"bitunix-trading-bot-hermes.md": {
+	id: "bitunix-trading-bot-hermes.md";
+  slug: "bitunix-trading-bot-hermes";
+  body: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">
+} & { render(): Render[".md"] };
 "cash-carry-risk-management.md": {
 	id: "cash-carry-risk-management.md";
   slug: "cash-carry-risk-management";

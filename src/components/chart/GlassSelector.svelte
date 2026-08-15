@@ -281,9 +281,15 @@
   .glass-selector-container {
     position: relative;
     display: inline-block;
-    min-width: 160px;
+    min-width: 105px;
     font-family: inherit;
     z-index: 9999;
+  }
+
+  @media (min-width: 640px) {
+    .glass-selector-container {
+      min-width: 140px;
+    }
   }
 
   .hidden-native-select {
@@ -306,13 +312,21 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
     color: #fff;
-    padding: 8px 16px;
-    font-size: 14px;
+    padding: 6px 12px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), 
                 inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    gap: 6px;
+  }
+
+  @media (min-width: 640px) {
+    .glass-trigger {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
   }
 
   .glass-trigger:hover {
@@ -330,6 +344,9 @@
 
   .symbol-label {
     letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .arrow-icon {
@@ -337,6 +354,7 @@
     align-items: center;
     transition: transform 0.3s ease;
     opacity: 0.7;
+    flex-shrink: 0;
   }
 
   .arrow-icon.rotated {
@@ -347,16 +365,17 @@
   /* Liquid Glass Dropdown */
   .glass-dropdown {
     position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
+    top: calc(100% + 6px);
     right: 0;
+    min-width: 160px;
+    max-width: min(280px, calc(100vw - 32px));
     z-index: 99999;
-    background: rgba(15, 20, 35, 0.95);
+    background: rgba(15, 20, 35, 0.96);
     backdrop-filter: blur(20px) saturate(190%);
     -webkit-backdrop-filter: blur(20px) saturate(190%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 14px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5),
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6),
                 inset 0 1px 0 rgba(255, 255, 255, 0.05);
     overflow: hidden;
     animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);

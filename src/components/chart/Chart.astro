@@ -1,14 +1,8 @@
 ---
-import ChartSv from "./ChartSv.svelte"
-import Toolbar from "../toolbar/ToolBar.astro"
-import Calc from "../calc/Calc.astro"
+import ChartSv from "./ChartSv.svelte";
+import Toolbar from "../toolbar/ToolBar.astro";
 ---
-<ChartSv client:load>
-    
-    <Toolbar/>
 
+<ChartSv client:only="svelte">
+    <Toolbar />
 </ChartSv>
-
-
-<Calc>
-    

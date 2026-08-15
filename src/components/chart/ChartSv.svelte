@@ -34,24 +34,26 @@
 
 <style>
     .liquid-glass-card {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        background: rgba(13, 15, 24, 0.6);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        border-radius: 16px;
+        box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45);
+        border-radius: 20px;
         transition: all 0.3s ease;
     }
 
     .liquid-glass-card:hover {
-        border-color: rgba(255, 255, 255, 0.12);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        border-color: rgba(64, 205, 224, 0.2);
+        box-shadow: 0 16px 44px 0 rgba(0, 0, 0, 0.6);
     }
 
     .glass-table th {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 0.8) !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 11px;
+        letter-spacing: 0.5px;
     }
 
     .glass-table {
@@ -59,54 +61,74 @@
         border-spacing: 0;
     }
 
-    /* Glow effect in background */
-    .glow-container {
-        position: relative;
+    .glass-table td {
+        padding: 8px 12px;
+        font-size: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     }
 
-    .glow-container::before {
-        content: "";
-        position: absolute;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, rgba(64, 205, 224, 0.15) 0%, rgba(0,0,0,0) 70%);
-        top: -50px;
-        left: -50px;
-        z-index: -1;
-        pointer-events: none;
+    @media (min-width: 640px) {
+        .glass-table td {
+            padding: 10px 14px;
+            font-size: 13px;
+        }
+        .glass-table th {
+            font-size: 12px;
+        }
     }
 </style>
 
-<!-- if  -->
-{#if  nftBalance > 0 || nft2Balance > 0 || nft3Balance > 0}
+<!-- Main Container -->
+<div class="w-full max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 flex flex-col lg:flex-row gap-6 text-gray-200">
+    
+    <!-- Chart Column -->
+    <div class="liquid-glass-card w-full lg:w-3/5 p-3.5 sm:p-5 flex flex-col gap-4">
+        <!-- Chart Header -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                    BYBIT LINEAR
+                </span>
+                <span class="text-xs text-cyan-400 font-semibold bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/50">
+                    EMA 59 Reversión
+                </span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-gray-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Feed en Vivo</span>
+            </div>
+        </div>
 
-<div class="pb-3 px-3 text-gray-200 w-full lg:flex glow-container">
-    <div class="liquid-glass-card lg:w-3/5 my-3 mx-3 p-4">
-        
-        <div>
+        <!-- Chart Canvas Container -->
+        <div class="rounded-xl overflow-hidden border border-white/5 bg-black/60 relative w-full">
+            <div class="chart" id="chart"></div>
+        </div>
 
-            <span>
-                <div class="mx-3 rounded-xl overflow-hidden">
-                    <div class="chart" id="chart"></div>
+        <!-- Chart Footer / Legend -->
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-gray-400 pt-1">
+            <div class="flex items-center gap-4 flex-wrap">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#4a50bf]"></span>
+                    <span>EMA 59</span>
                 </div>
-            </span>
-            <span class="py-3 font-bold">
-                <div class="flex-row md:flex px-3 justify-between items-center py-3 px-5 gap-4">
-                    <h4 class="m-0 font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">BYBIT</h4>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#bf964a]"></span>
+                    <span>Umbral Superior</span>
                 </div>
-                <!-- aqui van las configuraciones y los agregados  -->
-                <h5 class="text-[#40cde0] opacity-80 px-5 text-sm">
-                    ema 59
-                </h5>
-            </span>
-            
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-[#4abf71]"></span>
+                    <span>Umbral Inferior</span>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="tables" class="my-3 px-5 lg:w-2/5 liquid-glass-card mx-3 py-5" style="overflow: visible;">
+
+    <!-- Tables & Filters Column -->
+    <div id="tables" class="w-full lg:w-2/5 liquid-glass-card p-3.5 sm:p-5 flex flex-col gap-5">
         <!-- Selectores sobre la tabla -->
-        <div class="flex justify-between items-center mb-6 pb-4 border-b border-[rgba(255,255,255,0.08)] gap-3">
-            <span class="font-extrabold text-sm text-gray-400 uppercase tracking-wider">Filtros</span>
-            <div class="flex gap-2 items-center">
+        <div class="flex flex-wrap justify-between items-center pb-3 border-b border-white/10 gap-3">
+            <span class="font-extrabold text-xs text-gray-400 uppercase tracking-wider">Filtros Activos</span>
+            <div class="flex gap-2 items-center flex-wrap sm:flex-nowrap">
                 <GlassSelector id="symbolSelector" defaultValue="BTCUSDT">
                     <option value="BTCUSDT">BTCUSDT</option>
                     <option value="ETHUSDT">ETHUSDT</option>
@@ -131,45 +153,58 @@
             </div>
         </div>
 
-        <div class="mb-6 overflow-x-auto">
-            <h4 class="text-rose-400 font-bold mb-3 flex items-center gap-2">SHORT 🔻</h4>
-            <table
-                class="w-full text-left rtl:text-right text-gray-300 glass-table rounded-lg overflow-hidden"
-                id="positiveTable"
-            >
-                <thead
-                    class="uppercase"
+        <!-- Tabla SHORT -->
+        <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+                <h4 class="text-rose-400 font-bold text-sm sm:text-base flex items-center gap-2 m-0">
+                    <span>SHORT</span>
+                    <span class="text-xs">🔻 Sobrecomprados</span>
+                </h4>
+            </div>
+            <div class="overflow-x-auto rounded-xl border border-white/5 max-h-56 overflow-y-auto">
+                <table
+                    class="w-full text-left rtl:text-right text-gray-300 glass-table"
+                    id="positiveTable"
                 >
-                    <tr>
-                        <th class="p-3">Symbol</th>
-                        <th class="p-3">%Ema59</th>
-                        <th class="p-3">%24h</th>
-                    </tr>
-                </thead>
-                <tbody ></tbody>
-            </table>
+                    <thead class="uppercase sticky top-0 bg-slate-900/90 backdrop-blur-md z-10">
+                        <tr>
+                            <th class="p-2 sm:p-3">Symbol</th>
+                            <th class="p-2 sm:p-3">%Ema59</th>
+                            <th class="p-2 sm:p-3">%24h</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="overflow-x-auto">
-            <h4 class="text-emerald-400 font-bold mb-3 flex items-center gap-2">LONG 🔼</h4>
-            <table
-                class="w-full text-left rtl:text-right text-gray-300 glass-table rounded-lg overflow-hidden"
-                id="negativeTable"
-            >
-                <thead
-                    class="uppercase"
+        <!-- Tabla LONG -->
+        <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+                <h4 class="text-emerald-400 font-bold text-sm sm:text-base flex items-center gap-2 m-0">
+                    <span>LONG</span>
+                    <span class="text-xs">🔼 Sobreventidos</span>
+                </h4>
+            </div>
+            <div class="overflow-x-auto rounded-xl border border-white/5 max-h-56 overflow-y-auto">
+                <table
+                    class="w-full text-left rtl:text-right text-gray-300 glass-table"
+                    id="negativeTable"
                 >
-                    <tr>
-                        <th class="p-3">Symbol</th>
-                        <th class="p-3">%Ema59</th>
-                        <th class="p-3">%24h</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+                    <thead class="uppercase sticky top-0 bg-slate-900/90 backdrop-blur-md z-10">
+                        <tr>
+                            <th class="p-2 sm:p-3">Symbol</th>
+                            <th class="p-2 sm:p-3">%Ema59</th>
+                            <th class="p-2 sm:p-3">%24h</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
+    <!-- Third party and chart logic scripts -->
     <script
         src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js"
     ></script>
@@ -182,9 +217,6 @@
     <script data-is-inline src="/scripts/graph/graph.js"></script>
 
     <script
-    data-is-inline
+        data-is-inline
         src="https://cdn.jsdelivr.net/npm/ta-lib@0.11.0/index.min.js"></script>
-    <script></script>
 </div>
-
-{/if}
