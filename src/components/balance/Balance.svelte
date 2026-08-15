@@ -119,6 +119,18 @@
     }
   }
 
+  function portal(node) {
+    let target = document.body;
+    target.appendChild(node);
+    return {
+      destroy() {
+        if (node.parentNode) {
+          node.parentNode.removeChild(node);
+        }
+      },
+    };
+  }
+
   function clickOutside(node) {
     const handleClick = (event) => {
       if (node && !node.contains(event.target) && !event.defaultPrevented) {
@@ -448,16 +460,17 @@
   </button>
 {/if}
 
-<!-- Modal de Conexión de Wallet con Diseño Premium -->
+<!-- Modal de Conexión de Wallet con Diseño Premium (centrado global con Portal) -->
 {#if showModal}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div
-    class="fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-opacity duration-300"
+    use:portal
+    class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[999999] p-4 transition-opacity duration-300"
     on:click={() => (showModal = false)}
   >
     <!-- Contenedor del Modal -->
     <div
-      class="bg-gradient-to-b from-[#0f1422] to-[#090c14] border border-white/10 rounded-2xl w-full max-w-sm p-5 sm:p-6 shadow-2xl relative transform scale-100 transition-all duration-300"
+      class="bg-gradient-to-b from-[#0f1422] to-[#090c14] border border-white/10 rounded-2xl w-full max-w-sm p-5 sm:p-6 shadow-2xl relative my-auto transform scale-100 transition-all duration-300"
       on:click|stopPropagation
     >
       <!-- Botón de Cerrar -->
