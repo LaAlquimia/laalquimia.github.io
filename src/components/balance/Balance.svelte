@@ -119,6 +119,22 @@
     }
   }
 
+  function clickOutside(node) {
+    const handleClick = (event) => {
+      if (node && !node.contains(event.target) && !event.defaultPrevented) {
+        showDropdown = false;
+      }
+    };
+
+    document.addEventListener("click", handleClick, true);
+
+    return {
+      destroy() {
+        document.removeEventListener("click", handleClick, true);
+      },
+    };
+  }
+
   function copyAddress() {
     if ($userInfo.address) {
       navigator.clipboard.writeText($userInfo.address);
@@ -149,13 +165,20 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     border-radius: 9999px;
-    padding: 3px 4px 3px 10px;
+    padding: 3px 4px 3px 8px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
+  }
+
+  @media (min-width: 640px) {
+    .wallet-pill {
+      padding: 3px 4px 3px 10px;
+      gap: 8px;
+    }
   }
 
   .wallet-pill:hover {
@@ -171,12 +194,19 @@
 
   .balance-chip {
     font-weight: 700;
-    font-size: 13px;
+    font-size: 12px;
     color: #e2e8f0;
     letter-spacing: 0.2px;
-    display: flex;
+    display: none;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
+  }
+
+  @media (min-width: 640px) {
+    .balance-chip {
+      display: flex;
+      font-size: 13px;
+    }
   }
 
   .token-symbol {
@@ -189,14 +219,21 @@
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 9999px;
-    padding: 3px 8px;
+    padding: 2px 7px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: #cbd5e1;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     transition: background 0.2s;
+  }
+
+  @media (min-width: 640px) {
+    .address-badge {
+      font-size: 12px;
+      padding: 3px 8px;
+    }
   }
 
   .wallet-pill:hover .address-badge {
@@ -223,14 +260,22 @@
     box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     color: #fff;
     font-weight: 700;
-    font-size: 13px;
-    padding: 7px 14px;
+    font-size: 12px;
+    padding: 5px 12px;
     border-radius: 9999px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (min-width: 640px) {
+    .connect-btn {
+      font-size: 13px;
+      padding: 7px 14px;
+      gap: 6px;
+    }
   }
 
   .connect-btn:hover {
@@ -249,12 +294,13 @@
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    width: 270px;
-    background: rgba(13, 17, 28, 0.95);
+    width: 260px;
+    max-width: calc(100vw - 20px);
+    background: rgba(13, 17, 28, 0.96);
     backdrop-filter: blur(24px) saturate(200%);
     -webkit-backdrop-filter: blur(24px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     border-radius: 18px;
     padding: 12px;
     z-index: 99999;
@@ -271,31 +317,10 @@
       transform: translateY(0);
     }
   }
-
-  @media (max-width: 480px) {
-    .wallet-pill {
-      padding: 2px 3px 2px 8px;
-      gap: 5px;
-    }
-    .balance-chip {
-      font-size: 11px;
-    }
-    .address-badge {
-      font-size: 10px;
-      padding: 2px 6px;
-    }
-    .connect-btn {
-      font-size: 12px;
-      padding: 6px 11px;
-    }
-    .dropdown-menu {
-      width: min(260px, calc(100vw - 24px));
-    }
-  }
 </style>
 
 {#if $userInfo.address}
-  <div class="relative inline-block text-left">
+  <div class="relative inline-block text-left" use:clickOutside>
     <!-- Main Connected Pill Button -->
     <button
       type="button"
@@ -303,18 +328,21 @@
       class="wallet-pill"
       aria-expanded={showDropdown}
     >
-      <!-- Active Pulse & Balance -->
+      <!-- Active Pulse & Balance on tablet/desktop -->
       <div class="balance-chip">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
         <span>{$userInfo.balance ? $userInfo.balance : "0.00"}</span>
         <span class="token-symbol">$ALQ</span>
       </div>
 
+      <!-- Mobile Pulse Indicator (when balance is hidden) -->
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0 sm:hidden"></span>
+
       <!-- Address Capsule -->
       <div class="address-badge">
-        <span>{$userInfo.address.slice(0, 4) + "..." + $userInfo.address.slice(-4)}</span>
+        <span>{$userInfo.address.slice(0, 4) + "..." + $userInfo.address.slice(-3)}</span>
         <svg
-          class="w-3.5 h-3.5 chevron-icon"
+          class="w-3 h-3 sm:w-3.5 sm:h-3.5 chevron-icon"
           class:rotated={showDropdown}
           fill="none"
           stroke="currentColor"
@@ -327,9 +355,6 @@
 
     <!-- Dropdown Menu -->
     {#if showDropdown}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="fixed inset-0 z-40" on:click={() => (showDropdown = false)}></div>
-
       <div class="dropdown-menu">
         <!-- Top Status Row -->
         <div class="flex items-center justify-between px-2 py-1.5 mb-2 border-b border-white/5">
