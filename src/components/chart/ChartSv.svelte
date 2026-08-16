@@ -23,6 +23,30 @@
         });
     }
 
+    async function triggerKatexRender() {
+        try {
+            if (typeof window.renderMathInElement === 'undefined') {
+                if (!document.querySelector('script[src*="katex.min.js"]')) {
+                    await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js");
+                }
+                if (!document.querySelector('script[src*="auto-render.min.js"]')) {
+                    await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js");
+                }
+            }
+            if (window.renderMathInElement) {
+                window.renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        } catch (e) {
+            console.warn("KaTeX render notice:", e);
+        }
+    }
+
     onMount(async () => {
         try {
             balances = await checkBalances();
@@ -35,6 +59,7 @@
 
         if (nftBalance > 0) {
             await tick();
+            setTimeout(triggerKatexRender, 250);
             try {
                 await loadScript("https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js");
                 await loadScript("https://cdn.jsdelivr.net/npm/ta-lib@0.11.0/index.min.js");
@@ -296,32 +321,82 @@
 
         </div>
 
-        <!-- Fórmula Matemática y Parámetros -->
-        <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-slate-950/80 via-slate-900/60 to-slate-950/80 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div class="space-y-1.5 max-w-xl">
-                <h4 class="text-sm font-bold text-amber-400 uppercase tracking-wide font-mono m-0">Condición de Gatillo de Reversión</h4>
-                <p class="text-xs text-gray-300 leading-relaxed m-0">
-                    Señal activa únicamente cuando la distancia porcentual supera el umbral crítico y el momentum confirma capitulación:
-                </p>
-                <div class="p-3 bg-black/40 border border-white/5 rounded-xl text-amber-300 font-mono text-xs sm:text-sm">
-                    Condición = (|Precio - EMA_59| / Precio &gt; 3.0%) ∧ (RSI_28 en Extremo con Giro)
+        <!-- Fórmulas Matemáticas Cuantitativas & Desglose de Variables -->
+        <div class="flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-slate-950/90 via-slate-900/70 to-slate-950/90 border border-white/10 shadow-2xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <div>
+                    <span class="text-[11px] font-mono text-amber-400 font-bold uppercase tracking-wider block">Formulación Matemática Exacta</span>
+                    <h4 class="text-lg sm:text-xl font-extrabold text-white m-0 tracking-tight">Modelo de Dispersión Exponencial & Agotamiento RSI</h4>
+                </div>
+                <span class="text-xs px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono rounded-full self-start sm:self-auto">
+                    Bybit Linear USDT
+                </span>
+            </div>
+
+            <!-- Ecuación Principal Display LaTeX -->
+            <div class="flex flex-col gap-2 p-4 sm:p-6 bg-black/60 rounded-xl border border-amber-500/20 text-center relative overflow-x-auto">
+                <span class="text-[10px] uppercase font-mono text-amber-400/80 tracking-widest block text-left">Fórmula de Dispersión respecto a la EMA 59:</span>
+                <div class="text-lg sm:text-2xl text-amber-300 font-serif my-2 py-2">
+                    {@html '$$\\text{Dispersión}_{\\text{EMA59}} = \\left( \\frac{P_t - \\text{EMA}_{59}(P)}{P_t} \\right) \\times 100$$'}
                 </div>
             </div>
 
-            <div class="space-y-2 text-xs text-gray-400 w-full sm:w-auto self-stretch sm:self-auto border-t sm:border-t-0 sm:border-l border-white/5 pt-4 sm:pt-0 sm:pl-6">
-                <div class="flex items-center justify-between sm:justify-start gap-4">
-                    <span class="text-gray-500 font-mono">Exchange:</span>
-                    <span class="text-amber-400 font-semibold">Bybit Linear Perpetuals</span>
+            <!-- Desglose de Componentes de la Ecuación -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
+                    <span class="text-xs font-mono font-bold text-amber-400">1. Media Exponencial (EMA 59)</span>
+                    <div class="text-sm font-mono text-white py-1">{@html '$$\\text{EMA}_t = P_t \\cdot \\left(\\frac{2}{60}\\right) + \\text{EMA}_{t-1} \\cdot \\left(1 - \\frac{2}{60}\\right)$$'}</div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Ponderación exponencial de 59 períodos que define el punto de equilibrio dinámico del mercado para klines de 1m a 15m.
+                    </p>
                 </div>
-                <div class="flex items-center justify-between sm:justify-start gap-4">
-                    <span class="text-gray-500 font-mono">Tipo de Estrategia:</span>
-                    <span class="text-cyan-400 font-semibold">Statistical Mean Reversion</span>
+
+                <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
+                    <span class="text-xs font-mono font-bold text-cyan-400">2. Filtro de Agotamiento RSI(28)</span>
+                    <div class="text-sm font-mono text-white py-1">{@html '$$\\text{RSI}_{28} = 100 - \\left( \\frac{100}{1 + \\frac{\\text{Ganancia Med}_{28}}{\\text{Pérdida Med}_{28}}} \\right)$$'}</div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Oscilador de 28 velas que confirma la pérdida de fuerza tendencial y previene trampas de continuación en impulsos explosivos.
+                    </p>
                 </div>
-                <div class="flex items-center justify-between sm:justify-start gap-4">
-                    <span class="text-gray-500 font-mono">Umbral de Entrada:</span>
-                    <span class="text-white font-semibold">±3.0% Desviación vs EMA 59</span>
+
+                <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
+                    <span class="text-xs font-mono font-bold text-emerald-400">3. Condición de Disparo Lógica</span>
+                    <div class="text-sm font-mono text-white py-1">{@html '$$\\text{Gatillo} = (|\\text{Disp}| > 3.0\\%) \\land (\\Delta\\text{RSI} \\text{ Giro})$$'}</div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Exige dispersión crítica superior a 3.0% y giro simultáneo en el RSI para activar la señal y síntesis de voz en tiempo real.
+                    </p>
                 </div>
             </div>
+
+            <!-- Ecuaciones Secundarias (Gatillo Short & Gatillo Long) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/5">
+                <div class="p-4 rounded-xl bg-black/40 border border-rose-500/20 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-semibold text-rose-300">Condición Cuantitativa SHORT (Sobrecompra):</span>
+                        <span class="text-xs text-rose-400 font-mono font-bold">Venta / Corto</span>
+                    </div>
+                    <div class="text-sm font-mono text-rose-300 py-1">
+                        {@html '$$\\text{SHORT} = (\\text{Disp} > +3.0\\%) \\;\\land\\; (\\text{RSI}_{28} > 75) \\;\\land\\; (\\text{RSI}_t < \\text{RSI}_{t-1})$$'}
+                    </div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        El precio cotiza +3.0% por encima de su media exponencial y el oscilador marca sobrecompra extrema con curvatura descendente.
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-black/40 border border-emerald-500/20 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-semibold text-emerald-300">Condición Cuantitativa LONG (Sobreventa):</span>
+                        <span class="text-xs text-emerald-400 font-mono font-bold">Compra / Largo</span>
+                    </div>
+                    <div class="text-sm font-mono text-emerald-300 py-1">
+                        {@html '$$\\text{LONG} = (\\text{Disp} < -3.0\\%) \\;\\land\\; (\\text{RSI}_{28} < 25) \\;\\land\\; (\\text{RSI}_t > \\text{RSI}_{t-1})$$'}
+                    </div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        El precio cae -3.0% por debajo de su media exponencial y el oscilador marca sobreventa extrema con curvatura ascendente.
+                    </p>
+                </div>
+            </div>
+
         </div>
 
     </div>

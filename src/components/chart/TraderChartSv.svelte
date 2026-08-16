@@ -22,6 +22,30 @@
     });
   }
 
+  async function triggerKatexRender() {
+    try {
+      if (typeof window.renderMathInElement === 'undefined') {
+        if (!document.querySelector('script[src*="katex.min.js"]')) {
+          await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js");
+        }
+        if (!document.querySelector('script[src*="auto-render.min.js"]')) {
+          await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js");
+        }
+      }
+      if (window.renderMathInElement) {
+        window.renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    } catch (e) {
+      console.warn("KaTeX render notice:", e);
+    }
+  }
+
   // Selected coin and state
   let selectedSymbol = "ETHUSDT";
   let activeSymbolData = null;
@@ -213,6 +237,7 @@
       
       // Auto scan tokens
       triggerScan();
+      setTimeout(triggerKatexRender, 250);
 
       loopInterval = setInterval(async () => {
         await updateData();
@@ -1220,32 +1245,82 @@
 
       </div>
 
-      <!-- Fórmula Matemática e Indicadores Clave -->
-      <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-slate-950/80 via-slate-900/60 to-slate-950/80 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div class="space-y-1.5 max-w-xl">
-          <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wide font-mono m-0">Fórmula Central del Score</h4>
-          <p class="text-xs text-gray-300 leading-relaxed m-0">
-            El Score de Expansión normaliza la distancia entre medias móviles respecto a la volatilidad histórica del activo y la multiplica por la aceleración del vector:
-          </p>
-          <div class="p-3 bg-black/40 border border-white/5 rounded-xl text-cyan-300 font-mono text-xs sm:text-sm">
-            Score = ( (EMA_20 - EMA_50) / ATR_14 ) × WMA_3(Aceleración)
+      <!-- Fórmulas Matemáticas Cuantitativas & Desglose de Variables -->
+      <div class="flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-slate-950/90 via-slate-900/70 to-slate-950/90 border border-white/10 shadow-2xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <span class="text-[11px] font-mono text-emerald-400 font-bold uppercase tracking-wider block">Formulación Matemática Exacta</span>
+            <h4 class="text-lg sm:text-xl font-extrabold text-white m-0 tracking-tight">Modelo Multifactorial de Impulso y Normalización</h4>
+          </div>
+          <span class="text-xs px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-mono rounded-full self-start sm:self-auto">
+            Resolución: 5M / 1H
+          </span>
+        </div>
+
+        <!-- Ecuación Principal Display LaTeX -->
+        <div class="flex flex-col gap-2 p-4 sm:p-6 bg-black/60 rounded-xl border border-cyan-500/20 text-center relative overflow-x-auto">
+          <span class="text-[10px] uppercase font-mono text-cyan-400/80 tracking-widest block text-left">Fórmula Central del Score:</span>
+          <div class="text-lg sm:text-2xl text-cyan-300 font-serif my-2 py-2">
+            {@html '$$\\text{Score}_{\\text{Exp}} = \\left( \\frac{\\text{EMA}_{20}(P) - \\text{EMA}_{50}(P)}{\\text{ATR}_{14}(P)} \\right) \\times \\text{WMA}_3(\\Delta_{\\text{Spread}})$$'}
           </div>
         </div>
 
-        <div class="space-y-2 text-xs text-gray-400 w-full sm:w-auto self-stretch sm:self-auto border-t sm:border-t-0 sm:border-l border-white/5 pt-4 sm:pt-0 sm:pl-6">
-          <div class="flex items-center justify-between sm:justify-start gap-4">
-            <span class="text-gray-500 font-mono">Marco Temporal:</span>
-            <span class="text-white font-semibold">5M (Gatillo) / 1H (Macro)</span>
+        <!-- Desglose de Componentes de la Ecuación -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
+            <span class="text-xs font-mono font-bold text-cyan-400">1. Spread de Inercia</span>
+            <div class="text-sm font-mono text-white py-1">{@html '$$\\text{Spread} = \\text{EMA}_{20} - \\text{EMA}_{50}$$'}</div>
+            <p class="text-[11px] text-gray-400 leading-relaxed">
+              Mide la divergencia entre el momento rápido (20) y la tendencia media (50). Un valor positivo indica expansión alcista del precio.
+            </p>
           </div>
-          <div class="flex items-center justify-between sm:justify-start gap-4">
-            <span class="text-gray-500 font-mono">Tipo de Señal:</span>
-            <span class="text-emerald-400 font-semibold">Breakout & Momentum</span>
+
+          <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
+            <span class="text-xs font-mono font-bold text-emerald-400">2. Normalizador de Ruido</span>
+            <div class="text-sm font-mono text-white py-1">{@html '$$\\text{Normalizador} = \\frac{1}{\\text{ATR}_{14}}$$'}</div>
+            <p class="text-[11px] text-gray-400 leading-relaxed">
+              Ajusta el spread según la volatilidad estocástica real (Average True Range), impidiendo señales falsas en monedas erráticas.
+            </p>
           </div>
-          <div class="flex items-center justify-between sm:justify-start gap-4">
-            <span class="text-gray-500 font-mono">Gestión de Riesgo:</span>
-            <span class="text-rose-400 font-semibold">1.5 × ATR(14) Stop Loss</span>
+
+          <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
+            <span class="text-xs font-mono font-bold text-violet-400">3. Aceleración Ponderada</span>
+            <div class="text-sm font-mono text-white py-1">{@html '$$\\text{WMA}_3(\\Delta) = \\frac{3\\Delta_t + 2\\Delta_{t-1} + 1\\Delta_{t-2}}{6}$$'}</div>
+            <p class="text-[11px] text-gray-400 leading-relaxed">
+              Derivada ponderada de velocidad ($\Delta_t = \text{Spread}_t - \text{Spread}_{t-1}$) que confirma aceleración física del vector.
+            </p>
           </div>
         </div>
+
+        <!-- Ecuaciones Secundarias (RVOL, OI, Stop Loss) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/5">
+          <div class="p-4 rounded-xl bg-black/40 border border-white/5 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-semibold text-gray-300">Volumen Relativo Institucional (RVOL):</span>
+              <span class="text-xs text-emerald-400 font-mono font-bold">&gt; 1.5x</span>
+            </div>
+            <div class="text-sm font-mono text-emerald-300 py-1">
+              {@html '$$\\text{RVOL} = \\frac{V_t}{\\frac{1}{20} \\sum_{i=1}^{20} V_{t-i}} > 1.50$$'}
+            </div>
+            <p class="text-[11px] text-gray-400 leading-relaxed">
+              Exige que la vela de ruptura concentre un volumen al menos 50% superior a su promedio móvil de 20 velas de 5 minutos.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-black/40 border border-white/5 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-semibold text-gray-300">Stop Loss Dinámico Estocástico:</span>
+              <span class="text-xs text-rose-400 font-mono font-bold">1.5 × ATR</span>
+            </div>
+            <div class="text-sm font-mono text-rose-300 py-1">
+              {@html '$$\\text{Stop Loss} = P_{\\text{Entrada}} - (1.5 \\times \\text{ATR}_{14})$$'}
+            </div>
+            <p class="text-[11px] text-gray-400 leading-relaxed">
+              Protege el capital contra barridos de liquidez ubicando la orden de corte fuera de la varianza estocástica del activo.
+            </p>
+          </div>
+        </div>
+
       </div>
 
     </div>

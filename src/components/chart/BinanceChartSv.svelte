@@ -23,6 +23,30 @@
         });
     }
 
+    async function triggerKatexRender() {
+        try {
+            if (typeof window.renderMathInElement === 'undefined') {
+                if (!document.querySelector('script[src*="katex.min.js"]')) {
+                    await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js");
+                }
+                if (!document.querySelector('script[src*="auto-render.min.js"]')) {
+                    await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js");
+                }
+            }
+            if (window.renderMathInElement) {
+                window.renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        } catch (e) {
+            console.warn("KaTeX render notice:", e);
+        }
+    }
+
     onMount(async () => {
         try {
             balances = await checkBalances();
@@ -35,6 +59,7 @@
 
         if (nft2Balance > 0) {
             await tick();
+            setTimeout(triggerKatexRender, 250);
             try {
                 await loadScript("https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js");
                 await loadScript("https://cdn.jsdelivr.net/npm/ta-lib@0.11.0/index.min.js");
@@ -313,32 +338,82 @@
 
         </div>
 
-        <!-- Fórmula Matemática y Parámetros -->
-        <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-slate-950/80 via-slate-900/60 to-slate-950/80 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div class="space-y-1.5 max-w-xl">
-                <h4 class="text-sm font-bold text-yellow-400 uppercase tracking-wide font-mono m-0">Métrica Central de Dispersión</h4>
-                <p class="text-xs text-gray-300 leading-relaxed m-0">
-                    Calcula la distancia porcentual del precio respecto a la media ponderada exponencial de 59 períodos:
-                </p>
-                <div class="p-3 bg-black/40 border border-white/5 rounded-xl text-yellow-300 font-mono text-xs sm:text-sm">
-                    Distancia_EMA = ((Precio - EMA_59) / Precio) × 100
+        <!-- Fórmulas Matemáticas Cuantitativas & Desglose de Variables -->
+        <div class="flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-slate-950/90 via-slate-900/70 to-slate-950/90 border border-white/10 shadow-2xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <div>
+                    <span class="text-[11px] font-mono text-yellow-400 font-bold uppercase tracking-wider block">Formulación Matemática Exacta</span>
+                    <h4 class="text-lg sm:text-xl font-extrabold text-white m-0 tracking-tight">Modelo Multi-Stream de Dispersión Binance Futures</h4>
+                </div>
+                <span class="text-xs px-3 py-1 bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 font-mono rounded-full self-start sm:self-auto">
+                    Binance USDⓈ-M
+                </span>
+            </div>
+
+            <!-- Ecuación Principal Display LaTeX -->
+            <div class="flex flex-col gap-2 p-4 sm:p-6 bg-black/60 rounded-xl border border-yellow-500/20 text-center relative overflow-x-auto">
+                <span class="text-[10px] uppercase font-mono text-yellow-400/80 tracking-widest block text-left">Métrica de Dispersión Relativa:</span>
+                <div class="text-lg sm:text-2xl text-yellow-300 font-serif my-2 py-2">
+                    {@html '$$\\text{Distancia}_{\\text{EMA59}} = \\left( \\frac{P_t - \\text{EMA}_{59}(P_t)}{P_t} \\right) \\times 100$$'}
                 </div>
             </div>
 
-            <div class="space-y-2 text-xs text-gray-400 w-full sm:w-auto self-stretch sm:self-auto border-t sm:border-t-0 sm:border-l border-white/5 pt-4 sm:pt-0 sm:pl-6">
-                <div class="flex items-center justify-between sm:justify-start gap-4">
-                    <span class="text-gray-500 font-mono">Mercado:</span>
-                    <span class="text-yellow-400 font-semibold">Binance USDⓈ-M Futures</span>
+            <!-- Desglose de Componentes de la Ecuación -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
+                    <span class="text-xs font-mono font-bold text-yellow-400">1. Mark Price en Streaming (P_t)</span>
+                    <div class="text-sm font-mono text-white py-1">{@html '$$P_t = \\text{WebSocket Feed}(\\text{Binance})$$'}</div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Precio de referencia indexado de alta frecuencia capturado en milisegundos para evitar desviaciones por falta de liquidez puntual.
+                    </p>
                 </div>
-                <div class="flex items-center justify-between sm:justify-start gap-4">
-                    <span class="text-gray-500 font-mono">Universo de Activos:</span>
-                    <span class="text-cyan-400 font-semibold">Top 50 Liquid Contracts</span>
+
+                <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
+                    <span class="text-xs font-mono font-bold text-cyan-400">2. Centro Exponencial (EMA 59)</span>
+                    <div class="text-sm font-mono text-white py-1">{@html '$$\\text{EMA}_t = \\alpha P_t + (1 - \\alpha)\\text{EMA}_{t-1}$$'}</div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Factor de suavizado $\alpha = \frac{2}{60} \approx 0.0333$ que modela la tendencia inercial del activo en contratos derivados.
+                    </p>
                 </div>
-                <div class="flex items-center justify-between sm:justify-start gap-4">
-                    <span class="text-gray-500 font-mono">Filtro de Tendencia:</span>
-                    <span class="text-white font-semibold">EMA 59 & Bandas de Desviación</span>
+
+                <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
+                    <span class="text-xs font-mono font-bold text-emerald-400">3. Algoritmo de Ranking Continuo</span>
+                    <div class="text-sm font-mono text-white py-1">{@html '$$\\text{Rank} = \\operatorname{ArgSort}(\\text{Distancia}_i)_{1..10}$$'}</div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Clasificación continua del universo de 50 monedas divididas en Top 10 Sobrecompra y Top 10 Sobreventa.
+                    </p>
                 </div>
             </div>
+
+            <!-- Ecuaciones Secundarias (Umbrales y Bandas) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/5">
+                <div class="p-4 rounded-xl bg-black/40 border border-yellow-500/20 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-semibold text-yellow-300">Canal Dinámico de Sobrecompra (Shorts):</span>
+                        <span class="text-xs text-yellow-400 font-mono font-bold">Resistencia</span>
+                    </div>
+                    <div class="text-sm font-mono text-yellow-300 py-1">
+                        {@html '$$\\text{Banda Superior} = \\text{EMA}_{59} \\times (1 + 0.030)$$'}
+                    </div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Umbral superior a partir del cual el precio entra en zona de distribución estadística y aumento de probabilidad de retroceso.
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-black/40 border border-emerald-500/20 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-semibold text-emerald-300">Canal Dinámico de Sobreventa (Longs):</span>
+                        <span class="text-xs text-emerald-400 font-mono font-bold">Soporte</span>
+                    </div>
+                    <div class="text-sm font-mono text-emerald-300 py-1">
+                        {@html '$$\\text{Banda Inferior} = \\text{EMA}_{59} \\times (1 - 0.030)$$'}
+                    </div>
+                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                        Umbral inferior donde la sobreextensión bajista extrema activa condiciones de capitulación y rebote a la media.
+                    </p>
+                </div>
+            </div>
+
         </div>
 
     </div>
