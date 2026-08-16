@@ -54,6 +54,8 @@
         return;
       }
 
+      showModal = false;
+
       const provider = new ethers.BrowserProvider(rawProvider);
       const accounts = await rawProvider.request({ method: "eth_requestAccounts" });
       const address = accounts[0];
@@ -68,11 +70,11 @@
       if (balance) {
         userInfo.setKey("balance", parseFloat(balance).toFixed(2));
       }
-
-      showModal = false;
     } catch (error) {
       console.error("Error al conectar wallet:", error);
-      alert("Error de conexión: " + (error.message || error));
+      if (error.code !== 4001 && error.code !== "ACTION_REJECTED") {
+        alert("Error de conexión: " + (error.message || error));
+      }
     } finally {
       isConnecting = false;
     }
@@ -81,6 +83,8 @@
   async function connectWalletConnect() {
     isConnecting = true;
     try {
+      showModal = false;
+
       const provider = await EthereumProvider.init({
         projectId: walletConnectProjectId,
         chains: [8453],
@@ -109,11 +113,11 @@
       if (balance) {
         userInfo.setKey("balance", parseFloat(balance).toFixed(2));
       }
-
-      showModal = false;
     } catch (error) {
       console.error("Error con WalletConnect:", error);
-      alert("Error de WalletConnect: " + (error.message || error));
+      if (error.message && !error.message.includes("User rejected") && !error.message.includes("User closed")) {
+        alert("Error de WalletConnect: " + (error.message || error));
+      }
     } finally {
       isConnecting = false;
     }
