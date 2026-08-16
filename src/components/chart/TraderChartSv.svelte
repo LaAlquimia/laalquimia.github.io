@@ -1323,7 +1323,7 @@
               {@html '$$\\text{WMA}_3 = \\frac{3\\Delta_t + 2\\Delta_{t-1} + \\Delta_{t-2}}{6}$$'}
             </div>
             <p class="text-[11px] text-gray-400 leading-relaxed">
-              Derivada ponderada de velocidad ($\Delta_t = \text{Spread}_t - \text{Spread}_{t-1}$) que confirma aceleración física del vector.
+              {@html 'Derivada ponderada de velocidad ($\\Delta_t = \\text{Spread}_t - \\text{Spread}_{t-1}$) que confirma aceleración física del vector.'}
             </p>
           </div>
         </div>
