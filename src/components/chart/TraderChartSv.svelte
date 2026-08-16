@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, onDestroy, tick } from "svelte";
   import { checkBalances } from "../bots/botBalance.js";
   import GlassSelector from "./GlassSelector.svelte";
 
@@ -7,6 +7,7 @@
   let balances = {};
   let nft3Balance = 0;
   let loadingBalance = true;
+  let mathSection;
 
   function loadScript(src) {
     return new Promise((resolve, reject) => {
@@ -24,6 +25,7 @@
 
   async function triggerKatexRender() {
     try {
+      if (!mathSection) return;
       if (typeof window.renderMathInElement === 'undefined') {
         if (!document.querySelector('script[src*="katex.min.js"]')) {
           await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js");
@@ -32,8 +34,8 @@
           await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js");
         }
       }
-      if (window.renderMathInElement) {
-        window.renderMathInElement(document.body, {
+      if (window.renderMathInElement && mathSection) {
+        window.renderMathInElement(mathSection, {
           delimiters: [
             {left: '$$', right: '$$', display: true},
             {left: '$', right: '$', display: false}
@@ -226,6 +228,7 @@
     }
 
     if (nft3Balance > 0) {
+      await tick();
       try {
         await loadScript("https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js");
       } catch (e) {
@@ -267,7 +270,7 @@
     let limitRemaining = targetLimit;
 
     while (limitRemaining > 0) {
-      const fetchLimit = Math.min(limitRemaining, 1000);
+      const fetchLimit = Math.min(limitRemaining, 200);
       let url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=${interval}&limit=${fetchLimit}`;
       if (endTimestamp) {
         url += `&end=${endTimestamp}`;
@@ -319,12 +322,12 @@
   async function calculateStrategyForCoin(symbol) {
     try {
       const [klines5M, klines1H, oiList] = await Promise.all([
-        fetchKlines(symbol, "5", 2000),
-        fetchKlines(symbol, "60", 500),
+        fetchKlines(symbol, "5", 200),
+        fetchKlines(symbol, "60", 200),
         fetchOpenInterest(symbol, 200)
       ]);
 
-      if (klines5M.length < 50 || klines1H.length < 210) return null;
+      if (klines5M.length < 30 || klines1H.length < 30) return null;
 
       // 1. 1H Macro Filter
       const closePrices1H = klines1H.map(k => k.close);
@@ -717,7 +720,11 @@
   }
 
   async function initChart() {
-    if (!chartContainer) return;
+    if (!chartContainer) {
+      await tick();
+      if (!chartContainer) return;
+    }
+    if (chart) return;
     
     if (typeof window.LightweightCharts === 'undefined') {
       await new Promise(resolve => {
@@ -730,8 +737,8 @@
     }
     
     chart = window.LightweightCharts.createChart(chartContainer, {
-      width: chartContainer.offsetWidth,
-      height: 400,
+      width: chartContainer.offsetWidth || 800,
+      height: 350,
       layout: {
         background: { type: 'solid', color: '#090a0f' },
         textColor: '#94a3b8',
@@ -1246,7 +1253,7 @@
       </div>
 
       <!-- Fórmulas Matemáticas Cuantitativas & Desglose de Variables -->
-      <div class="flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-slate-950/90 via-slate-900/70 to-slate-950/90 border border-white/10 shadow-2xl">
+      <div bind:this={mathSection} class="flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-slate-950/90 via-slate-900/70 to-slate-950/90 border border-white/10 shadow-2xl">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div>
             <span class="text-[11px] font-mono text-emerald-400 font-bold uppercase tracking-wider block">Formulación Matemática Exacta</span>

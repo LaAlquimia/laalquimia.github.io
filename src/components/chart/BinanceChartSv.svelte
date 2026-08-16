@@ -23,8 +23,11 @@
         });
     }
 
+    let mathSection;
+
     async function triggerKatexRender() {
         try {
+            if (!mathSection) return;
             if (typeof window.renderMathInElement === 'undefined') {
                 if (!document.querySelector('script[src*="katex.min.js"]')) {
                     await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js");
@@ -33,8 +36,8 @@
                     await loadScript("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js");
                 }
             }
-            if (window.renderMathInElement) {
-                window.renderMathInElement(document.body, {
+            if (window.renderMathInElement && mathSection) {
+                window.renderMathInElement(mathSection, {
                     delimiters: [
                         {left: '$$', right: '$$', display: true},
                         {left: '$', right: '$', display: false}
@@ -339,7 +342,7 @@
         </div>
 
         <!-- Fórmulas Matemáticas Cuantitativas & Desglose de Variables -->
-        <div class="flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-slate-950/90 via-slate-900/70 to-slate-950/90 border border-white/10 shadow-2xl">
+        <div bind:this={mathSection} class="flex flex-col gap-6 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-slate-950/90 via-slate-900/70 to-slate-950/90 border border-white/10 shadow-2xl">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <div>
                     <span class="text-[11px] font-mono text-yellow-400 font-bold uppercase tracking-wider block">Formulación Matemática Exacta</span>
