@@ -79,25 +79,38 @@
     entryPrice: 0
   };
 
-  // Checklist verification
+  // Checklist verification & reactive state
+  let checklist = {
+    macroTrend: false,
+    confirmGiro: false,
+    inercia: false,
+    momentum: false,
+    confirmPrice: false,
+    rvol: false,
+    capitalFlow: false
+  };
+
+  let isLongTriggered = false;
+
   $: checklist = {
-    macroTrend: stats.macroEnabled,
-    confirmGiro: stats.delta > 0 && stats.deltaPrev < 0,
-    inercia: stats.acceleration > 0,
-    momentum: stats.score > 0 && stats.score > stats.scorePrev,
+    macroTrend: stats ? Boolean(stats.macroEnabled) : false,
+    confirmGiro: stats ? (stats.delta > 0 && stats.deltaPrev < 0) : false,
+    inercia: stats ? stats.acceleration > 0 : false,
+    momentum: stats ? (stats.score > 0 && stats.score > stats.scorePrev) : false,
     confirmPrice: activeSymbolData ? (activeSymbolData.close > activeSymbolData.ema20) : false,
-    rvol: stats.rvol > 1.5,
-    capitalFlow: stats.oiCurrent > stats.oiPrev
+    rvol: stats ? stats.rvol > 1.5 : false,
+    capitalFlow: stats ? stats.oiCurrent > stats.oiPrev : false
   };
 
   $: isLongTriggered = 
+    Boolean(checklist &&
     checklist.macroTrend &&
     checklist.confirmGiro &&
     checklist.inercia &&
     checklist.momentum &&
     checklist.confirmPrice &&
     checklist.rvol &&
-    checklist.capitalFlow;
+    checklist.capitalFlow);
 
   // Scanned results list
   let scanResults = [];
@@ -1045,66 +1058,66 @@
 
           <div class="flex flex-col gap-3">
             <!-- 1 -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist.macroTrend ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist?.macroTrend ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
               <div class="flex flex-col">
-                <span class="text-xs font-semibold {checklist.macroTrend ? 'text-emerald-400' : 'text-gray-300'}">1. Alineación Macro (1H)</span>
+                <span class="text-xs font-semibold {checklist?.macroTrend ? 'text-emerald-400' : 'text-gray-300'}">1. Alineación Macro (1H)</span>
                 <span class="text-[10px] text-gray-400">EMA50 > EMA200, Precio > EMA200 y Bandwidth > P20</span>
               </div>
-              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist.macroTrend ? 'text-emerald-400' : 'text-rose-400'}">{checklist.macroTrend ? 'Apto' : 'Lateralizado'}</span>
+              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist?.macroTrend ? 'text-emerald-400' : 'text-rose-400'}">{checklist?.macroTrend ? 'Apto' : 'Lateralizado'}</span>
             </div>
 
             <!-- 2 -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist.confirmGiro ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist?.confirmGiro ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
               <div class="flex flex-col">
-                <span class="text-xs font-semibold {checklist.confirmGiro ? 'text-emerald-400' : 'text-gray-300'}">2. Confirmación de Giro</span>
+                <span class="text-xs font-semibold {checklist?.confirmGiro ? 'text-emerald-400' : 'text-gray-300'}">2. Confirmación de Giro</span>
                 <span class="text-[10px] text-gray-400">Delta 5M > 0 y Delta Anterior &lt; 0</span>
               </div>
-              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist.confirmGiro ? 'text-emerald-400' : 'text-rose-400'}">{checklist.confirmGiro ? 'Giro 🟢' : 'Esperando'}</span>
+              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist?.confirmGiro ? 'text-emerald-400' : 'text-rose-400'}">{checklist?.confirmGiro ? 'Giro 🟢' : 'Esperando'}</span>
             </div>
 
             <!-- 3 -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist.inercia ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist?.inercia ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
               <div class="flex flex-col">
-                <span class="text-xs font-semibold {checklist.inercia ? 'text-emerald-400' : 'text-gray-300'}">3. Inercia a Favor</span>
+                <span class="text-xs font-semibold {checklist?.inercia ? 'text-emerald-400' : 'text-gray-300'}">3. Inercia a Favor</span>
                 <span class="text-[10px] text-gray-400">Aceleración 5M > 0</span>
               </div>
-              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist.inercia ? 'text-emerald-400' : 'text-rose-400'}">{checklist.inercia ? 'Creciente' : 'Bajando'}</span>
+              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist?.inercia ? 'text-emerald-400' : 'text-rose-400'}">{checklist?.inercia ? 'Creciente' : 'Bajando'}</span>
             </div>
 
             <!-- 4 -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist.momentum ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist?.momentum ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
               <div class="flex flex-col">
-                <span class="text-xs font-semibold {checklist.momentum ? 'text-emerald-400' : 'text-gray-300'}">4. Score de Expansión</span>
+                <span class="text-xs font-semibold {checklist?.momentum ? 'text-emerald-400' : 'text-gray-300'}">4. Score de Expansión</span>
                 <span class="text-[10px] text-gray-400">Score 5M > 0 y mayor que vela anterior</span>
               </div>
-              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist.momentum ? 'text-emerald-400' : 'text-rose-400'}">{checklist.momentum ? 'Expansión' : 'Débil'}</span>
+              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist?.momentum ? 'text-emerald-400' : 'text-rose-400'}">{checklist?.momentum ? 'Expansión' : 'Débil'}</span>
             </div>
 
             <!-- 5 -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist.confirmPrice ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist?.confirmPrice ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
               <div class="flex flex-col">
-                <span class="text-xs font-semibold {checklist.confirmPrice ? 'text-emerald-400' : 'text-gray-300'}">5. Confirmación de Precio</span>
+                <span class="text-xs font-semibold {checklist?.confirmPrice ? 'text-emerald-400' : 'text-gray-300'}">5. Confirmación de Precio</span>
                 <span class="text-[10px] text-gray-400">Precio de cierre > EMA 20 (5M)</span>
               </div>
-              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist.confirmPrice ? 'text-emerald-400' : 'text-rose-400'}">{checklist.confirmPrice ? 'Por Encima' : 'Por Debajo'}</span>
+              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist?.confirmPrice ? 'text-emerald-400' : 'text-rose-400'}">{checklist?.confirmPrice ? 'Por Encima' : 'Por Debajo'}</span>
             </div>
 
             <!-- 6 -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist.rvol ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist?.rvol ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
               <div class="flex flex-col">
-                <span class="text-xs font-semibold {checklist.rvol ? 'text-emerald-400' : 'text-gray-300'}">6. Filtro Volumen Relativo</span>
+                <span class="text-xs font-semibold {checklist?.rvol ? 'text-emerald-400' : 'text-gray-300'}">6. Filtro Volumen Relativo</span>
                 <span class="text-[10px] text-gray-400">RVOL > 1.5 (> 50% promedio)</span>
               </div>
-              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist.rvol ? 'text-emerald-400' : 'text-rose-400'}">{checklist.rvol ? 'Ruptura' : 'Bajo Vol'}</span>
+              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist?.rvol ? 'text-emerald-400' : 'text-rose-400'}">{checklist?.rvol ? 'Ruptura' : 'Bajo Vol'}</span>
             </div>
 
             <!-- 7 -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist.capitalFlow ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 rounded-xl gap-2 {checklist?.capitalFlow ? 'bg-emerald-950/20 border border-emerald-900/50' : 'bg-white/2 border border-white/5'}">
               <div class="flex flex-col">
-                <span class="text-xs font-semibold {checklist.capitalFlow ? 'text-emerald-400' : 'text-gray-300'}">7. Flujo de Capital (OI)</span>
+                <span class="text-xs font-semibold {checklist?.capitalFlow ? 'text-emerald-400' : 'text-gray-300'}">7. Flujo de Capital (OI)</span>
                 <span class="text-[10px] text-gray-400">Open Interest actual > anterior</span>
               </div>
-              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist.capitalFlow ? 'text-emerald-400' : 'text-rose-400'}">{checklist.capitalFlow ? 'Inyección 🟢' : 'Sin Flujo'}</span>
+              <span class="text-[11px] font-bold flex-shrink-0 self-start sm:self-center {checklist?.capitalFlow ? 'text-emerald-400' : 'text-rose-400'}">{checklist?.capitalFlow ? 'Inyección 🟢' : 'Sin Flujo'}</span>
             </div>
           </div>
 
