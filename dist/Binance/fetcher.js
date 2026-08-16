@@ -313,10 +313,10 @@ const convertirDatos = (datos) => {
 }
 
 const fetchTickers = async () => {
-  const response = await fetch('https://api.bybit.com//v5/market/tickers?category=linear')
+  const response = await fetch(BinanceApi + h24Ticker)
   const data = await response.json()
-  tickers = data.result.list
-  return data.result.list
+  tickers = data
+  return data
 }
 
 const fetchBinanceMarketInfo = async () => {
@@ -354,24 +354,24 @@ const FetchBinaceKline = async (symbol) => {
 }
 
 const fetchKline = async (symbol) => {
-  const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=1`
+  const url = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m&limit=150`
   const response = await fetch(url)
   const data = await response.json()
-  const kline = data.result.list
+  const kline = data
   const numericValues = kline.map(entry => parseFloat(entry[1]))
   const ema = EMA(numericValues, 59)
   const emaDist = ((numericValues[0] - ema[0]) / numericValues[0]) * 100
   signals(kline, symbol, emaDist)
-  const price24hPcnt = (parseFloat(tickers.find(ticker => ticker.symbol === symbol).price24hPcnt) * 100).toFixed(2)
+  const price24hPcnt = parseFloat(tickers.find(ticker => ticker.symbol === symbol)?.priceChangePercent || 0).toFixed(2)
 
   return { symbol, EMA_dist: emaDist, price24hPcnt }
 }
 
 const fetchKlineDev = async (symbol) => {
-  const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=1&limit=200`
+  const url = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m&limit=200`
   const response = await fetch(url)
   const data = await response.json()
-  const kline = data.result.list
+  const kline = data
   const numericValues = kline.map(entry => parseFloat(entry[1]))
   const ema = EMA(numericValues, 59)
   return { symbol, ema }
@@ -401,10 +401,10 @@ const signals = (kLine, symbol, emaDist) => {
 }
 
 const zscore = async (symbol = 'BTCUSDT') => {
-  const url = `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=1`
+  const url = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m&limit=150`
   const response = await fetch(url)
   const data = await response.json()
-  const kline = data.result.list
+  const kline = data
   const numericValues = kline.map(entry => parseFloat(entry[1]))
   const ema = EMA(numericValues, 59)
   const emaDist = ((numericValues[0] - ema[0]) / numericValues[0]) * 100
@@ -418,6 +418,6 @@ const zscore = async (symbol = 'BTCUSDT') => {
 
   const upperBand = mean + (2 * stdDeviation);
   const lowerBand = mean - (2 * stdDeviation);
-  const price24hPcnt = (parseFloat(tickers.find(ticker => ticker.symbol === symbol).price24hPcnt) * 100).toFixed(2)
+  const price24hPcnt = parseFloat(tickers.find(ticker => ticker.symbol === symbol)?.priceChangePercent || 0).toFixed(2)
   return { symbol, EMA_dist: emaDist, price24hPcnt, zScore, upperBand, lowerBand }
 }

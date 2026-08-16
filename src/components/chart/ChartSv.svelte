@@ -127,8 +127,6 @@
         <div class="rounded-xl overflow-hidden border border-white/5 bg-black/60 relative w-full">
             <div class="chart" id="chart"></div>
         </div>
-
-        <slot />
     </div>
 
     <!-- Signals and Tables Column -->
