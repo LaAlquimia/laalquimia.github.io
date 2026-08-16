@@ -7,6 +7,7 @@
     let balances = {};
     let nftBalance = 0;
     let loadingBalance = true;
+    let activeTab = "short"; // "short" or "long"
 
     function loadScript(src) {
         return new Promise((resolve, reject) => {
@@ -159,20 +160,32 @@
             </div>
         </div>
 
+        <!-- Tab Switcher Group -->
+        <div class="flex p-1 bg-slate-950/80 border border-white/5 rounded-xl gap-1.5 w-full">
+            <button
+                type="button"
+                on:click={() => activeTab = "short"}
+                class="flex-1 py-2 px-3 text-center text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 {activeTab === 'short' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30 shadow-lg' : 'text-gray-400 hover:text-white border border-transparent'}"
+            >
+                <span>🔻 SHORT (Sobrecomprados)</span>
+            </button>
+            <button
+                type="button"
+                on:click={() => activeTab = "long"}
+                class="flex-1 py-2 px-3 text-center text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 {activeTab === 'long' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-lg' : 'text-gray-400 hover:text-white border border-transparent'}"
+            >
+                <span>🟢 LONG (Sobrevendidos)</span>
+            </button>
+        </div>
+
         <!-- Tabla SHORT -->
-        <div class="flex flex-col gap-2">
-            <div class="flex items-center justify-between">
-                <h4 class="text-rose-400 font-bold text-sm sm:text-base flex items-center gap-2 m-0">
-                    <span>SHORT</span>
-                    <span class="text-xs">🔻 Sobrecomprados</span>
-                </h4>
-            </div>
-            <div class="overflow-x-auto rounded-xl border border-white/5 max-h-56 overflow-y-auto">
+        <div class="flex flex-col gap-2" style={activeTab === 'short' ? 'display: flex;' : 'display: none;'}>
+            <div class="overflow-x-auto rounded-xl border border-white/5">
                 <table
                     class="w-full text-left rtl:text-right text-gray-300 glass-table"
                     id="positiveTable"
                 >
-                    <thead class="uppercase sticky top-0 bg-slate-900/90 backdrop-blur-md z-10">
+                    <thead class="uppercase bg-slate-900/90 backdrop-blur-md">
                         <tr>
                             <th class="p-2 sm:p-3">Symbol</th>
                             <th class="p-2 sm:p-3">%Ema59</th>
@@ -185,19 +198,13 @@
         </div>
 
         <!-- Tabla LONG -->
-        <div class="flex flex-col gap-2">
-            <div class="flex items-center justify-between">
-                <h4 class="text-emerald-400 font-bold text-sm sm:text-base flex items-center gap-2 m-0">
-                    <span>LONG</span>
-                    <span class="text-xs">🔼 Sobreventidos</span>
-                </h4>
-            </div>
-            <div class="overflow-x-auto rounded-xl border border-white/5 max-h-56 overflow-y-auto">
+        <div class="flex flex-col gap-2" style={activeTab === 'long' ? 'display: flex;' : 'display: none;'}>
+            <div class="overflow-x-auto rounded-xl border border-white/5">
                 <table
                     class="w-full text-left rtl:text-right text-gray-300 glass-table"
                     id="negativeTable"
                 >
-                    <thead class="uppercase sticky top-0 bg-slate-900/90 backdrop-blur-md z-10">
+                    <thead class="uppercase bg-slate-900/90 backdrop-blur-md">
                         <tr>
                             <th class="p-2 sm:p-3">Symbol</th>
                             <th class="p-2 sm:p-3">%Ema59</th>
