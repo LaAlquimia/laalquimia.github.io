@@ -33,12 +33,15 @@ import Balance from './balance/Balance.svelte';
 		margin: 0;
 		font-size: 1.25rem;
 		font-weight: 800;
+		letter-spacing: -0.03em;
 	}
 	.brand-title a {
-		background: linear-gradient(120deg, #fff 40%, #40cde0 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
+		color: #ffffff;
 		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+	.brand-title a:hover {
+		color: #34d399;
 	}
 	nav {
 		display: flex;
@@ -66,9 +69,9 @@ import Balance from './balance/Balance.svelte';
 		background: rgba(255, 255, 255, 0.05);
 	}
 	nav :global(a.active) {
-		color: #40cde0;
-		background: rgba(64, 205, 224, 0.1);
-		border: 1px solid rgba(64, 205, 224, 0.2);
+		color: #34d399;
+		background: rgba(16, 185, 129, 0.1);
+		border: 1px solid rgba(16, 185, 129, 0.25);
 	}
 	.social-links {
 		display: flex;

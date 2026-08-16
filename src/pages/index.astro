@@ -24,30 +24,44 @@ const latestPosts = (await getCollection("blog"))
 			<!-- HERO SECTION: Institutional Quant Fund -->
 			<section class="relative">
 				<!-- Ambient Glow Effect -->
-				<div class="absolute -top-24 left-1/2 -translate-x-1/2 w-full max-w-4xl h-72 bg-gradient-to-tr from-emerald-500/10 via-cyan-500/10 to-transparent blur-3xl -z-10 pointer-events-none"></div>
+				<div class="absolute -top-24 left-1/2 -translate-x-1/2 w-full max-w-4xl h-72 bg-gradient-to-tr from-emerald-500/10 via-teal-500/5 to-transparent blur-3xl -z-10 pointer-events-none"></div>
 
-				<div class="liquid-glass-card p-6 sm:p-12 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-10 sm:gap-14 border border-white/10 relative overflow-hidden">
-					<div class="flex-1 text-left space-y-6 z-10">
+				<div class="liquid-glass-card p-6 sm:p-12 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 sm:gap-14 border border-white/[0.08] relative overflow-hidden bg-slate-900/40">
+					
+					<!-- Left Column: Turtle looking right towards the text -->
+					<div class="w-full lg:w-5/12 flex justify-center items-center relative order-first">
+						<div class="relative w-full max-w-sm">
+							<div class="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 via-teal-500/10 to-transparent rounded-3xl blur-2xl transform -rotate-2"></div>
+							<img
+								src="/images/rightlaptop.webp"
+								class="relative w-full rounded-2xl border border-white/[0.08] shadow-2xl hover:scale-102 transition-transform duration-500 object-contain bg-slate-950/60"
+								alt="Terminal de Algoritmos Quant"
+							/>
+						</div>
+					</div>
+
+					<!-- Right Column: Institutional Copy & CTAs -->
+					<div class="flex-1 text-left space-y-6 z-10 order-last">
 						
 						<!-- Institutional Badge -->
 						<div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-xs font-bold tracking-wider uppercase">
 							<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-							<span>Quantitative Asset Management & Algorithmic Systems</span>
+							<span>Quantitative Asset Management & Systems</span>
 						</div>
 
-						<h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.15]">
+						<h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight text-white leading-[1.15]">
 							Ingeniería Financiera y Ejecución Algorítmica Sistemática.
 						</h1>
 
-						<p class="text-gray-300 text-base sm:text-lg leading-relaxed max-w-2xl font-normal">
-							Diseñamos y ejecutamos modelos de arbitraje estadístico, reversión a la media y flujo de órdenes institucional en mercados de derivados globales. Gestión cuantitativa de riesgo impulsada por matemáticas puras y tecnología Web3 no-custodial.
+						<p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl font-normal">
+							Diseñamos y ejecutamos modelos de arbitraje estadístico, reversión a la media y microestructura de mercado en contratos perpetuos globales. Gestión rigurosa de riesgo impulsada por matemáticas y Web3 no-custodial.
 						</p>
 
 						<!-- CTA Actions -->
 						<div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4">
 							<a
 								href="/bot"
-								class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg shadow-emerald-500/15 flex items-center justify-center gap-2 text-center"
+								class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 text-center"
 							>
 								<span>Explorar Estrategias Activas</span>
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +71,7 @@ const latestPosts = (await getCollection("blog"))
 
 							<a
 								href="/blog"
-								class="px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-200 font-semibold text-sm sm:text-base rounded-xl transition-all flex items-center justify-center gap-2 text-center"
+								class="px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-slate-200 font-semibold text-sm sm:text-base rounded-xl transition-all flex items-center justify-center gap-2 text-center"
 							>
 								<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -67,38 +81,36 @@ const latestPosts = (await getCollection("blog"))
 						</div>
 					</div>
 
-					<div class="w-full lg:w-5/12 flex justify-center items-center relative">
-						<div class="relative w-full max-w-sm">
-							<div class="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl blur-2xl transform rotate-3"></div>
-							<img
-								src="/images/rightlaptop.webp"
-								class="relative w-full rounded-2xl border border-white/10 shadow-2xl hover:scale-102 transition-transform duration-500 object-contain bg-slate-950/60"
-								alt="Terminal de Algoritmos Quant"
-							/>
-						</div>
-					</div>
 				</div>
 
-				<!-- Live Institutional Stats Grid -->
+				<!-- Live Institutional Stats Grid (Unified Elegant Palette) -->
 				<div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mt-6">
-					<div class="liquid-glass-card p-4 sm:p-6 text-center border border-white/5 bg-slate-900/40">
-						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-emerald-400 font-mono tracking-tight">99.98%</span>
-						<span class="text-xs sm:text-sm text-gray-400 font-medium mt-1 block">Uptime de Infraestructura</span>
+					<div class="liquid-glass-card p-5 sm:p-6 text-center border border-white/[0.08] bg-slate-900/50 hover:border-emerald-500/30 transition-all">
+						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-mono tracking-tight">
+							99.98<span class="text-emerald-400 text-lg">%</span>
+						</span>
+						<span class="text-xs sm:text-sm text-slate-400 font-medium mt-1 block">Uptime de Infraestructura</span>
 					</div>
 
-					<div class="liquid-glass-card p-4 sm:p-6 text-center border border-white/5 bg-slate-900/40">
-						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-cyan-400 font-mono tracking-tight">&lt; 15ms</span>
-						<span class="text-xs sm:text-sm text-gray-400 font-medium mt-1 block">Latencia WebSocket Directa</span>
+					<div class="liquid-glass-card p-5 sm:p-6 text-center border border-white/[0.08] bg-slate-900/50 hover:border-emerald-500/30 transition-all">
+						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-mono tracking-tight">
+							&lt; 15<span class="text-emerald-400 text-lg">ms</span>
+						</span>
+						<span class="text-xs sm:text-sm text-slate-400 font-medium mt-1 block">Latencia WebSocket Directa</span>
 					</div>
 
-					<div class="liquid-glass-card p-4 sm:p-6 text-center border border-white/5 bg-slate-900/40">
-						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-amber-400 font-mono tracking-tight">100%</span>
-						<span class="text-xs sm:text-sm text-gray-400 font-medium mt-1 block">Ejecución Sistemática</span>
+					<div class="liquid-glass-card p-5 sm:p-6 text-center border border-white/[0.08] bg-slate-900/50 hover:border-emerald-500/30 transition-all">
+						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-mono tracking-tight">
+							100<span class="text-emerald-400 text-lg">%</span>
+						</span>
+						<span class="text-xs sm:text-sm text-slate-400 font-medium mt-1 block">Ejecución Sistemática</span>
 					</div>
 
-					<div class="liquid-glass-card p-4 sm:p-6 text-center border border-white/5 bg-slate-900/40">
-						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-indigo-400 font-mono tracking-tight">No-Custodial</span>
-						<span class="text-xs sm:text-sm text-gray-400 font-medium mt-1 block">Acceso Web3 en Base L2</span>
+					<div class="liquid-glass-card p-5 sm:p-6 text-center border border-white/[0.08] bg-slate-900/50 hover:border-emerald-500/30 transition-all">
+						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-mono tracking-tight">
+							Non<span class="text-emerald-400 text-lg">-Custodial</span>
+						</span>
+						<span class="text-xs sm:text-sm text-slate-400 font-medium mt-1 block">Acceso Web3 en Base L2</span>
 					</div>
 				</div>
 			</section>
@@ -113,20 +125,20 @@ const latestPosts = (await getCollection("blog"))
 							Estrategias Activas en Producción
 						</h2>
 					</div>
-					<p class="text-xs sm:text-sm text-gray-400 max-w-md">
+					<p class="text-xs sm:text-sm text-slate-400 max-w-md">
 						Sistemas cuantitativos diseñados para operar de forma autónoma 24/7 sobre mercados perpetuos de alta liquidez.
 					</p>
 				</div>
 
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
 					<!-- Strategy 1: Bybit Mean Rev -->
-					<div class="liquid-glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-amber-500/40 transition-all duration-300 rounded-2xl group">
+					<div class="liquid-glass-card p-6 flex flex-col justify-between border border-white/[0.08] hover:border-emerald-500/40 bg-slate-900/40 transition-all duration-300 rounded-2xl group">
 						<div class="space-y-4">
 							<div class="flex items-center justify-between">
-								<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+								<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/25">
 									BYBIT LINEAR
 								</span>
-								<span class="text-xs font-mono text-gray-400">Token ID #1</span>
+								<span class="text-xs font-mono text-slate-400">Token ID #1</span>
 							</div>
 
 							<div class="w-full h-36 rounded-xl bg-slate-950/60 border border-white/5 overflow-hidden flex items-center justify-center p-3">
@@ -138,17 +150,17 @@ const latestPosts = (await getCollection("blog"))
 							</div>
 
 							<h3 class="text-xl font-bold text-white">Mean Reversion Bybit</h3>
-							<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+							<p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
 								Algoritmo estadístico basado en dispersión de volatilidad ($\pm 3\sigma$) y reversión a la media móvil exponencial EMA 59 en contratos perpetuos Bybit.
 							</p>
 
-							<div class="space-y-1.5 pt-2 text-xs text-gray-300 font-mono">
+							<div class="space-y-1.5 pt-2 text-xs text-slate-300 font-mono">
 								<div class="flex justify-between py-1 border-b border-white/5">
-									<span class="text-gray-500">Mecanismo:</span>
+									<span class="text-slate-500">Mecanismo:</span>
 									<span class="text-emerald-400">Desviación Estándar EMA</span>
 								</div>
 								<div class="flex justify-between py-1 border-b border-white/5">
-									<span class="text-gray-500">Frecuencia:</span>
+									<span class="text-slate-500">Frecuencia:</span>
 									<span>1m / 5m / 15m</span>
 								</div>
 							</div>
@@ -156,7 +168,7 @@ const latestPosts = (await getCollection("blog"))
 
 						<a
 							href="/bot/meanRev"
-							class="mt-6 w-full py-2.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-400 font-bold text-sm rounded-xl text-center transition-all flex items-center justify-center gap-2"
+							class="mt-6 w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-sm rounded-xl text-center transition-all flex items-center justify-center gap-2"
 						>
 							<span>Ver Terminal Bybit</span>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,13 +178,13 @@ const latestPosts = (await getCollection("blog"))
 					</div>
 
 					<!-- Strategy 2: Binance Mean Rev -->
-					<div class="liquid-glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-yellow-500/40 transition-all duration-300 rounded-2xl group">
+					<div class="liquid-glass-card p-6 flex flex-col justify-between border border-white/[0.08] hover:border-emerald-500/40 bg-slate-900/40 transition-all duration-300 rounded-2xl group">
 						<div class="space-y-4">
 							<div class="flex items-center justify-between">
-								<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-500/15 text-yellow-400 border border-yellow-500/30">
+								<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-500/10 text-yellow-400 border border-yellow-500/25">
 									BINANCE FUTURES
 								</span>
-								<span class="text-xs font-mono text-gray-400">Token ID #2</span>
+								<span class="text-xs font-mono text-slate-400">Token ID #2</span>
 							</div>
 
 							<div class="w-full h-36 rounded-xl bg-slate-950/60 border border-white/5 overflow-hidden flex items-center justify-center p-3">
@@ -184,17 +196,17 @@ const latestPosts = (await getCollection("blog"))
 							</div>
 
 							<h3 class="text-xl font-bold text-white">Mean Reversion Binance</h3>
-							<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+							<p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
 								Scanner multiactivo en tiempo real conectado vía WebSocket a los 50 contratos perpetuos de mayor liquidez en Binance Futures con ordenación dinámica.
 							</p>
 
-							<div class="space-y-1.5 pt-2 text-xs text-gray-300 font-mono">
+							<div class="space-y-1.5 pt-2 text-xs text-slate-300 font-mono">
 								<div class="flex justify-between py-1 border-b border-white/5">
-									<span class="text-gray-500">Mecanismo:</span>
-									<span class="text-yellow-400">Multi-Stream Scanner</span>
+									<span class="text-slate-500">Mecanismo:</span>
+									<span class="text-emerald-400">Multi-Stream Scanner</span>
 								</div>
 								<div class="flex justify-between py-1 border-b border-white/5">
-									<span class="text-gray-500">Universo:</span>
+									<span class="text-slate-500">Universo:</span>
 									<span>Top 50 USDT Pairs</span>
 								</div>
 							</div>
@@ -202,7 +214,7 @@ const latestPosts = (await getCollection("blog"))
 
 						<a
 							href="/bot/meanRevBinance"
-							class="mt-6 w-full py-2.5 bg-yellow-500/15 hover:bg-yellow-500/25 border border-yellow-500/30 text-yellow-400 font-bold text-sm rounded-xl text-center transition-all flex items-center justify-center gap-2"
+							class="mt-6 w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-sm rounded-xl text-center transition-all flex items-center justify-center gap-2"
 						>
 							<span>Ver Terminal Binance</span>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,13 +224,13 @@ const latestPosts = (await getCollection("blog"))
 					</div>
 
 					<!-- Strategy 3: Quant Trader V2 -->
-					<div class="liquid-glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-indigo-500/40 transition-all duration-300 rounded-2xl group">
+					<div class="liquid-glass-card p-6 flex flex-col justify-between border border-white/[0.08] hover:border-emerald-500/40 bg-slate-900/40 transition-all duration-300 rounded-2xl group">
 						<div class="space-y-4">
 							<div class="flex items-center justify-between">
-								<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+								<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/25">
 									QUANT TRADER V2
 								</span>
-								<span class="text-xs font-mono text-gray-400">Token ID #3</span>
+								<span class="text-xs font-mono text-slate-400">Token ID #3</span>
 							</div>
 
 							<div class="w-full h-36 rounded-xl bg-slate-950/60 border border-white/5 overflow-hidden flex items-center justify-center p-3">
@@ -230,17 +242,17 @@ const latestPosts = (await getCollection("blog"))
 							</div>
 
 							<h3 class="text-xl font-bold text-white">Score de Expansión & OI</h3>
-							<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+							<p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
 								Algoritmo multifactorial de microestructura que combina Volumen Relativo (RVOL), Flujo de Capital Institucional (Open Interest) e Inercia de Medias.
 							</p>
 
-							<div class="space-y-1.5 pt-2 text-xs text-gray-300 font-mono">
+							<div class="space-y-1.5 pt-2 text-xs text-slate-300 font-mono">
 								<div class="flex justify-between py-1 border-b border-white/5">
-									<span class="text-gray-500">Mecanismo:</span>
-									<span class="text-indigo-400">Open Interest + RVOL</span>
+									<span class="text-slate-500">Mecanismo:</span>
+									<span class="text-emerald-400">Open Interest + RVOL</span>
 								</div>
 								<div class="flex justify-between py-1 border-b border-white/5">
-									<span class="text-gray-500">Ejecución:</span>
+									<span class="text-slate-500">Ejecución:</span>
 									<span>Multi-Factorial Score</span>
 								</div>
 							</div>
@@ -248,7 +260,7 @@ const latestPosts = (await getCollection("blog"))
 
 						<a
 							href="/bot/TraderBot"
-							class="mt-6 w-full py-2.5 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 font-bold text-sm rounded-xl text-center transition-all flex items-center justify-center gap-2"
+							class="mt-6 w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-sm rounded-xl text-center transition-all flex items-center justify-center gap-2"
 						>
 							<span>Ver Terminal Quant V2</span>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
