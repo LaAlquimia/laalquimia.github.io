@@ -884,16 +884,6 @@
         </h1>
         <p class="text-gray-400 text-xs sm:text-sm mt-1">Medias de Inercia, Flujo de Capital (Open Interest) y Volumen Relativo (RVOL).</p>
       </div>
-
-      <!-- Quick Selector -->
-      <div class="flex items-center gap-3 self-start sm:self-center">
-        <span class="text-xs sm:text-sm text-gray-400 font-medium">Activo:</span>
-        <GlassSelector id="traderCoinSelector" defaultValue={selectedSymbol} on:change={(e) => handleSelectSymbol(e.target.value)}>
-          {#each hotTokens as tok}
-            <option value={tok}>{tok}</option>
-          {/each}
-        </GlassSelector>
-      </div>
     </div>
 
 
@@ -918,19 +908,32 @@
             <div bind:this={chartContainer} class="w-full" style="height: 350px;"></div>
           </div>
           
-          <!-- Indicator Legends -->
-          <div class="flex flex-wrap gap-3 sm:gap-6 text-xs text-gray-400 mt-1">
-            <div class="flex items-center gap-1.5">
-              <span class="w-3 h-1 bg-cyan-500 rounded"></span>
-              <span>EMA 20</span>
+          <!-- Bottom Controls & Selector Toolbar below Chart -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-white/5">
+            <!-- Indicator Legends -->
+            <div class="flex flex-wrap items-center gap-3 sm:gap-5 text-xs text-gray-400">
+              <div class="flex items-center gap-1.5">
+                <span class="w-3 h-1 bg-cyan-500 rounded"></span>
+                <span>EMA 20</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-3 h-1 bg-violet-500 rounded"></span>
+                <span>EMA 50</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 bg-emerald-500/30 border border-emerald-500/50 rounded"></span>
+                <span>Ruptura Vol (>1.5)</span>
+              </div>
             </div>
-            <div class="flex items-center gap-1.5">
-              <span class="w-3 h-1 bg-violet-500 rounded"></span>
-              <span>EMA 50</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 bg-emerald-500/30 border border-emerald-500/50 rounded"></span>
-              <span>Ruptura Vol (>1.5 RVOL)</span>
+
+            <!-- Asset Selector positioned right below chart -->
+            <div class="flex items-center gap-2.5 self-start sm:self-auto">
+              <span class="text-xs text-gray-400 font-medium whitespace-nowrap">Seleccionar Activo:</span>
+              <GlassSelector id="traderCoinSelector" defaultValue={selectedSymbol} on:change={(e) => handleSelectSymbol(e.target.value)}>
+                {#each hotTokens as tok}
+                  <option value={tok}>{tok}</option>
+                {/each}
+              </GlassSelector>
             </div>
           </div>
         </div>
