@@ -9,27 +9,19 @@
     import GlassSelector from "./GlassSelector.svelte";
 
     let balances = {};
-    let nftBalance ;
-    let nft2Balance ;
-    let nft3Balance ;
+    let nft2Balance = 0;
+    let loadingBalance = true;
+
     onMount(async () => {
-  try {
-    console.log("Iniciando el selector de bots");
-    
-    balances = await checkBalances();
-    console.log(balances);
-    // balance on 1 or 2
-
-    nftBalance= balances[1]   
-    nft2Balance= balances[2]
-    nft3Balance= balances[3]
-    console.log(nftBalance);
-    
-  } catch (error) {
-    console.error("Error al obtener balances:", error);
-  }
-
-});
+        try {
+            balances = await checkBalances();
+            nft2Balance = parseInt(balances[2] || 0);
+        } catch (error) {
+            console.error("Error al obtener balances:", error);
+        } finally {
+            loadingBalance = false;
+        }
+    });
 </script>
 
 <style>
@@ -78,6 +70,12 @@
     }
 </style>
 
+{#if loadingBalance}
+    <div class="flex flex-col items-center justify-center min-h-[60vh] text-gray-300 gap-3 py-16">
+        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-yellow-400"></div>
+        <span class="text-sm font-semibold text-gray-400">Verificando acceso a Binance Mean Reversion...</span>
+    </div>
+{:else if nft2Balance > 0}
 <!-- Main Container -->
 <div class="w-full max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 flex flex-col lg:flex-row gap-6 text-gray-200">
     
@@ -102,6 +100,7 @@
         <!-- Chart Canvas Container -->
         <div class="rounded-xl overflow-hidden border border-white/5 bg-black/60 relative w-full">
             <div class="chart" id="chart"></div>
+            <slot />
         </div>
 
         <!-- Chart Footer / Legend -->
@@ -123,19 +122,21 @@
         </div>
     </div>
 
-    <!-- Tables & Filters Column -->
-    <div id="tables" class="w-full lg:w-2/5 liquid-glass-card p-3.5 sm:p-5 flex flex-col gap-5">
-        <!-- Selectores sobre la tabla -->
-        <div class="flex flex-wrap justify-between items-center pb-3 border-b border-white/10 gap-3">
-            <span class="font-extrabold text-xs text-gray-400 uppercase tracking-wider">Filtros Activos</span>
-            <div class="flex gap-2 items-center flex-wrap sm:flex-nowrap">
-                <GlassSelector id="symbolSelector" defaultValue="BTCUSDT">
+    <!-- Signals and Tables Column -->
+    <div class="liquid-glass-card w-full lg:w-2/5 p-3.5 sm:p-5 flex flex-col gap-5">
+        <!-- Header & Selectors -->
+        <div class="flex flex-col gap-3 pb-3 border-b border-white/5">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-bold text-white tracking-wide m-0">Scanner de Señales</h3>
+                <span class="text-xs text-gray-400 font-mono" id="ticker-time">--:--:--</span>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <GlassSelector id="tickerSelect" defaultValue="BTCUSDT">
                     <option value="BTCUSDT">BTCUSDT</option>
-                    <option value="ETHUSDT">ETHUSDT</option>
-                    <option value="ETCUSDT">ETCUSDT</option>
                 </GlassSelector>
 
-                <GlassSelector id="intervalSelector" defaultValue="1">
+                <GlassSelector id="intervalSelect" defaultValue="1">
                     <option value="1">1m</option>
                     <option value="3">3m</option>
                     <option value="5">5m</option>
@@ -144,9 +145,7 @@
                     <option value="60">1h</option>
                     <option value="120">2h</option>
                     <option value="240">4h</option>
-                    <option value="360">6h</option>
-                    <option value="720">12h</option>
-                    <option value="D">1d</option>
+                    <option value="D">1D</option>
                     <option value="M">1M</option>
                     <option value="W">1W</option>
                 </GlassSelector>
@@ -219,3 +218,26 @@
         data-is-inline
         src="https://cdn.jsdelivr.net/npm/ta-lib@0.11.0/index.min.js"></script>
 </div>
+{:else}
+<div class="flex items-center justify-center min-h-[70vh] text-white p-4">
+    <div class="liquid-glass-card p-8 max-w-md text-center flex flex-col items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Acceso Restringido</h2>
+        <p class="text-sm text-gray-400">
+            Para acceder al bot <b>Binance Mean Reversion</b> debes conectar tu wallet y poseer al menos 1 NFT de la estrategia (#2) en la red Base.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 w-full mt-2">
+            <a class="flex-1 px-4 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl text-sm font-bold transition-all text-center" href="https://opensea.io/assets/base/0xd78be833ed889929b50d2ad3ab7ba94f76a9a8bf/2" target="_blank" rel="noopener noreferrer">
+                Obtener NFT #2
+            </a>
+            <a class="flex-1 px-4 py-2.5 bg-white/10 hover:bg-white/15 rounded-xl text-sm font-semibold text-gray-200 transition-all text-center" href="/bot">
+                Ver Bots
+            </a>
+        </div>
+    </div>
+</div>
+{/if}

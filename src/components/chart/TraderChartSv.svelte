@@ -187,7 +187,7 @@
       loadingBalance = false;
     }
 
-    if (nft3Balance > 0 || true) { // For testing/dev we allow viewing
+    if (nft3Balance > 0) {
       await initChart();
       await updateData();
       startWebSocket();
@@ -843,9 +843,12 @@
   }
 </style>
 
-<!-- if token balance is valid -->
-<!-- if token balance is valid -->
-{#if nft3Balance > 0 || true}
+{#if loadingBalance}
+  <div class="flex flex-col items-center justify-center min-h-[60vh] text-gray-300 gap-3 py-16">
+    <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-cyan-400"></div>
+    <span class="text-sm font-semibold text-gray-400">Verificando acceso a Quant Trader V2...</span>
+  </div>
+{:else if nft3Balance > 0}
 <div class="trader-panel text-white py-6 sm:py-10 px-3 sm:px-6 lg:px-8 w-full min-h-screen">
   <div class="max-w-7xl mx-auto flex flex-col gap-6 sm:gap-8">
 
@@ -1124,9 +1127,23 @@
 {:else}
 <div class="flex items-center justify-center min-h-[70vh] text-white p-4">
   <div class="glass-card p-6 sm:p-8 max-w-md text-center flex flex-col items-center gap-4">
-    <h2 class="text-xl font-bold text-rose-400">Acceso Restringido</h2>
-    <p class="text-sm text-gray-400">Requiere propiedad del NFT del Bot 3 en OpenSea para activar el Algoritmo Score de Expansión.</p>
-    <a class="px-6 py-2.5 bg-rose-600 hover:bg-rose-500 rounded-xl text-sm font-semibold transition-all mt-2" href="https://opensea.io/assets/base/0xd78be833ed889929b50d2ad3ab7ba94f76a9a8bf/3" target="_blank" rel="noopener noreferrer">Comprar NFT en OpenSea</a>
+    <div class="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold text-white tracking-tight">Acceso Restringido</h2>
+    <p class="text-sm text-gray-400">
+      Para acceder al bot <b>Quant Trader V2</b> debes conectar tu wallet y poseer al menos 1 NFT de la estrategia (#3) en la red Base.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 w-full mt-2">
+      <a class="flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 rounded-xl text-sm font-semibold text-white transition-all text-center" href="https://opensea.io/assets/base/0xd78be833ed889929b50d2ad3ab7ba94f76a9a8bf/3" target="_blank" rel="noopener noreferrer">
+        Obtener NFT #3
+      </a>
+      <a class="flex-1 px-4 py-2.5 bg-white/10 hover:bg-white/15 rounded-xl text-sm font-semibold text-gray-200 transition-all text-center" href="/bot">
+        Ver Bots
+      </a>
+    </div>
   </div>
 </div>
 {/if}
