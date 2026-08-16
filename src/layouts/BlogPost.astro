@@ -10,81 +10,295 @@ type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 ---
 
-<html lang="en">
+<!doctype html>
+<html lang="es">
 	<head>
-		<BaseHead title={title} description={description} />
-		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				
+		<BaseHead title={`${title} | La Alquimia`} description={description} image={heroImage} />
+		<style is:global>
+			/* Mobile-optimized Prose Typography & Elements */
+			.article-content {
+				color: #cbd5e1;
+				font-size: 1.0625rem; /* 17px */
+				line-height: 1.8;
+				word-wrap: break-word;
+				overflow-wrap: break-word;
 			}
-			.hero-image {
-				margin: auto;
+
+			@media (max-width: 640px) {
+				.article-content {
+					font-size: 1rem; /* 16px */
+					line-height: 1.75;
+				}
 			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
+
+			/* Remove first h1 if it duplicates article title */
+			.article-content > h1:first-child {
+				display: none;
 			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-light));
+
+			.article-content h1,
+			.article-content h2,
+			.article-content h3,
+			.article-content h4 {
+				color: #fff;
+				font-weight: 800;
+				letter-spacing: -0.02em;
+				line-height: 1.3;
+				scroll-margin-top: 5rem;
 			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
+
+			.article-content h2 {
+				font-size: 1.5rem;
+				margin-top: 2.2em;
+				margin-bottom: 0.8em;
+				padding-bottom: 0.4em;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+				background: linear-gradient(135deg, #ffffff 40%, #a7f3d0 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
 			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-				color:  #a5e5c2;
+
+			@media (min-width: 640px) {
+				.article-content h2 {
+					font-size: 1.85rem;
+				}
 			}
-			.date {
+
+			.article-content h3 {
+				font-size: 1.25rem;
+				margin-top: 1.8em;
+				margin-bottom: 0.6em;
+				color: #6ee7b7;
+			}
+
+			@media (min-width: 640px) {
+				.article-content h3 {
+					font-size: 1.4rem;
+				}
+			}
+
+			.article-content h4 {
+				font-size: 1.1rem;
+				margin-top: 1.5em;
 				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
+				color: #38bdf8;
 			}
-			.last-updated-on {
+
+			.article-content p {
+				margin-bottom: 1.5em;
+				color: #cbd5e1;
+			}
+
+			.article-content strong,
+			.article-content b {
+				color: #fff;
+				font-weight: 700;
+			}
+
+			.article-content a {
+				color: #34d399;
+				text-decoration: underline;
+				text-underline-offset: 3px;
+				transition: color 0.2s ease;
+			}
+
+			.article-content a:hover {
+				color: #6ee7b7;
+			}
+
+			.article-content ul,
+			.article-content ol {
+				margin-bottom: 1.5em;
+				padding-left: 1.4rem;
+			}
+
+			.article-content li {
+				margin-bottom: 0.5em;
+				color: #cbd5e1;
+			}
+
+			.article-content ul {
+				list-style-type: disc;
+			}
+
+			.article-content ol {
+				list-style-type: decimal;
+			}
+
+			.article-content blockquote {
+				margin: 1.8em 0;
+				padding: 1rem 1.25rem;
+				border-left: 4px solid #10b981;
+				background: rgba(16, 185, 129, 0.05);
+				border-radius: 0 12px 12px 0;
+				color: #e2e8f0;
 				font-style: italic;
+			}
+
+			.article-content blockquote p:last-child {
+				margin-bottom: 0;
+			}
+
+			.article-content pre {
+				background: rgba(10, 14, 23, 0.85) !important;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 14px;
+				padding: 1rem 1.25rem;
+				overflow-x: auto;
+				max-width: 100%;
+				font-size: 0.875rem;
+				line-height: 1.6;
+				margin: 1.8em 0;
+				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+			}
+
+			.article-content code {
+				font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+			}
+
+			.article-content :not(pre) > code {
+				background: rgba(255, 255, 255, 0.08);
+				color: #6ee7b7;
+				padding: 0.15rem 0.4rem;
+				border-radius: 6px;
+				font-size: 0.875em;
+				word-break: break-word;
+				border: 1px solid rgba(255, 255, 255, 0.06);
+			}
+
+			.article-content table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 1.8em 0;
+				display: block;
+				overflow-x: auto;
+				-webkit-overflow-scrolling: touch;
+				border-radius: 12px;
+				border: 1px solid rgba(255, 255, 255, 0.08);
+			}
+
+			.article-content th,
+			.article-content td {
+				padding: 0.75rem 1rem;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+				text-align: left;
+				font-size: 0.9rem;
+			}
+
+			.article-content th {
+				background: rgba(255, 255, 255, 0.04);
+				color: #fff;
+				font-weight: 700;
+			}
+
+			.article-content tr:hover td {
+				background: rgba(255, 255, 255, 0.02);
+			}
+
+			.article-content hr {
+				border: 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.08);
+				margin: 2.5em 0;
+			}
+
+			.article-content img {
+				max-width: 100%;
+				height: auto;
+				border-radius: 14px;
+				margin: 1.8em auto;
+				display: block;
+				border: 1px solid rgba(255, 255, 255, 0.08);
 			}
 		</style>
 	</head>
 
-	<body>
+	<body class="bg-[#080c14] text-slate-100 min-h-screen flex flex-col antialiased">
 		<Header />
-		<main>
-			<article class="">
-				
-				<div class="prose">
-					<div class="title">
-						<div class="date">
+		
+		<main class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 flex-1">
+			<!-- Back to Blog Button -->
+			<div class="mb-6">
+				<a
+					href="/blog"
+					class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-gray-400 hover:text-emerald-400 transition-colors group"
+				>
+					<svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+					</svg>
+					<span>Volver a Artículos</span>
+				</a>
+			</div>
+
+			<article class="w-full">
+				<!-- Header Section -->
+				<header class="mb-8">
+					<div class="flex items-center gap-2.5 flex-wrap text-xs font-mono text-gray-400 mb-3">
+						<span class="px-2.5 py-0.5 rounded-full bg-emerald-950/40 border border-emerald-800/50 text-emerald-400 font-semibold tracking-wide uppercase text-[11px]">
+							Investigación
+						</span>
+						<span class="text-gray-600">•</span>
+						<span class="flex items-center gap-1.5">
+							<svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+							</svg>
 							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<div class="hero-image py-5 w-1/2 md:w-1/2">
-							{heroImage && <img width={720} height={520} src={heroImage} alt="" />}
-						</div>
-						<h1>{title}</h1>
-						<hr />
+						</span>
+						{
+							updatedDate && (
+								<>
+									<span class="text-gray-600">•</span>
+									<span class="text-gray-500 italic">
+										Actualizado el <FormattedDate date={updatedDate} />
+									</span>
+								</>
+							)
+						}
 					</div>
+
+					<h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight mb-4 !bg-none !text-white">
+						{title}
+					</h1>
+
+					{description && (
+						<p class="text-sm sm:text-base md:text-lg text-gray-300 leading-relaxed font-normal mb-6">
+							{description}
+						</p>
+					)}
+				</header>
+
+				<!-- Hero Image Banner -->
+				{heroImage && (
+					<div class="w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden mb-8 sm:mb-12 border border-white/10 shadow-2xl bg-black/40">
+						<img
+							src={heroImage}
+							alt={title}
+							class="w-full h-full object-cover"
+							loading="eager"
+						/>
+					</div>
+				)}
+
+				<!-- Post Markdown Body -->
+				<div class="article-content bg-slate-900/30 border border-white/5 rounded-2xl p-4 sm:p-8 md:p-10 backdrop-blur-sm">
 					<slot />
 				</div>
+
+				<!-- Post Footer & CTA -->
+				<div class="mt-10 sm:mt-14 p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-emerald-950/30 to-cyan-950/30 border border-emerald-500/20 flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
+					<div>
+						<h3 class="text-lg sm:text-xl font-bold text-white mb-1">¿Listo para operar con algoritmos?</h3>
+						<p class="text-xs sm:text-sm text-gray-400 mb-0">Explora nuestros bots de Mean Reversion y Quant Trader en vivo.</p>
+					</div>
+					<a
+						href="/bot"
+						class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl text-sm transition-all whitespace-nowrap shadow-lg shadow-emerald-500/10"
+					>
+						Ver Bots en Vivo &rarr;
+					</a>
+				</div>
 			</article>
-			
 		</main>
 
 		<Footer />
 	</body>
-	
 </html>
