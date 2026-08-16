@@ -3,84 +3,435 @@ import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { getCollection } from "astro:content";
+import FormattedDate from "../components/FormattedDate.astro";
+
+const latestPosts = (await getCollection("blog"))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`La Alquimia | Quantitative Asset Management & Algorithmic Trading`} description={SITE_DESCRIPTION} />
 	</head>
-	<body>
+	<body class="bg-[#080c14] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
 		<Header />
 		
-		<main class="py-12 px-4 max-w-5xl mx-auto space-y-12">
-			<!-- Hero section inside liquid glass card -->
-			<div class="liquid-glass-card flex flex-col md:flex-row items-center justify-between gap-8 p-8 md:p-12">
-				<div class="flex-1 text-left space-y-4">
-					<h1 class="text-5xl md:text-6xl font-black tracking-tight">La Alquimia</h1>
-					<h3 class="text-xl md:text-2xl text-cyan-400 font-semibold">Algorithmic Trading 🐢</h3>
-					<p class="text-gray-300 text-lg leading-relaxed max-w-xl">
-						Desarrollo de sistemas de trading avanzados y automatizados utilizando las mejores estrategias cuantitativas.
+		<main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16 space-y-16 sm:space-y-24 flex-1">
+			
+			<!-- HERO SECTION: Institutional Quant Fund -->
+			<section class="relative">
+				<!-- Ambient Glow Effect -->
+				<div class="absolute -top-24 left-1/2 -translate-x-1/2 w-full max-w-4xl h-72 bg-gradient-to-tr from-emerald-500/10 via-cyan-500/10 to-transparent blur-3xl -z-10 pointer-events-none"></div>
+
+				<div class="liquid-glass-card p-6 sm:p-12 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-10 sm:gap-14 border border-white/10 relative overflow-hidden">
+					<div class="flex-1 text-left space-y-6 z-10">
+						
+						<!-- Institutional Badge -->
+						<div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-xs font-bold tracking-wider uppercase">
+							<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+							<span>Quantitative Asset Management & Algorithmic Systems</span>
+						</div>
+
+						<h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.15]">
+							Ingeniería Financiera y Ejecución Algorítmica Sistemática.
+						</h1>
+
+						<p class="text-gray-300 text-base sm:text-lg leading-relaxed max-w-2xl font-normal">
+							Diseñamos y ejecutamos modelos de arbitraje estadístico, reversión a la media y flujo de órdenes institucional en mercados de derivados globales. Gestión cuantitativa de riesgo impulsada por matemáticas puras y tecnología Web3 no-custodial.
+						</p>
+
+						<!-- CTA Actions -->
+						<div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4">
+							<a
+								href="/bot"
+								class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg shadow-emerald-500/15 flex items-center justify-center gap-2 text-center"
+							>
+								<span>Explorar Estrategias Activas</span>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+								</svg>
+							</a>
+
+							<a
+								href="/blog"
+								class="px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-200 font-semibold text-sm sm:text-base rounded-xl transition-all flex items-center justify-center gap-2 text-center"
+							>
+								<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+								</svg>
+								<span>Research & Papers</span>
+							</a>
+						</div>
+					</div>
+
+					<div class="w-full lg:w-5/12 flex justify-center items-center relative">
+						<div class="relative w-full max-w-sm">
+							<div class="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl blur-2xl transform rotate-3"></div>
+							<img
+								src="/images/rightlaptop.webp"
+								class="relative w-full rounded-2xl border border-white/10 shadow-2xl hover:scale-102 transition-transform duration-500 object-contain bg-slate-950/60"
+								alt="Terminal de Algoritmos Quant"
+							/>
+						</div>
+					</div>
+				</div>
+
+				<!-- Live Institutional Stats Grid -->
+				<div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mt-6">
+					<div class="liquid-glass-card p-4 sm:p-6 text-center border border-white/5 bg-slate-900/40">
+						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-emerald-400 font-mono tracking-tight">99.98%</span>
+						<span class="text-xs sm:text-sm text-gray-400 font-medium mt-1 block">Uptime de Infraestructura</span>
+					</div>
+
+					<div class="liquid-glass-card p-4 sm:p-6 text-center border border-white/5 bg-slate-900/40">
+						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-cyan-400 font-mono tracking-tight">&lt; 15ms</span>
+						<span class="text-xs sm:text-sm text-gray-400 font-medium mt-1 block">Latencia WebSocket Directa</span>
+					</div>
+
+					<div class="liquid-glass-card p-4 sm:p-6 text-center border border-white/5 bg-slate-900/40">
+						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-amber-400 font-mono tracking-tight">100%</span>
+						<span class="text-xs sm:text-sm text-gray-400 font-medium mt-1 block">Ejecución Sistemática</span>
+					</div>
+
+					<div class="liquid-glass-card p-4 sm:p-6 text-center border border-white/5 bg-slate-900/40">
+						<span class="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-indigo-400 font-mono tracking-tight">No-Custodial</span>
+						<span class="text-xs sm:text-sm text-gray-400 font-medium mt-1 block">Acceso Web3 en Base L2</span>
+					</div>
+				</div>
+			</section>
+
+
+			<!-- STRATEGIES IN PRODUCTION SECTION -->
+			<section class="space-y-8">
+				<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+					<div>
+						<span class="text-xs font-bold text-emerald-400 tracking-wider uppercase font-mono">Portafolio Algorítmico</span>
+						<h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight mt-1">
+							Estrategias Activas en Producción
+						</h2>
+					</div>
+					<p class="text-xs sm:text-sm text-gray-400 max-w-md">
+						Sistemas cuantitativos diseñados para operar de forma autónoma 24/7 sobre mercados perpetuos de alta liquidez.
 					</p>
-					<div class="pt-4 flex gap-4">
-						<a href="/bot" class="button bg-cyan-500/20 hover:bg-cyan-500/30 border-cyan-500/30 text-cyan-400 font-bold px-6 py-3 rounded-xl transition-all">Ver Bots 🤖</a>
-						<!-- <a href="/stake" class="button font-bold px-6 py-3 rounded-xl transition-all">Staking ALQ 💰</a> -->
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+					<!-- Strategy 1: Bybit Mean Rev -->
+					<div class="liquid-glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-amber-500/40 transition-all duration-300 rounded-2xl group">
+						<div class="space-y-4">
+							<div class="flex items-center justify-between">
+								<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+									BYBIT LINEAR
+								</span>
+								<span class="text-xs font-mono text-gray-400">Token ID #1</span>
+							</div>
+
+							<div class="w-full h-36 rounded-xl bg-slate-950/60 border border-white/5 overflow-hidden flex items-center justify-center p-3">
+								<img
+									src="/images/botMeanRev1.webp"
+									alt="Bybit Mean Rev Bot"
+									class="max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+								/>
+							</div>
+
+							<h3 class="text-xl font-bold text-white">Mean Reversion Bybit</h3>
+							<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+								Algoritmo estadístico basado en dispersión de volatilidad ($\pm 3\sigma$) y reversión a la media móvil exponencial EMA 59 en contratos perpetuos Bybit.
+							</p>
+
+							<div class="space-y-1.5 pt-2 text-xs text-gray-300 font-mono">
+								<div class="flex justify-between py-1 border-b border-white/5">
+									<span class="text-gray-500">Mecanismo:</span>
+									<span class="text-emerald-400">Desviación Estándar EMA</span>
+								</div>
+								<div class="flex justify-between py-1 border-b border-white/5">
+									<span class="text-gray-500">Frecuencia:</span>
+									<span>1m / 5m / 15m</span>
+								</div>
+							</div>
+						</div>
+
+						<a
+							href="/bot/meanRev"
+							class="mt-6 w-full py-2.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-400 font-bold text-sm rounded-xl text-center transition-all flex items-center justify-center gap-2"
+						>
+							<span>Ver Terminal Bybit</span>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+							</svg>
+						</a>
+					</div>
+
+					<!-- Strategy 2: Binance Mean Rev -->
+					<div class="liquid-glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-yellow-500/40 transition-all duration-300 rounded-2xl group">
+						<div class="space-y-4">
+							<div class="flex items-center justify-between">
+								<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-500/15 text-yellow-400 border border-yellow-500/30">
+									BINANCE FUTURES
+								</span>
+								<span class="text-xs font-mono text-gray-400">Token ID #2</span>
+							</div>
+
+							<div class="w-full h-36 rounded-xl bg-slate-950/60 border border-white/5 overflow-hidden flex items-center justify-center p-3">
+								<img
+									src="/images/BinanceMRBot.webp"
+									alt="Binance Mean Rev Bot"
+									class="max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+								/>
+							</div>
+
+							<h3 class="text-xl font-bold text-white">Mean Reversion Binance</h3>
+							<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+								Scanner multiactivo en tiempo real conectado vía WebSocket a los 50 contratos perpetuos de mayor liquidez en Binance Futures con ordenación dinámica.
+							</p>
+
+							<div class="space-y-1.5 pt-2 text-xs text-gray-300 font-mono">
+								<div class="flex justify-between py-1 border-b border-white/5">
+									<span class="text-gray-500">Mecanismo:</span>
+									<span class="text-yellow-400">Multi-Stream Scanner</span>
+								</div>
+								<div class="flex justify-between py-1 border-b border-white/5">
+									<span class="text-gray-500">Universo:</span>
+									<span>Top 50 USDT Pairs</span>
+								</div>
+							</div>
+						</div>
+
+						<a
+							href="/bot/meanRevBinance"
+							class="mt-6 w-full py-2.5 bg-yellow-500/15 hover:bg-yellow-500/25 border border-yellow-500/30 text-yellow-400 font-bold text-sm rounded-xl text-center transition-all flex items-center justify-center gap-2"
+						>
+							<span>Ver Terminal Binance</span>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+							</svg>
+						</a>
+					</div>
+
+					<!-- Strategy 3: Quant Trader V2 -->
+					<div class="liquid-glass-card p-6 flex flex-col justify-between border border-white/10 hover:border-indigo-500/40 transition-all duration-300 rounded-2xl group">
+						<div class="space-y-4">
+							<div class="flex items-center justify-between">
+								<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+									QUANT TRADER V2
+								</span>
+								<span class="text-xs font-mono text-gray-400">Token ID #3</span>
+							</div>
+
+							<div class="w-full h-36 rounded-xl bg-slate-950/60 border border-white/5 overflow-hidden flex items-center justify-center p-3">
+								<img
+									src="/images/TraderBot.webp"
+									alt="Quant Trader V2 Bot"
+									class="max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+								/>
+							</div>
+
+							<h3 class="text-xl font-bold text-white">Score de Expansión & OI</h3>
+							<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+								Algoritmo multifactorial de microestructura que combina Volumen Relativo (RVOL), Flujo de Capital Institucional (Open Interest) e Inercia de Medias.
+							</p>
+
+							<div class="space-y-1.5 pt-2 text-xs text-gray-300 font-mono">
+								<div class="flex justify-between py-1 border-b border-white/5">
+									<span class="text-gray-500">Mecanismo:</span>
+									<span class="text-indigo-400">Open Interest + RVOL</span>
+								</div>
+								<div class="flex justify-between py-1 border-b border-white/5">
+									<span class="text-gray-500">Ejecución:</span>
+									<span>Multi-Factorial Score</span>
+								</div>
+							</div>
+						</div>
+
+						<a
+							href="/bot/TraderBot"
+							class="mt-6 w-full py-2.5 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 font-bold text-sm rounded-xl text-center transition-all flex items-center justify-center gap-2"
+						>
+							<span>Ver Terminal Quant V2</span>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+							</svg>
+						</a>
 					</div>
 				</div>
-				<div class="flex-1 flex justify-center">
-					<img
-						src="/images/rightlaptop.webp"
-						class="w-full max-w-xs md:max-w-sm hover:scale-105 transition-transform duration-500 filter drop-shadow-[0_0_25px_rgba(64,205,224,0.2)]"
-						alt="laptop"
-					/>
-				</div>
-			</div>
+			</section>
 
-			<!-- Grid features with liquid glass -->
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-				<!-- Spot & Futures Card -->
-				<div class="liquid-glass-card flex flex-col justify-between p-8 gap-6">
-					<div class="space-y-3">
-						<h2 class="text-3xl font-bold">Spot & Futures</h2>
-						<h4 class="text-cyan-400 font-semibold text-lg">Strategies for trade</h4>
-						<p class="text-gray-400">
-							Ejecución precisa de algoritmos adaptados para mercados spot y de futuros, maximizando retornos y controlando riesgos.
+
+			<!-- QUANTITATIVE INVESTMENT METHODOLOGY -->
+			<section class="space-y-10">
+				<div class="text-center max-w-3xl mx-auto space-y-3">
+					<span class="text-xs font-bold text-emerald-400 tracking-wider uppercase font-mono">Marco Metodológico</span>
+					<h2 class="text-2xl sm:text-4xl font-black text-white tracking-tight">
+						Pilares de la Inversión Sistemática
+					</h2>
+					<p class="text-sm sm:text-base text-gray-400 leading-relaxed">
+						Reemplazamos el sesgo y la especulación humana por modelos estocásticos, arbitraje estadístico y gestión rigurosa de capital.
+					</p>
+				</div>
+
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+					<!-- Pillar 1 -->
+					<div class="liquid-glass-card p-6 space-y-3 border border-white/5 bg-slate-900/30 rounded-2xl">
+						<div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2">
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+							</svg>
+						</div>
+						<h3 class="text-lg font-bold text-white">Arbitraje Estadístico</h3>
+						<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+							Explotación sistemática de divergencias temporales de precios mediante Z-Scores y modelos de cointegración estadística.
 						</p>
 					</div>
-					<div class="flex justify-center pt-4">
-						<img
-							src="/images/diamondturtle.png"
-							class="h-44 object-contain hover:rotate-3 transition-transform duration-300 filter drop-shadow-[0_0_15px_rgba(165,177,244,0.15)]"
-							alt="diamond turtle"
-						/>
-					</div>
-				</div>
 
-				<!-- Best Trading Bots Card -->
-				<div class="liquid-glass-card flex flex-col justify-between p-8 gap-6">
-					<div class="space-y-3">
-						<h2 class="text-3xl font-bold">Best Trading Bots 🤖</h2>
-						<h4 class="text-cyan-400 font-semibold text-lg">Python and JavaScript</h4>
-						<p class="text-gray-400">
-							Nuestros sistemas están construidos sobre infraestructuras rápidas y seguras que corren 24/7 de forma ininterrumpida.
+					<!-- Pillar 2 -->
+					<div class="liquid-glass-card p-6 space-y-3 border border-white/5 bg-slate-900/30 rounded-2xl">
+						<div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-2">
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+							</svg>
+						</div>
+						<h3 class="text-lg font-bold text-white">Delta-Neutralidad</h3>
+						<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+							Captura de tasas de financiación (Funding Rates) y spreads de base sin exposición direccional al precio de mercado.
 						</p>
 					</div>
-					<div class="flex justify-center pt-4">
-						<img
-							src="/images/tortugacadenas.png"
-							class="h-44 object-contain hover:scale-105 transition-transform duration-300"
-							alt="tortuga cadenas"
-						/>
+
+					<!-- Pillar 3 -->
+					<div class="liquid-glass-card p-6 space-y-3 border border-white/5 bg-slate-900/30 rounded-2xl">
+						<div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-2">
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+							</svg>
+						</div>
+						<h3 class="text-lg font-bold text-white">Control de Riesgo (VaR)</h3>
+						<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+							Monitoreo continuo de Valor en Riesgo, límites de apalancamiento y protección activa ante anomalías de liquidez.
+						</p>
+					</div>
+
+					<!-- Pillar 4 -->
+					<div class="liquid-glass-card p-6 space-y-3 border border-white/5 bg-slate-900/30 rounded-2xl">
+						<div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-2">
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+							</svg>
+						</div>
+						<h3 class="text-lg font-bold text-white">Gobernanza Web3</h3>
+						<p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+							Licenciamiento no-custodial a través de contratos inteligentes ERC-1155 desplegados en Base L2 (Ethereum).
+						</p>
 					</div>
 				</div>
-			</div>
+			</section>
 
-			<!-- Banner Section -->
-			<div class="liquid-glass-card text-center p-8 md:p-12">
-				<h2 class="text-3xl md:text-4xl max-w-3xl mx-auto leading-snug">
-					Algoritmos de trading diseñados profesionalmente para contratos de futuros.
-				</h2>
-			</div>
+
+			<!-- QUANTITATIVE RESEARCH & PUBLICATIONS -->
+			<section class="space-y-8">
+				<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+					<div>
+						<span class="text-xs font-bold text-emerald-400 tracking-wider uppercase font-mono">Research & Academia</span>
+						<h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight mt-1">
+							Publicaciones e Investigaciones Cuantitativas
+						</h2>
+					</div>
+					<a
+						href="/blog"
+						class="text-xs sm:text-sm text-emerald-400 hover:text-emerald-300 font-semibold inline-flex items-center gap-1.5"
+					>
+						<span>Ver todos los artículos</span>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+						</svg>
+					</a>
+				</div>
+
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+					{
+						latestPosts.map((post) => (
+							<article class="liquid-glass-card group flex flex-col justify-between overflow-hidden !p-0 rounded-2xl border border-white/10 bg-slate-900/40 hover:border-emerald-500/40 transition-all duration-300">
+								<a href={`/blog/${post.slug}/`} class="flex flex-col h-full">
+									{post.data.heroImage && (
+										<div class="relative w-full aspect-[16/9] overflow-hidden bg-slate-950/80 border-b border-white/5">
+											<img
+												src={post.data.heroImage}
+												alt={post.data.title}
+												class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+												loading="lazy"
+											/>
+											<div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent"></div>
+										</div>
+									)}
+									
+									<div class="p-5 sm:p-6 flex flex-col flex-1 gap-3">
+										<div class="flex items-center justify-between text-xs text-gray-400 font-mono">
+											<span class="flex items-center gap-1.5 text-emerald-400/90 font-medium">
+												<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+												</svg>
+												<FormattedDate date={post.data.pubDate} />
+											</span>
+											<span class="px-2 py-0.5 rounded-full bg-white/5 text-[11px] text-gray-400 border border-white/5">
+												Paper
+											</span>
+										</div>
+
+										<h3 class="text-base sm:text-lg font-bold text-white group-hover:text-emerald-400 transition-colors line-clamp-2 leading-snug m-0">
+											{post.data.title}
+										</h3>
+
+										{post.data.description && (
+											<p class="text-xs text-gray-400 line-clamp-2 leading-relaxed m-0">
+												{post.data.description}
+											</p>
+										)}
+
+										<div class="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold pt-2 mt-auto border-t border-white/5 group-hover:translate-x-1 transition-transform">
+											<span>Leer documento</span>
+											<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+											</svg>
+										</div>
+									</div>
+								</a>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+
+			<!-- INSTITUTIONAL ACCESS CTA -->
+			<section class="liquid-glass-card p-8 sm:p-12 md:p-16 rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-slate-900/60 to-cyan-950/40 text-center space-y-6 relative overflow-hidden">
+				<div class="max-w-2xl mx-auto space-y-4 relative z-10">
+					<span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider font-mono">
+						Despliegue Cuantitativo
+					</span>
+					<h2 class="text-2xl sm:text-4xl font-black text-white tracking-tight">
+						Comienza a Operar con Infraestructura Institucional
+					</h2>
+					<p class="text-sm sm:text-base text-gray-300 leading-relaxed font-normal">
+						Conecta tu wallet Web3 en la red Base para verificar tu tenencia de licencias y desbloquear el acceso a nuestros algoritmos y terminales de trading en tiempo real.
+					</p>
+					<div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+						<a
+							href="/bot"
+							class="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg shadow-emerald-500/20"
+						>
+							Ingresar a los Bots &rarr;
+						</a>
+						<a
+							href="/calculadora"
+							class="w-full sm:w-auto px-8 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-sm sm:text-base rounded-xl transition-all"
+						>
+							Calculadora de Riesgo
+						</a>
+					</div>
+				</div>
+			</section>
+
 		</main>
 
 		<Footer />
