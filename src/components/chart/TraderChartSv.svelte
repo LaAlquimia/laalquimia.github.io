@@ -1144,6 +1144,112 @@
 
     </div>
 
+    <!-- SECCIÓN DETALLADA: Arquitectura y Funcionamiento del Algoritmo -->
+    <div class="liquid-glass-card p-6 sm:p-10 flex flex-col gap-8 border border-white/[0.08] bg-slate-900/40 rounded-3xl mt-4">
+      
+      <!-- Encabezado de la Documentación -->
+      <div class="flex flex-col gap-3 border-b border-white/5 pb-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/50 border border-indigo-500/30 text-indigo-400 text-xs font-bold tracking-wider uppercase self-start font-mono">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          <span>Arquitectura Cuantitativa del Algoritmo</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight m-0">
+          ¿Cómo funciona el Algoritmo Score de Expansión & Flujo Institucional?
+        </h2>
+        <p class="text-xs sm:text-sm text-gray-400 max-w-4xl leading-relaxed m-0">
+          Este sistema cuantitativo utiliza un modelo multifactorial de 3 capas diseñado para descartar ruido de mercado, detectar giros de inercia y confirmar la entrada de volumen y capital institucional en contratos perpetuos de derivados.
+        </p>
+      </div>
+
+      <!-- 3 Pilares del Algoritmo -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Capa 1: Filtro Macro 1H -->
+        <div class="p-5 rounded-2xl bg-slate-950/60 border border-white/5 flex flex-col gap-3.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-xs">
+              01
+            </div>
+            <h3 class="text-base font-bold text-white m-0">Filtro Macro 1H (Anti-Choppy)</h3>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Garantiza que el contexto general del mercado esté a favor del trade antes de evaluar marcos temporales menores:
+          </p>
+          <ul class="text-xs text-gray-300 space-y-2 font-mono list-disc pl-4">
+            <li><b class="text-white">Dirección:</b> EMA(50) &gt; EMA(200) en 1H para asegurar régimen alcista estructural.</li>
+            <li><b class="text-white">Soporte:</b> Precio &gt; EMA(200) en 1H, operando siempre sobre el piso institucional.</li>
+            <li><b class="text-white">Anti-Lateralidad:</b> Bandwidth de Bollinger &gt; Percentil 20 para evitar falsos quiebres en mercados estancados.</li>
+          </ul>
+        </div>
+
+        <!-- Capa 2: Gatillo Cuantitativo 5M -->
+        <div class="p-5 rounded-2xl bg-slate-950/60 border border-white/5 flex flex-col gap-3.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xs">
+              02
+            </div>
+            <h3 class="text-base font-bold text-white m-0">Gatillo de Expansión 5M</h3>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Modela la física de inercia y velocidad del movimiento del precio mediante derivadas temporales:
+          </p>
+          <ul class="text-xs text-gray-300 space-y-2 font-mono list-disc pl-4">
+            <li><b class="text-white">Spread & Delta:</b> Separación entre EMA(20) y EMA(50) y cambio de velocidad (Delta &gt; 0).</li>
+            <li><b class="text-white">Aceleración (WMA3):</b> Filtro ponderado de aceleración positiva de la inercia.</li>
+            <li><b class="text-white">Score Normalizado:</b> Medición del impulso relativo ajustado por volatilidad real (ATR 14).</li>
+          </ul>
+        </div>
+
+        <!-- Capa 3: Microestructura & Flujo de Órdenes -->
+        <div class="p-5 rounded-2xl bg-slate-950/60 border border-white/5 flex flex-col gap-3.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold text-xs">
+              03
+            </div>
+            <h3 class="text-base font-bold text-white m-0">Flujo Institucional & Riesgo</h3>
+          </div>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Verifica que haya capital genuino respaldando la ruptura para evitar trampas de liquidez:
+          </p>
+          <ul class="text-xs text-gray-300 space-y-2 font-mono list-disc pl-4">
+            <li><b class="text-white">RVOL &gt; 1.5x:</b> El volumen actual supera en al menos +50% el promedio de las últimas 20 velas.</li>
+            <li><b class="text-white">Open Interest Creciente:</b> Expansión de contratos abiertos que certifica entrada de dinero nuevo.</li>
+            <li><b class="text-white">Stop Loss Estocástico:</b> Fijado a 1.5 veces el ATR por debajo del precio de entrada.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Fórmula Matemática e Indicadores Clave -->
+      <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-slate-950/80 via-slate-900/60 to-slate-950/80 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div class="space-y-1.5 max-w-xl">
+          <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wide font-mono m-0">Fórmula Central del Score</h4>
+          <p class="text-xs text-gray-300 leading-relaxed m-0">
+            El Score de Expansión normaliza la distancia entre medias móviles respecto a la volatilidad histórica del activo y la multiplica por la aceleración del vector:
+          </p>
+          <div class="p-3 bg-black/40 border border-white/5 rounded-xl text-cyan-300 font-mono text-xs sm:text-sm">
+            Score = ( (EMA_20 - EMA_50) / ATR_14 ) × WMA_3(Aceleración)
+          </div>
+        </div>
+
+        <div class="space-y-2 text-xs text-gray-400 w-full sm:w-auto self-stretch sm:self-auto border-t sm:border-t-0 sm:border-l border-white/5 pt-4 sm:pt-0 sm:pl-6">
+          <div class="flex items-center justify-between sm:justify-start gap-4">
+            <span class="text-gray-500 font-mono">Marco Temporal:</span>
+            <span class="text-white font-semibold">5M (Gatillo) / 1H (Macro)</span>
+          </div>
+          <div class="flex items-center justify-between sm:justify-start gap-4">
+            <span class="text-gray-500 font-mono">Tipo de Señal:</span>
+            <span class="text-emerald-400 font-semibold">Breakout & Momentum</span>
+          </div>
+          <div class="flex items-center justify-between sm:justify-start gap-4">
+            <span class="text-gray-500 font-mono">Gestión de Riesgo:</span>
+            <span class="text-rose-400 font-semibold">1.5 × ATR(14) Stop Loss</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
   </div>
 </div>
 {:else}
