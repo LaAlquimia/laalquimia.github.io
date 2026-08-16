@@ -31,12 +31,11 @@ async function getWorkingProvider() {
 }
 
 export async function checkBalances() {
-
   try {
-    const provider = await getWorkingProvider();
-    const userAddress = localStorage.getItem("accountAddress");
-    if (!userAddress) throw new Error("No hay dirección en localStorage");
+    const userAddress = typeof localStorage !== 'undefined' ? localStorage.getItem("accountAddress") : null;
+    if (!userAddress) return {};
 
+    const provider = await getWorkingProvider();
     const contract = new ethers.Contract(contractAddress, abi, provider);
 
     const owners = tokenIds.map(() => userAddress);

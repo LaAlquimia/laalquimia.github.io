@@ -283,7 +283,6 @@
         const list = data.result.list;
         allKlines = allKlines.concat(list);
         
-        // El último elemento devuelto es el más antiguo del lote
         const oldestCandle = list[list.length - 1];
         const oldestTimeMs = parseInt(oldestCandle[0]);
         endTimestamp = oldestTimeMs - 1;
@@ -298,14 +297,25 @@
       }
     }
 
-    return allKlines.map(arr => ({
-      time: parseInt(parseFloat(arr[0]) / 1000),
-      open: parseFloat(arr[1]),
-      high: parseFloat(arr[2]),
-      low: parseFloat(arr[3]),
-      close: parseFloat(arr[4]),
-      volume: parseFloat(arr[5])
-    })).reverse();
+    const uniqueKlines = [];
+    const seenTimes = new Set();
+    for (let arr of allKlines) {
+      const t = Math.floor(parseFloat(arr[0]) / 1000);
+      if (!seenTimes.has(t) && !isNaN(t)) {
+        seenTimes.add(t);
+        uniqueKlines.push({
+          time: t,
+          open: parseFloat(arr[1]),
+          high: parseFloat(arr[2]),
+          low: parseFloat(arr[3]),
+          close: parseFloat(arr[4]),
+          volume: parseFloat(arr[5])
+        });
+      }
+    }
+
+    uniqueKlines.sort((a, b) => a.time - b.time);
+    return uniqueKlines;
   }
 
   async function fetchOpenInterest(symbol, limit = 200) {
@@ -931,8 +941,8 @@
               <span class="text-[11px] text-cyan-400 font-semibold border border-cyan-800 bg-cyan-950/30 px-2 py-0.5 rounded">5M</span>
             </div>
             <div class="flex items-center gap-3 text-xs sm:text-sm flex-wrap">
-              <span class="text-gray-400">SL: <b class="text-rose-400">${stats.sl.toFixed(4)}</b></span>
-              <span class="text-gray-400">Precio: <b class="text-white">${stats.entryPrice.toFixed(4)}</b></span>
+              <span class="text-gray-400">SL: <b class="text-rose-400">${(stats.sl || 0).toFixed(4)}</b></span>
+              <span class="text-gray-400">Precio: <b class="text-white">${(stats.entryPrice || 0).toFixed(4)}</b></span>
             </div>
           </div>
           
@@ -1003,16 +1013,16 @@
                 {#each scanResults as item}
                   <tr class="trow cursor-pointer" on:click={() => handleSelectSymbol(item.symbol)}>
                     <td class="font-bold text-cyan-400">{item.symbol}</td>
-                    <td class="text-right font-mono">${item.price.toFixed(4)}</td>
+                    <td class="text-right font-mono">${(item.price || 0).toFixed(4)}</td>
                     <td class="text-right text-xs">{item.macro}</td>
-                    <td class="text-right font-mono {item.rvol > 1.5 ? 'text-emerald-400 font-bold' : 'text-gray-400'}">{item.rvol.toFixed(2)}</td>
-                    <td class="text-right font-mono {item.oiChangePct > 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                      {item.oiChangePct > 0 ? '+' : ''}{item.oiChangePct.toFixed(2)}%
+                    <td class="text-right font-mono {(item.rvol || 0) > 1.5 ? 'text-emerald-400 font-bold' : 'text-gray-400'}">{(item.rvol || 0).toFixed(2)}</td>
+                    <td class="text-right font-mono {(item.oiChangePct || 0) > 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                      {(item.oiChangePct || 0) > 0 ? '+' : ''}{(item.oiChangePct || 0).toFixed(2)}%
                     </td>
-                    <td class="text-right font-mono font-bold {item.score > 0 ? 'text-cyan-400' : 'text-gray-500'}">{item.score.toFixed(4)}</td>
+                    <td class="text-right font-mono font-bold {(item.score || 0) > 0 ? 'text-cyan-400' : 'text-gray-500'}">{(item.score || 0).toFixed(4)}</td>
                     <td class="text-right">
-                      <span class="px-2 py-0.5 rounded text-[10px] font-bold {item.signal.includes('LONG') ? 'bg-emerald-950/50 border border-emerald-800 text-emerald-400 animate-pulse' : 'bg-white/5 border border-white/10 text-gray-400'}">
-                        {item.signal}
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold {item.signal && item.signal.includes('LONG') ? 'bg-emerald-950/50 border border-emerald-800 text-emerald-400 animate-pulse' : 'bg-white/5 border border-white/10 text-gray-400'}">
+                        {item.signal || 'NEUTRAL'}
                       </span>
                     </td>
                   </tr>
@@ -1111,27 +1121,27 @@
           <div class="grid grid-cols-2 gap-2.5 sm:gap-4">
             <div class="p-2.5 sm:p-3 bg-white/2 rounded-xl border border-white/5 text-center">
               <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-wider block">Spread (EMA20-50)</span>
-              <span class="text-sm sm:text-base font-mono font-bold text-white mt-0.5 block">{stats.spread.toFixed(4)}</span>
+              <span class="text-sm sm:text-base font-mono font-bold text-white mt-0.5 block">{(stats.spread || 0).toFixed(4)}</span>
             </div>
             
             <div class="p-2.5 sm:p-3 bg-white/2 rounded-xl border border-white/5 text-center">
               <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-wider block">Delta (Velocidad)</span>
-              <span class="text-sm sm:text-base font-mono font-bold mt-0.5 block {stats.delta > 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                {stats.delta > 0 ? '+' : ''}{stats.delta.toFixed(4)}
+              <span class="text-sm sm:text-base font-mono font-bold mt-0.5 block {(stats.delta || 0) > 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                {(stats.delta || 0) > 0 ? '+' : ''}{(stats.delta || 0).toFixed(4)}
               </span>
             </div>
 
             <div class="p-2.5 sm:p-3 bg-white/2 rounded-xl border border-white/5 text-center">
               <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-wider block">Aceleración</span>
-              <span class="text-sm sm:text-base font-mono font-bold mt-0.5 block {stats.acceleration > 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                {stats.acceleration > 0 ? '+' : ''}{stats.acceleration.toFixed(4)}
+              <span class="text-sm sm:text-base font-mono font-bold mt-0.5 block {(stats.acceleration || 0) > 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                {(stats.acceleration || 0) > 0 ? '+' : ''}{(stats.acceleration || 0).toFixed(4)}
               </span>
             </div>
 
             <div class="p-2.5 sm:p-3 bg-white/2 rounded-xl border border-white/5 text-center">
               <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-wider block">Score Expansión</span>
-              <span class="text-sm sm:text-base font-mono font-bold mt-0.5 block {stats.score > 0 ? 'text-cyan-400' : 'text-gray-400'}">
-                {stats.score.toFixed(4)}
+              <span class="text-sm sm:text-base font-mono font-bold mt-0.5 block {(stats.score || 0) > 0 ? 'text-cyan-400' : 'text-gray-400'}">
+                {(stats.score || 0).toFixed(4)}
               </span>
             </div>
           </div>
@@ -1139,16 +1149,16 @@
           <div class="border-t border-white/5 pt-3 flex flex-col gap-2 text-xs">
             <div class="flex justify-between">
               <span class="text-gray-400">RVOL:</span>
-              <span class="font-mono text-white">{stats.rvol.toFixed(2)}x</span>
+              <span class="font-mono text-white">{(stats.rvol || 0).toFixed(2)}x</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-400">OI Actual:</span>
-              <span class="font-mono text-white">{stats.oiCurrent.toLocaleString()}</span>
+              <span class="font-mono text-white">{(stats.oiCurrent || 0).toLocaleString()}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-400">Cambio OI:</span>
-              <span class="font-mono {stats.oiChangePct > 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                {stats.oiChangePct > 0 ? '+' : ''}{stats.oiChangePct.toFixed(2)}%
+              <span class="font-mono {(stats.oiChangePct || 0) > 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                {(stats.oiChangePct || 0) > 0 ? '+' : ''}{(stats.oiChangePct || 0).toFixed(2)}%
               </span>
             </div>
           </div>
@@ -1162,7 +1172,7 @@
               <div class="flex justify-between items-center p-2 rounded-lg bg-emerald-950/20 border border-emerald-900/40 text-xs">
                 <div>
                   <b class="text-emerald-400">{log.symbol}</b>
-                  <span class="text-gray-400"> - LONG @ {log.price.toFixed(4)}</span>
+                  <span class="text-gray-400"> - LONG @ {(log.price || 0).toFixed(4)}</span>
                 </div>
                 <span class="text-gray-500 font-mono text-[10px]">{log.timestamp}</span>
               </div>
