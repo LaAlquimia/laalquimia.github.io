@@ -8,6 +8,20 @@
   let nft3Balance = 0;
   let loadingBalance = true;
 
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) {
+        resolve();
+        return;
+      }
+      const s = document.createElement("script");
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.body.appendChild(s);
+    });
+  }
+
   // Selected coin and state
   let selectedSymbol = "ETHUSDT";
   let activeSymbolData = null;
@@ -188,6 +202,11 @@
     }
 
     if (nft3Balance > 0) {
+      try {
+        await loadScript("https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js");
+      } catch (e) {
+        console.error("Error loading lightweight-charts on Bot 3:", e);
+      }
       await initChart();
       await updateData();
       startWebSocket();
