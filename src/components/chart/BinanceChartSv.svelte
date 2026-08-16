@@ -1,16 +1,26 @@
-<!-- from nanostores verify login -->
-
 <script> 
-    import { isLoginPersistent } from "../../store";
-    import { botConfig } from "../../store";
-    import { onMount } from "svelte";
-    import { userInfo } from "../../store";
+    import { onMount, tick } from "svelte";
+    import { isLoginPersistent, botConfig, userInfo } from "../../store";
     import { checkBalances } from "../bots/botBalance.js";
     import GlassSelector from "./GlassSelector.svelte";
 
     let balances = {};
     let nft2Balance = 0;
     let loadingBalance = true;
+
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            if (document.querySelector(`script[src="${src}"]`)) {
+                resolve();
+                return;
+            }
+            const s = document.createElement("script");
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.body.appendChild(s);
+        });
+    }
 
     onMount(async () => {
         try {
@@ -20,6 +30,21 @@
             console.error("Error al obtener balances:", error);
         } finally {
             loadingBalance = false;
+        }
+
+        if (nft2Balance > 0) {
+            await tick();
+            try {
+                await loadScript("https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js");
+                await loadScript("https://cdn.jsdelivr.net/npm/ta-lib@0.11.0/index.min.js");
+                await loadScript("/notification.js");
+                await loadScript("/Binance/fetcher.js?v=4");
+                await loadScript("/Binance/handler.js?v=4");
+                await loadScript("/Binance/graph/graph.js?v=4");
+                await loadScript("/Binance/runtime.js?v=4");
+            } catch (e) {
+                console.error("Error cargando scripts de Binance:", e);
+            }
         }
     });
 </script>
@@ -123,7 +148,7 @@
     </div>
 
     <!-- Signals and Tables Column -->
-    <div class="liquid-glass-card w-full lg:w-2/5 p-3.5 sm:p-5 flex flex-col gap-5">
+    <div id="tables" class="liquid-glass-card w-full lg:w-2/5 p-3.5 sm:p-5 flex flex-col gap-5">
         <!-- Header & Selectors -->
         <div class="flex flex-col gap-3 pb-3 border-b border-white/5">
             <div class="flex items-center justify-between">
@@ -132,11 +157,11 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                <GlassSelector id="tickerSelect" defaultValue="BTCUSDT">
+                <GlassSelector id="symbolSelector" defaultValue="BTCUSDT">
                     <option value="BTCUSDT">BTCUSDT</option>
                 </GlassSelector>
 
-                <GlassSelector id="intervalSelect" defaultValue="1">
+                <GlassSelector id="intervalSelector" defaultValue="1">
                     <option value="1">1m</option>
                     <option value="3">3m</option>
                     <option value="5">5m</option>
@@ -202,21 +227,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Third party and chart logic scripts -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.min.js"
-    ></script>
-    
-    <script data-is-inline src="/notification.js"></script>
-    <script data-is-inline src="/Binance/fetcher.js?v=3"></script>
-    <script data-is-inline src="/Binance/handler.js?v=3"></script>
-    <script data-is-inline src="/Binance/runtime.js"></script>
-    <script data-is-inline src="/Binance/graph/graph.js"></script>
-
-    <script
-        data-is-inline
-        src="https://cdn.jsdelivr.net/npm/ta-lib@0.11.0/index.min.js"></script>
 </div>
 {:else}
 <div class="flex items-center justify-center min-h-[70vh] text-white p-4">
