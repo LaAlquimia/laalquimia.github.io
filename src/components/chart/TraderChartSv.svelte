@@ -1258,10 +1258,10 @@
         </div>
 
         <!-- Ecuación Principal Display LaTeX -->
-        <div class="flex flex-col gap-2 p-4 sm:p-6 bg-black/60 rounded-xl border border-cyan-500/20 text-center relative overflow-x-auto">
+        <div class="flex flex-col gap-2 p-4 sm:p-6 bg-black/60 rounded-xl border border-cyan-500/20 text-center">
           <span class="text-[10px] uppercase font-mono text-cyan-400/80 tracking-widest block text-left">Fórmula Central del Score:</span>
-          <div class="text-lg sm:text-2xl text-cyan-300 font-serif my-2 py-2">
-            {@html '$$\\text{Score}_{\\text{Exp}} = \\left( \\frac{\\text{EMA}_{20}(P) - \\text{EMA}_{50}(P)}{\\text{ATR}_{14}(P)} \\right) \\times \\text{WMA}_3(\\Delta_{\\text{Spread}})$$'}
+          <div class="math-formula-box math-hero-size text-cyan-300 font-serif my-1 py-1">
+            {@html '$$\\text{Score}_{\\text{Exp}} = \\left( \\frac{\\text{EMA}_{20} - \\text{EMA}_{50}}{\\text{ATR}_{14}} \\right) \\times \\text{WMA}_3(\\Delta_{\\text{Spread}})$$'}
           </div>
         </div>
 
@@ -1269,7 +1269,9 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
             <span class="text-xs font-mono font-bold text-cyan-400">1. Spread de Inercia</span>
-            <div class="text-sm font-mono text-white py-1">{@html '$$\\text{Spread} = \\text{EMA}_{20} - \\text{EMA}_{50}$$'}</div>
+            <div class="math-formula-box math-sub-size text-white py-1">
+              {@html '$$\\text{Spread} = \\text{EMA}_{20} - \\text{EMA}_{50}$$'}
+            </div>
             <p class="text-[11px] text-gray-400 leading-relaxed">
               Mide la divergencia entre el momento rápido (20) y la tendencia media (50). Un valor positivo indica expansión alcista del precio.
             </p>
@@ -1277,7 +1279,9 @@
 
           <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
             <span class="text-xs font-mono font-bold text-emerald-400">2. Normalizador de Ruido</span>
-            <div class="text-sm font-mono text-white py-1">{@html '$$\\text{Normalizador} = \\frac{1}{\\text{ATR}_{14}}$$'}</div>
+            <div class="math-formula-box math-sub-size text-white py-1">
+              {@html '$$\\text{Normalizador} = \\frac{1}{\\text{ATR}_{14}}$$'}
+            </div>
             <p class="text-[11px] text-gray-400 leading-relaxed">
               Ajusta el spread según la volatilidad estocástica real (Average True Range), impidiendo señales falsas en monedas erráticas.
             </p>
@@ -1285,7 +1289,9 @@
 
           <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
             <span class="text-xs font-mono font-bold text-violet-400">3. Aceleración Ponderada</span>
-            <div class="text-sm font-mono text-white py-1">{@html '$$\\text{WMA}_3(\\Delta) = \\frac{3\\Delta_t + 2\\Delta_{t-1} + 1\\Delta_{t-2}}{6}$$'}</div>
+            <div class="math-formula-box math-sub-size text-white py-1">
+              {@html '$$\\text{WMA}_3 = \\frac{3\\Delta_t + 2\\Delta_{t-1} + \\Delta_{t-2}}{6}$$'}
+            </div>
             <p class="text-[11px] text-gray-400 leading-relaxed">
               Derivada ponderada de velocidad ($\Delta_t = \text{Spread}_t - \text{Spread}_{t-1}$) que confirma aceleración física del vector.
             </p>
@@ -1299,8 +1305,8 @@
               <span class="text-xs font-mono font-semibold text-gray-300">Volumen Relativo Institucional (RVOL):</span>
               <span class="text-xs text-emerald-400 font-mono font-bold">&gt; 1.5x</span>
             </div>
-            <div class="text-sm font-mono text-emerald-300 py-1">
-              {@html '$$\\text{RVOL} = \\frac{V_t}{\\frac{1}{20} \\sum_{i=1}^{20} V_{t-i}} > 1.50$$'}
+            <div class="math-formula-box math-sub-size text-emerald-300 py-1">
+              {@html '$$\\text{RVOL} = \\frac{V_t}{\\overline{V}_{20}} > 1.50, \\; \\overline{V}_{20} = \\text{SMA}_{20}(V)$$'}
             </div>
             <p class="text-[11px] text-gray-400 leading-relaxed">
               Exige que la vela de ruptura concentre un volumen al menos 50% superior a su promedio móvil de 20 velas de 5 minutos.
@@ -1312,7 +1318,7 @@
               <span class="text-xs font-mono font-semibold text-gray-300">Stop Loss Dinámico Estocástico:</span>
               <span class="text-xs text-rose-400 font-mono font-bold">1.5 × ATR</span>
             </div>
-            <div class="text-sm font-mono text-rose-300 py-1">
+            <div class="math-formula-box math-sub-size text-rose-300 py-1">
               {@html '$$\\text{Stop Loss} = P_{\\text{Entrada}} - (1.5 \\times \\text{ATR}_{14})$$'}
             </div>
             <p class="text-[11px] text-gray-400 leading-relaxed">

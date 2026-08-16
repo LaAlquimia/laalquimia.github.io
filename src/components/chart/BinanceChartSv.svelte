@@ -351,10 +351,10 @@
             </div>
 
             <!-- Ecuación Principal Display LaTeX -->
-            <div class="flex flex-col gap-2 p-4 sm:p-6 bg-black/60 rounded-xl border border-yellow-500/20 text-center relative overflow-x-auto">
+            <div class="flex flex-col gap-2 p-4 sm:p-6 bg-black/60 rounded-xl border border-yellow-500/20 text-center">
                 <span class="text-[10px] uppercase font-mono text-yellow-400/80 tracking-widest block text-left">Métrica de Dispersión Relativa:</span>
-                <div class="text-lg sm:text-2xl text-yellow-300 font-serif my-2 py-2">
-                    {@html '$$\\text{Distancia}_{\\text{EMA59}} = \\left( \\frac{P_t - \\text{EMA}_{59}(P_t)}{P_t} \\right) \\times 100$$'}
+                <div class="math-formula-box math-hero-size text-yellow-300 font-serif my-1 py-1">
+                    {@html '$$\\text{Distancia} = \\left( \\frac{P_t - \\text{EMA}_{59}}{P_t} \\right) \\times 100$$'}
                 </div>
             </div>
 
@@ -362,7 +362,9 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
                     <span class="text-xs font-mono font-bold text-yellow-400">1. Mark Price en Streaming (P_t)</span>
-                    <div class="text-sm font-mono text-white py-1">{@html '$$P_t = \\text{WebSocket Feed}(\\text{Binance})$$'}</div>
+                    <div class="math-formula-box math-sub-size text-white py-1">
+                        {@html '$$P_t = \\text{WSS Feed}(\\text{Binance})$$'}
+                    </div>
                     <p class="text-[11px] text-gray-400 leading-relaxed">
                         Precio de referencia indexado de alta frecuencia capturado en milisegundos para evitar desviaciones por falta de liquidez puntual.
                     </p>
@@ -370,7 +372,9 @@
 
                 <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
                     <span class="text-xs font-mono font-bold text-cyan-400">2. Centro Exponencial (EMA 59)</span>
-                    <div class="text-sm font-mono text-white py-1">{@html '$$\\text{EMA}_t = \\alpha P_t + (1 - \\alpha)\\text{EMA}_{t-1}$$'}</div>
+                    <div class="math-formula-box math-sub-size text-white py-1">
+                        {@html '$$\\text{EMA}_t = \\alpha P_t + (1 - \\alpha)\\text{EMA}_{t-1}, \\; \\alpha = \\frac{2}{60}$$'}
+                    </div>
                     <p class="text-[11px] text-gray-400 leading-relaxed">
                         Factor de suavizado $\alpha = \frac{2}{60} \approx 0.0333$ que modela la tendencia inercial del activo en contratos derivados.
                     </p>
@@ -378,7 +382,9 @@
 
                 <div class="p-4 rounded-xl bg-slate-900/50 border border-white/5 flex flex-col gap-2">
                     <span class="text-xs font-mono font-bold text-emerald-400">3. Algoritmo de Ranking Continuo</span>
-                    <div class="text-sm font-mono text-white py-1">{@html '$$\\text{Rank} = \\operatorname{ArgSort}(\\text{Distancia}_i)_{1..10}$$'}</div>
+                    <div class="math-formula-box math-sub-size text-white py-1">
+                        {@html '$$\\text{Rank} = \\operatorname{ArgSort}(\\text{Distancia}_i)_{1..10}$$'}
+                    </div>
                     <p class="text-[11px] text-gray-400 leading-relaxed">
                         Clasificación continua del universo de 50 monedas divididas en Top 10 Sobrecompra y Top 10 Sobreventa.
                     </p>
@@ -392,7 +398,7 @@
                         <span class="text-xs font-mono font-semibold text-yellow-300">Canal Dinámico de Sobrecompra (Shorts):</span>
                         <span class="text-xs text-yellow-400 font-mono font-bold">Resistencia</span>
                     </div>
-                    <div class="text-sm font-mono text-yellow-300 py-1">
+                    <div class="math-formula-box math-sub-size text-yellow-300 py-1">
                         {@html '$$\\text{Banda Superior} = \\text{EMA}_{59} \\times (1 + 0.030)$$'}
                     </div>
                     <p class="text-[11px] text-gray-400 leading-relaxed">
@@ -405,7 +411,7 @@
                         <span class="text-xs font-mono font-semibold text-emerald-300">Canal Dinámico de Sobreventa (Longs):</span>
                         <span class="text-xs text-emerald-400 font-mono font-bold">Soporte</span>
                     </div>
-                    <div class="text-sm font-mono text-emerald-300 py-1">
+                    <div class="math-formula-box math-sub-size text-emerald-300 py-1">
                         {@html '$$\\text{Banda Inferior} = \\text{EMA}_{59} \\times (1 - 0.030)$$'}
                     </div>
                     <p class="text-[11px] text-gray-400 leading-relaxed">

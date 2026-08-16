@@ -302,3 +302,51 @@ button:active, .button:active {
 	white-space: nowrap;
 	border: 0;
 }
+
+/* KaTeX Mathematical Formulas Styling & Responsive Fitting */
+.katex-display {
+	margin: 0.25em 0 !important;
+	max-width: 100% !important;
+	overflow-x: auto !important;
+	overflow-y: hidden !important;
+	text-align: center !important;
+	padding: 4px 2px !important;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none; /* Hide scrollbars for clean aesthetic */
+}
+
+.katex-display::-webkit-scrollbar {
+	display: none;
+}
+
+.katex {
+	font-size: 1.05em;
+	text-rendering: geometricPrecision;
+	max-width: 100%;
+}
+
+.math-formula-box {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none;
+}
+
+.math-formula-box::-webkit-scrollbar {
+	display: none;
+}
+
+.math-hero-size .katex {
+	font-size: clamp(1rem, 3.2vw, 1.4rem) !important;
+}
+
+.math-sub-size .katex {
+	font-size: clamp(0.82rem, 2.2vw, 1.05rem) !important;
+}
+
+.math-compact-size .katex {
+	font-size: clamp(0.76rem, 1.8vw, 0.92rem) !important;
+}
