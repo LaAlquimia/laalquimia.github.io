@@ -283,7 +283,7 @@
     display: inline-block;
     min-width: 105px;
     font-family: inherit;
-    z-index: 9999;
+    z-index: 30;
   }
 
   @media (min-width: 640px) {
@@ -369,7 +369,7 @@
     right: 0;
     min-width: 160px;
     max-width: min(280px, calc(100vw - 32px));
-    z-index: 99999;
+    z-index: 40;
     background: rgba(15, 20, 35, 0.96);
     backdrop-filter: blur(20px) saturate(190%);
     -webkit-backdrop-filter: blur(20px) saturate(190%);
