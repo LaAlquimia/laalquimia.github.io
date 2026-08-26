@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Play Chess 2-Player Pass & Play mode with local multiplayer, custom piece styles, and tactile sound effects.">
+  <meta name="theme-color" content="#0f141c">
+  <title>Chess HTML | 2-Player Pass & Play</title>
+
+  <!-- Google Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-board-theme="green">
+
+  <!-- =========================================================================
+       APP HEADER
+       ========================================================================= -->
+  <header class="app-header">
+    <div class="brand-section">
+      <span class="brand-icon">⚔️</span>
+      <h1 class="app-title">Chess HTML</h1>
+      <span id="mode-badge" class="mode-badge pvp">PASS & PLAY</span>
+    </div>
+
+    <div class="header-actions">
+      <a href="index.html" class="btn-icon" title="Switch to AI Mode" aria-label="Switch to AI Mode" style="text-decoration: none;">
+        🤖
+      </a>
+      <button id="btn-header-theme" class="btn-icon" title="Change Board Theme" aria-label="Change Board Theme">
+        🎨
+      </button>
+      <button id="btn-header-mute" class="btn-icon active" title="Toggle Sound" aria-label="Toggle Sound">
+        🔊
+      </button>
+      <button id="btn-header-flip" class="btn-icon" title="Flip Board (F)" aria-label="Flip Board">
+        ⇅
+      </button>
+      <button id="btn-header-newgame" class="btn-icon" title="New Game (R)" aria-label="New Game">
+        ↻
+      </button>
+      <button id="btn-header-settings" class="btn-icon" title="Settings (S)" aria-label="Settings">
+        ⚙️
+      </button>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN CONTAINER (Mobile 100vw & Desktop 2-Column)
+       ========================================================================= -->
+  <main class="main-container">
+
+    <!-- LEFT / MAIN: Board & Player Bars -->
+    <section class="board-column">
+      
+      <!-- Top / Opponent Player Bar -->
+      <div id="top-player-bar" class="player-bar">
+        <div class="player-info">
+          <div id="top-player-avatar" class="player-avatar avatar-black">
+            ♚<span class="turn-glow-dot"></span>
+          </div>
+          <div class="player-meta">
+            <span id="top-player-name" class="player-name">Player 2 (Black)</span>
+            <span id="top-player-status" class="player-status-badge">Waiting</span>
+          </div>
+        </div>
+
+        <div class="player-material-tray">
+          <div id="top-captured-list" class="captured-pieces-list"></div>
+          <span id="top-material-diff" class="material-diff-badge"></span>
+        </div>
+      </div>
+
+      <!-- Chessboard Grid -->
+      <div id="chessboard-wrapper" class="chessboard-wrapper">
+        <div id="chessboard"></div>
+      </div>
+
+      <!-- Bottom / User Player Bar -->
+      <div id="bottom-player-bar" class="player-bar active-turn">
+        <div class="player-info">
+          <div id="bottom-player-avatar" class="player-avatar avatar-white">
+            ♔<span class="turn-glow-dot"></span>
+          </div>
+          <div class="player-meta">
+            <span id="bottom-player-name" class="player-name">Player 1 (White)</span>
+            <span id="bottom-player-status" class="player-status-badge">Active Turn</span>
+          </div>
+        </div>
+
+        <div class="player-material-tray">
+          <div id="bottom-captured-list" class="captured-pieces-list"></div>
+          <span id="bottom-material-diff" class="material-diff-badge"></span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT / DESKTOP SIDEBAR PANEL -->
+    <aside class="sidebar-panel">
+      
+      <!-- Evaluation Bar -->
+      <div class="eval-bar-wrapper">
+        <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);">EVAL</span>
+        <div class="eval-meter">
+          <div id="eval-fill-white" class="eval-fill-white"></div>
+        </div>
+        <span id="eval-score-text" class="eval-score-text">0.0</span>
+      </div>
+
+      <!-- Move History Box -->
+      <div class="move-history-card">
+        <div class="move-history-header">
+          <span>Move History</span>
+          <span style="font-size: 0.7rem; opacity: 0.8;">SAN</span>
+        </div>
+        <div id="move-history-list" class="move-history-list"></div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="sidebar-actions-grid">
+        <button id="btn-sidebar-newgame" class="btn-sidebar btn-primary">
+          <span>↻</span> New Game
+        </button>
+        <button id="btn-sidebar-undo" class="btn-sidebar">
+          <span>↶</span> Undo Move
+        </button>
+        <button id="btn-sidebar-flip" class="btn-sidebar">
+          <span>⇅</span> Flip Board
+        </button>
+        <button id="btn-sidebar-settings" class="btn-sidebar">
+          <span>⚙️</span> Settings
+        </button>
+        <button id="btn-sidebar-draw" class="btn-sidebar">
+          <span>🤝</span> Claim Draw
+        </button>
+        <button id="btn-sidebar-resign" class="btn-sidebar">
+          <span>🏳️</span> Resign
+        </button>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- =========================================================================
+       MOBILE BOTTOM DOCK
+       ========================================================================= -->
+  <nav class="mobile-bottom-dock">
+    <button id="btn-dock-undo" class="dock-btn">
+      <span class="btn-icon-svg">↶</span>
+      <span class="btn-label">Undo</span>
+    </button>
+    <button id="btn-dock-newgame" class="dock-btn">
+      <span class="btn-icon-svg">↻</span>
+      <span class="btn-label">New</span>
+    </button>
+    <button id="btn-dock-flip" class="dock-btn">
+      <span class="btn-icon-svg">⇅</span>
+      <span class="btn-label">Flip</span>
+    </button>
+    <button id="btn-dock-settings" class="dock-btn">
+      <span class="btn-icon-svg">⚙️</span>
+      <span class="btn-label">Settings</span>
+    </button>
+    <a href="index.html" class="dock-btn" style="text-decoration: none;">
+      <span class="btn-icon-svg">🤖</span>
+      <span class="btn-label">AI Mode</span>
+    </a>
+  </nav>
+
+  <!-- =========================================================================
+       MODALS & DRAWERS
+       ========================================================================= -->
+
+  <!-- 1. Settings Modal -->
+  <div id="modal-settings" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">⚙️ Game Settings</h2>
+        <button class="btn-icon" data-close-modal aria-label="Close Settings">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Game Mode -->
+        <div class="settings-section">
+          <label class="section-label" for="setting-game-mode">Game Mode</label>
+          <select id="setting-game-mode" class="custom-select">
+            <option value="pvp" selected>2-Player Pass & Play</option>
+            <option value="ai">Play vs Stockfish AI</option>
+          </select>
+        </div>
+
+        <!-- Board Theme Swatches -->
+        <div class="settings-section">
+          <span class="section-label">Board Theme</span>
+          <div class="theme-swatches-grid">
+            
+            <div class="theme-swatch-card active" data-theme="green">
+              <div class="theme-preview-box">
+                <div style="background: #eeeed2;"></div>
+                <div style="background: #769656;"></div>
+                <div style="background: #769656;"></div>
+                <div style="background: #eeeed2;"></div>
+              </div>
+              <span class="swatch-name">Green</span>
+            </div>
+
+            <div class="theme-swatch-card" data-theme="wood">
+              <div class="theme-preview-box">
+                <div style="background: #e3c496;"></div>
+                <div style="background: #a67243;"></div>
+                <div style="background: #a67243;"></div>
+                <div style="background: #e3c496;"></div>
+              </div>
+              <span class="swatch-name">Wood</span>
+            </div>
+
+            <div class="theme-swatch-card" data-theme="dark">
+              <div class="theme-preview-box">
+                <div style="background: #505664;"></div>
+                <div style="background: #2e333d;"></div>
+                <div style="background: #2e333d;"></div>
+                <div style="background: #505664;"></div>
+              </div>
+              <span class="swatch-name">Dark</span>
+            </div>
+
+            <div class="theme-swatch-card" data-theme="blue">
+              <div class="theme-preview-box">
+                <div style="background: #dee3e6;"></div>
+                <div style="background: #8ca2ad;"></div>
+                <div style="background: #8ca2ad;"></div>
+                <div style="background: #dee3e6;"></div>
+              </div>
+              <span class="swatch-name">Blue</span>
+            </div>
+
+            <div class="theme-swatch-card" data-theme="cyber">
+              <div class="theme-preview-box">
+                <div style="background: #1e293b;"></div>
+                <div style="background: #090d16;"></div>
+                <div style="background: #090d16;"></div>
+                <div style="background: #1e293b;"></div>
+              </div>
+              <span class="swatch-name">Cyber</span>
+            </div>
+
+            <div class="theme-swatch-card" data-theme="coral">
+              <div class="theme-preview-box">
+                <div style="background: #f0d9b5;"></div>
+                <div style="background: #b58863;"></div>
+                <div style="background: #b58863;"></div>
+                <div style="background: #f0d9b5;"></div>
+              </div>
+              <span class="swatch-name">Coral</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Piece Style Cards -->
+        <div class="settings-section">
+          <span class="section-label">Piece Set Style</span>
+          <div class="piece-styles-grid">
+            <div class="piece-style-card active" data-style="standard">
+              <span style="font-size: 1.5rem;">♞</span>
+              <span class="piece-style-name">Standard</span>
+            </div>
+            <div class="piece-style-card" data-style="modern">
+              <span style="font-size: 1.5rem;">♚</span>
+              <span class="piece-style-name">Modern</span>
+            </div>
+            <div class="piece-style-card" data-style="wood">
+              <span style="font-size: 1.5rem;">♜</span>
+              <span class="piece-style-name">Wood</span>
+            </div>
+            <div class="piece-style-card" data-style="neon">
+              <span style="font-size: 1.5rem; filter: drop-shadow(0 0 3px #00f0ff);">♛</span>
+              <span class="piece-style-name">Neon</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sound Engine & Volume -->
+        <div class="settings-section">
+          <div class="section-label">
+            <span>Sound Theme & FX</span>
+            <button id="btn-test-sound" class="btn-test-sound">🔊 Test Sound</button>
+          </div>
+          <div class="sound-controls-row">
+            <select id="setting-sound-theme" class="custom-select">
+              <option value="wood">Tactile Wood</option>
+              <option value="modern">Acoustic Modern</option>
+              <option value="arcade">Retro 8-Bit Arcade</option>
+              <option value="synth">Futuristic Sci-Fi Synth</option>
+            </select>
+          </div>
+
+          <div style="margin-top: 10px;">
+            <span class="section-label">Master Volume</span>
+            <div class="range-slider-wrapper">
+              <span>🔈</span>
+              <input type="range" id="setting-volume-slider" class="range-slider" min="0" max="1" step="0.05" value="0.5">
+              <span>🔊</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary-action" data-close-modal>Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Pawn Promotion Modal -->
+  <div id="modal-promotion" class="modal-backdrop">
+    <div class="modal-card promotion-modal-card">
+      <h3 class="promotion-title">Promote Pawn</h3>
+      <div id="promotion-pieces-container" class="promotion-pieces-grid"></div>
+    </div>
+  </div>
+
+  <!-- 3. Game Over Modal -->
+  <div id="modal-gameover" class="modal-backdrop">
+    <div class="modal-card gameover-modal-card">
+      <div id="gameover-icon" class="gameover-icon">👑</div>
+      <h2 id="gameover-title" class="gameover-result">White Wins!</h2>
+      <p id="gameover-reason" class="gameover-reason">Checkmate delivered.</p>
+
+      <div class="gameover-buttons">
+        <button id="btn-gameover-rematch" class="btn-primary-action">Play Rematch</button>
+        <button id="btn-gameover-copy-fen" class="btn-secondary-action">Copy FEN String</button>
+        <button class="btn-secondary-action" data-close-modal>Review Board</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Floating Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- =========================================================================
+       JAVASCRIPT MODULES & CORE SCRIPTS
+       ========================================================================= -->
+  <script src="js/pieces.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/chess-core.js"></script>
+  <script src="js/stockfish-bridge.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
