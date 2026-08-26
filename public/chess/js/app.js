@@ -196,6 +196,8 @@
         // Evaluation & Status
         evalFillWhite: document.getElementById('eval-fill-white'),
         evalScoreText: document.getElementById('eval-score-text'),
+        mobileEvalFillWhite: document.getElementById('mobile-eval-fill-white'),
+        mobileEvalScoreText: document.getElementById('mobile-eval-score-text'),
         modeBadge: document.getElementById('mode-badge'),
 
         // Modals
@@ -510,20 +512,32 @@
     }
 
     /**
-     * Render Evaluation Score Bar
+     * Render Evaluation Score Bar (Desktop and Mobile)
      */
     _renderEvaluation() {
-      if (!this.dom.evalFillWhite || !this.dom.evalScoreText) return;
-
       const score = this.evalScore || 0;
       // Convert centipawn to fill percentage (clamp -10 to +10 cp)
       const clamped = Math.max(-10, Math.min(10, score));
       // 0 cp = 50%, +10 cp = 95%, -10 cp = 5%
       const percentage = 50 + (clamped / 10) * 45;
-
-      this.dom.evalFillWhite.style.width = `${percentage}%`;
       const sign = score > 0 ? '+' : '';
-      this.dom.evalScoreText.textContent = `${sign}${score.toFixed(1)}`;
+      const scoreStr = (Math.abs(score) < 0.05) ? '0.0' : `${sign}${score.toFixed(1)}`;
+
+      // Desktop Eval Meter
+      if (this.dom.evalFillWhite) {
+        this.dom.evalFillWhite.style.width = `${percentage}%`;
+      }
+      if (this.dom.evalScoreText) {
+        this.dom.evalScoreText.textContent = scoreStr;
+      }
+
+      // Mobile Eval Meter (Above Bottom Dock)
+      if (this.dom.mobileEvalFillWhite) {
+        this.dom.mobileEvalFillWhite.style.width = `${percentage}%`;
+      }
+      if (this.dom.mobileEvalScoreText) {
+        this.dom.mobileEvalScoreText.textContent = scoreStr;
+      }
     }
 
     /* --------------------------------------------------------------------------

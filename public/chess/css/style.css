@@ -303,7 +303,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: calc(var(--dock-height) + env(safe-area-inset-bottom, 12px) + 8px);
+  padding-bottom: calc(var(--dock-height) + 38px + env(safe-area-inset-bottom, 12px));
   z-index: 1;
 }
 
@@ -736,6 +736,63 @@ button {
 @keyframes captureRingPulse {
   0%, 100% { transform: scale(0.92); opacity: 0.8; }
   50% { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   MOBILE EVALUATION BAR (Above Bottom Dock)
+   ========================================================================== */
+.mobile-eval-bar-wrapper {
+  position: fixed;
+  bottom: calc(var(--dock-height) + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: rgba(15, 20, 28, 0.95);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  z-index: 39;
+  box-sizing: border-box;
+}
+
+.mobile-eval-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--text-secondary);
+}
+
+.mobile-eval-bar-wrapper .eval-meter {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  background: #334155;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mobile-eval-bar-wrapper .eval-fill-white {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: #f8fafc;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-eval-bar-wrapper .eval-score-text {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 38px;
+  text-align: right;
+  color: var(--text-primary);
 }
 
 /* ==========================================================================
@@ -1457,8 +1514,9 @@ button {
     min-height: calc(var(--board-size) + 90px);
   }
 
-  .mobile-bottom-dock {
-    display: none;
+  .mobile-bottom-dock,
+  .mobile-eval-bar-wrapper {
+    display: none !important;
   }
 }
 
