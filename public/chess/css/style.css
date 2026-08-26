@@ -739,44 +739,55 @@ button {
 }
 
 /* ==========================================================================
-   MOBILE EVALUATION BAR (Above Bottom Dock)
+   MOBILE BOTTOM FLOATING DOCK (With Integrated Evaluation Bar)
    ========================================================================== */
-.mobile-eval-bar-wrapper {
+.mobile-bottom-dock {
   position: fixed;
-  bottom: calc(var(--dock-height) + env(safe-area-inset-bottom, 0px));
+  bottom: 0;
   left: 0;
   right: 0;
-  height: 32px;
-  background: rgba(15, 20, 28, 0.95);
+  background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.45);
+  padding-bottom: env(safe-area-inset-bottom, 4px);
+}
+
+/* 1. Integrated Real-time Evaluation Bar Row */
+.dock-eval-row {
+  width: 100%;
+  height: 28px;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0 16px;
-  z-index: 39;
+  background: rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
 }
 
-.mobile-eval-label {
+.dock-eval-label {
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.8px;
   color: var(--text-secondary);
 }
 
-.mobile-eval-bar-wrapper .eval-meter {
+.dock-eval-row .eval-meter {
   position: relative;
   flex: 1;
   height: 8px;
   background: #334155;
   border-radius: 4px;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-.mobile-eval-bar-wrapper .eval-fill-white {
+.dock-eval-row .eval-fill-white {
   position: absolute;
   left: 0;
   top: 0;
@@ -786,7 +797,7 @@ button {
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.mobile-eval-bar-wrapper .eval-score-text {
+.dock-eval-score {
   font-size: 0.78rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -795,27 +806,16 @@ button {
   color: var(--text-primary);
 }
 
-/* ==========================================================================
-   MOBILE BOTTOM FLOATING DOCK (Quick Action Bar)
-   ========================================================================== */
-.mobile-bottom-dock {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: calc(var(--dock-height) + env(safe-area-inset-bottom, 0));
-  padding-bottom: env(safe-area-inset-bottom, 0);
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border-top: 1px solid var(--border-color);
+/* 2. Action Buttons Row */
+.dock-actions-row {
+  width: 100%;
+  height: var(--dock-height);
   display: flex;
   align-items: center;
   justify-content: space-around;
   padding-left: 8px;
   padding-right: 8px;
-  z-index: 40;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
 }
 
 .dock-btn {

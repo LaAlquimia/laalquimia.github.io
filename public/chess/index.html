@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 
   <!-- Core Stylesheet -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=2.1">
 </head>
 <body data-board-theme="green">
 
@@ -145,40 +145,41 @@
   </main>
 
   <!-- =========================================================================
-       MOBILE EVALUATION BAR (Right above bottom dock)
-       ========================================================================= -->
-  <div id="mobile-eval-bar" class="mobile-eval-bar-wrapper">
-    <span class="mobile-eval-label">EVAL</span>
-    <div class="eval-meter">
-      <div id="mobile-eval-fill-white" class="eval-fill-white"></div>
-    </div>
-    <span id="mobile-eval-score-text" class="eval-score-text">0.0</span>
-  </div>
-
-  <!-- =========================================================================
-       MOBILE BOTTOM DOCK
+       MOBILE BOTTOM DOCK (With Integrated Evaluation Bar)
        ========================================================================= -->
   <nav class="mobile-bottom-dock">
-    <button id="btn-dock-undo" class="dock-btn">
-      <span class="btn-icon-svg">↶</span>
-      <span class="btn-label">Undo</span>
-    </button>
-    <button id="btn-dock-newgame" class="dock-btn">
-      <span class="btn-icon-svg">↻</span>
-      <span class="btn-label">New</span>
-    </button>
-    <button id="btn-dock-flip" class="dock-btn">
-      <span class="btn-icon-svg">⇅</span>
-      <span class="btn-label">Flip</span>
-    </button>
-    <button id="btn-dock-difficulty" class="dock-btn">
-      <span class="btn-icon-svg">⚡</span>
-      <span class="btn-label">Difficulty</span>
-    </button>
-    <button id="btn-dock-settings" class="dock-btn">
-      <span class="btn-icon-svg">⚙️</span>
-      <span class="btn-label">Settings</span>
-    </button>
+    <!-- 1. Real-time Evaluation Bar Row (Mobile) -->
+    <div id="mobile-eval-bar" class="dock-eval-row">
+      <span class="dock-eval-label">EVAL</span>
+      <div class="eval-meter">
+        <div id="mobile-eval-fill-white" class="eval-fill-white"></div>
+      </div>
+      <span id="mobile-eval-score-text" class="dock-eval-score">0.0</span>
+    </div>
+
+    <!-- 2. Action Buttons Row -->
+    <div class="dock-actions-row">
+      <button id="btn-dock-undo" class="dock-btn">
+        <span class="btn-icon-svg">↶</span>
+        <span class="btn-label">Undo</span>
+      </button>
+      <button id="btn-dock-newgame" class="dock-btn">
+        <span class="btn-icon-svg">↻</span>
+        <span class="btn-label">New</span>
+      </button>
+      <button id="btn-dock-flip" class="dock-btn">
+        <span class="btn-icon-svg">⇅</span>
+        <span class="btn-label">Flip</span>
+      </button>
+      <button id="btn-dock-difficulty" class="dock-btn">
+        <span class="btn-icon-svg">⚡</span>
+        <span class="btn-label">Difficulty</span>
+      </button>
+      <button id="btn-dock-settings" class="dock-btn">
+        <span class="btn-icon-svg">⚙️</span>
+        <span class="btn-label">Settings</span>
+      </button>
+    </div>
   </nav>
 
   <!-- =========================================================================
@@ -387,7 +388,7 @@
   <script src="js/audio.js"></script>
   <script src="js/chess-core.js"></script>
   <script src="js/stockfish-bridge.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=2.1"></script>
 
 </body>
 </html>

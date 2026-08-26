@@ -939,6 +939,11 @@
       // Update UI
       this.render();
 
+      // Recalculate evaluation if in PvP mode or human move against AI
+      if (this.mode === 'pvp' || (this.mode === 'ai' && this.game.getTurn() === this.playerColor)) {
+        this.recalculateEvaluation();
+      }
+
       // Check Game Over
       if (this.game.isGameOver()) {
         setTimeout(() => this.showGameOverModal(), 400);
@@ -1023,6 +1028,55 @@
       return { x: file, y: rank };
     }
 
+    /**
+     * Recalculate evaluation score after move, undo, or position change
+     */
+    recalculateEvaluation() {
+      const history = this.game.getHistory();
+      if (history.length === 0) {
+        this.evalScore = 0.0;
+        this._renderEvaluation();
+        return;
+      }
+
+      // Check Game Over evaluation
+      if (this.game.isGameOver()) {
+        const turn = this.game.getTurn();
+        if (this.game.isCheckmate(turn)) {
+          this.evalScore = (turn === 'w') ? -10.0 : 10.0;
+        } else {
+          this.evalScore = 0.0;
+        }
+        this._renderEvaluation();
+        return;
+      }
+
+      // Immediate baseline from material difference
+      const mat = this.game.getMaterialScore();
+      const materialDiff = mat.difference || 0;
+      this.evalScore = materialDiff;
+      this._renderEvaluation();
+
+      // If Stockfish engine is available and not currently calculating an AI move
+      if (this.ai && this.ai.isAvailable && !this.isAiThinking) {
+        const fen = this.game.getFEN();
+        this.ai.evaluate(fen, 10, (evalInfo) => {
+          if (evalInfo && evalInfo.score) {
+            this.evalScore = evalInfo.score.whiteValue || 0;
+            this._renderEvaluation();
+          }
+        }).then(res => {
+          if (res && res.evaluation && res.evaluation.score) {
+            this.evalScore = res.evaluation.score.whiteValue || 0;
+            this._renderEvaluation();
+          }
+        }).catch(() => {
+          this.evalScore = materialDiff;
+          this._renderEvaluation();
+        });
+      }
+    }
+
     /* --------------------------------------------------------------------------
        CONTROLS: UNDO, FLIP, RESTART, RESIGN, DRAW
        -------------------------------------------------------------------------- */
@@ -1055,6 +1109,14 @@
       this.lastMove = updatedHistory.length > 0 
         ? { from: updatedHistory[updatedHistory.length - 1].from, to: updatedHistory[updatedHistory.length - 1].to } 
         : null;
+
+      // Reset or recalculate evaluation score
+      if (updatedHistory.length === 0) {
+        this.evalScore = 0.0;
+        this._renderEvaluation();
+      } else {
+        this.recalculateEvaluation();
+      }
 
       this.audio.play('move');
       this.render();
