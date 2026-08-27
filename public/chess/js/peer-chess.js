@@ -23,14 +23,18 @@
 
   // Public STUN servers for NAT traversal (Internet & LAN)
   const DEFAULT_PEER_CONFIG = {
-    debug: 1,
+    debug: 0,
     config: {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
         { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' },
+        { urls: 'stun:stun4.l.google.com:19302' },
+        { urls: 'stun:stun.cloudflare.com:3478' },
         { urls: 'stun:global.stun.twilio.com:3478' }
-      ]
+      ],
+      sdpSemantics: 'unified-plan'
     }
   };
 
@@ -100,6 +104,7 @@
       this.pingMs = 0;
       this._pingTimer = null;
       this._lastPingTimestamp = 0;
+      this._handshakeTimer = null;
 
       // Event listeners
       this._listeners = new Map();
@@ -258,11 +263,11 @@
         let connectionTimeout = setTimeout(() => {
           if (this.status !== 'connected') {
             this.leaveRoom();
-            const err = new Error('Could not connect to host. Make sure the room code is correct.');
+            const err = new Error('No se pudo conectar con el anfitrión. Verifica que el código de sala sea correcto.');
             this._setStatus('error', err.message);
             reject(err);
           }
-        }, 15000);
+        }, 18000);
 
         this.peer.on('open', (id) => {
           this.peerId = id;
@@ -273,23 +278,25 @@
 
           this._setupConnection(conn);
 
-          this.on('connected', () => {
+          const onConnectedHandler = () => {
             clearTimeout(connectionTimeout);
+            this.off('connected', onConnectedHandler);
             resolve(true);
-          });
+          };
+          this.on('connected', onConnectedHandler);
         });
 
         this.peer.on('error', (err) => {
           clearTimeout(connectionTimeout);
           console.warn('PeerJS Guest Error:', err);
           if (err.type === 'peer-unavailable') {
-            const friendlyErr = new Error(`Room "${this.roomCode}" not found. Verify the room code.`);
+            const friendlyErr = new Error(`Sala "${this.roomCode}" no encontrada. Verifica el código.`);
             this._setStatus('error', friendlyErr.message);
             this._emit('error', friendlyErr);
             reject(friendlyErr);
             return;
           }
-          this._setStatus('error', err.message || 'Connection error');
+          this._setStatus('error', err.message || 'Error de conexión');
           this._emit('error', err);
           reject(err);
         });
@@ -326,13 +333,29 @@
 
           this._onConnected();
         } else {
-          // Guest sends HELLO handshake to Host
-          this._send({
-            type: 'HELLO',
-            payload: {
-              guestName: this.playerName
+          // Guest sends initial HELLO handshake to Host
+          const sendHello = () => {
+            this._send({
+              type: 'HELLO',
+              payload: {
+                guestName: this.playerName
+              }
+            });
+          };
+
+          sendHello();
+
+          // Resilient retry: keep sending HELLO every 500ms until WELCOME arrives
+          this._stopHandshakeTimer();
+          let helloCount = 0;
+          this._handshakeTimer = setInterval(() => {
+            if (this.status === 'connected' || helloCount >= 10) {
+              this._stopHandshakeTimer();
+              return;
             }
-          });
+            helloCount++;
+            sendHello();
+          }, 500);
         }
       });
 
@@ -341,12 +364,12 @@
       });
 
       conn.on('close', () => {
-        this._onDisconnected('Opponent disconnected');
+        this._onDisconnected('El rival se ha desconectado.');
       });
 
       conn.on('error', (err) => {
         console.warn('PeerConnection Error:', err);
-        this._onDisconnected(err.message || 'Connection lost');
+        this._onDisconnected(err.message || 'Conexión perdida');
       });
     }
 
@@ -355,17 +378,49 @@
 
       switch (msg.type) {
         case 'HELLO':
-          if (this.isHost && msg.payload) {
-            this.opponentName = msg.payload.guestName || 'Guest';
-            this._emit('opponent_info', { name: this.opponentName });
+          if (this.isHost) {
+            if (msg.payload && msg.payload.guestName) {
+              this.opponentName = msg.payload.guestName;
+              this._emit('opponent_info', { name: this.opponentName });
+            }
+            // Always reply with WELCOME so guest is guaranteed to receive it
+            this._send({
+              type: 'WELCOME',
+              payload: {
+                hostColor: this.assignedColor,
+                guestColor: this.opponentColor,
+                hostName: this.playerName
+              }
+            });
+            this._onConnected();
           }
           break;
 
         case 'WELCOME':
           if (!this.isHost && msg.payload) {
+            this._stopHandshakeTimer();
             this.assignedColor = msg.payload.guestColor || 'b';
             this.opponentColor = msg.payload.hostColor || 'w';
             this.opponentName = msg.payload.hostName || 'Host';
+
+            // Send acknowledgment back to Host
+            this._send({
+              type: 'WELCOME_ACK',
+              payload: {
+                guestName: this.playerName
+              }
+            });
+
+            this._onConnected();
+          }
+          break;
+
+        case 'WELCOME_ACK':
+          if (this.isHost) {
+            this._stopHandshakeTimer();
+            if (msg.payload && msg.payload.guestName) {
+              this.opponentName = msg.payload.guestName;
+            }
             this._onConnected();
           }
           break;
@@ -420,7 +475,16 @@
       }
     }
 
+    _stopHandshakeTimer() {
+      if (this._handshakeTimer) {
+        clearInterval(this._handshakeTimer);
+        this._handshakeTimer = null;
+      }
+    }
+
     _onConnected() {
+      if (this.status === 'connected') return;
+      this._stopHandshakeTimer();
       this._setStatus('connected', `Connected with ${this.opponentName}`);
       this._startPingInterval();
       this._emit('connected', {
@@ -433,6 +497,7 @@
     }
 
     _onDisconnected(reason = 'Disconnected') {
+      this._stopHandshakeTimer();
       this._stopPingInterval();
       const wasConnected = (this.status === 'connected');
       this._setStatus('disconnected', reason);
@@ -543,6 +608,7 @@
      * Leave current room and close connections
      */
     leaveRoom() {
+      this._stopHandshakeTimer();
       this._stopPingInterval();
       if (this.conn) {
         try {
