@@ -260,12 +260,15 @@
         <!-- Player Side -->
         <div class="settings-section">
           <span class="section-label">Play As</span>
-          <div class="side-chooser-grid">
+          <div class="side-chooser-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <button class="settings-side-btn side-chooser-btn" data-side="random">
+              <span>🎲</span> Auto
+            </button>
             <button class="settings-side-btn side-chooser-btn active" data-side="w">
-              <span>♔</span> White (First)
+              <span>♔</span> White
             </button>
             <button class="settings-side-btn side-chooser-btn" data-side="b">
-              <span>♚</span> Black (Second)
+              <span>♚</span> Black
             </button>
           </div>
         </div>

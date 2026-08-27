@@ -30,8 +30,9 @@
 
       // 2. Application State & Settings
       this.settings = this._loadSettings();
-      this.mode = this.settings.gameMode || 'ai'; // 'ai' | 'pvp'
-      this.playerColor = this.settings.playerColor || 'w'; // 'w' | 'b'
+      this.mode = this.settings.gameMode || 'ai'; // 'ai' | 'pvp' | 'online'
+      const savedSide = this.settings.playerColor || 'w';
+      this.playerColor = (savedSide === 'random') ? (Math.random() < 0.5 ? 'w' : 'b') : savedSide;
       this.boardFlipped = (this.playerColor === 'b');
       this.difficulty = this.settings.difficulty || 'medium';
 
@@ -79,14 +80,14 @@
         }
       }
 
-      // 10. If Player is Black vs AI, trigger AI initial move
+      // 10. Auto-start AI if player is black
       if (this.mode === 'ai' && this.playerColor === 'b' && this.game.getTurn() === 'w') {
         setTimeout(() => this.triggerAIMove(), 600);
       }
     }
 
     /* --------------------------------------------------------------------------
-       SETTINGS & LOCAL STORAGE
+       SETTINGS PERSISTENCE & LOCALSTORAGE
        -------------------------------------------------------------------------- */
     _loadSettings() {
       const defaults = {
@@ -98,6 +99,7 @@
         difficulty: 'medium',
         gameMode: 'ai',
         playerColor: 'w',
+        onlineSide: 'random',
         faceToFace: true
       };
 
@@ -167,17 +169,30 @@
         el.classList.toggle('active', el.dataset.diff === this.settings.difficulty);
       });
 
-      // Side chooser (White / Black)
+      // Game Mode Select
+      const modeSelect = document.getElementById('setting-game-mode');
+      if (modeSelect) modeSelect.value = this.mode;
+
+      // Settings Side chooser (Auto / White / Black)
+      const currentSideSetting = this.settings.playerColor || 'w';
       document.querySelectorAll('.settings-side-btn, [data-side]').forEach(el => {
         if (el.dataset.side) {
-          el.classList.toggle('active', el.dataset.side === this.playerColor);
+          el.classList.toggle('active', el.dataset.side === currentSideSetting);
+        }
+      });
+
+      // Online Side chooser (Random / White / Black)
+      const currentOnlineSideSetting = this.settings.onlineSide || 'random';
+      document.querySelectorAll('.online-side-btn, [data-online-side]').forEach(el => {
+        if (el.dataset.onlineSide) {
+          el.classList.toggle('active', el.dataset.onlineSide === currentOnlineSideSetting);
         }
       });
 
       // Mode badge
       if (this.dom.modeBadge) {
-        this.dom.modeBadge.textContent = (this.mode === 'ai') ? 'VS STOCKFISH' : 'PASS & PLAY';
-        this.dom.modeBadge.className = 'mode-badge ' + (this.mode === 'ai' ? 'ai' : 'pvp');
+        this.dom.modeBadge.textContent = (this.mode === 'ai') ? 'VS STOCKFISH' : (this.mode === 'online' ? 'ONLINE P2P' : 'PASS & PLAY');
+        this.dom.modeBadge.className = 'mode-badge ' + (this.mode === 'ai' ? 'ai' : (this.mode === 'online' ? 'online' : 'pvp'));
       }
 
       // Mute Icon button
@@ -650,16 +665,19 @@
       // Online Side Chooser
       document.querySelectorAll('.online-side-btn, [data-online-side]').forEach(btn => {
         btn.addEventListener('click', () => {
-          document.querySelectorAll('.online-side-btn, [data-online-side]').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
+          const side = btn.dataset.onlineSide || 'random';
+          this.settings.onlineSide = side;
+          this._saveSettings();
+          document.querySelectorAll('.online-side-btn, [data-online-side]').forEach(b => {
+            b.classList.toggle('active', b.dataset.onlineSide === side);
+          });
         });
       });
 
       // Create Room
       if (this.dom.btnCreateRoom) {
         this.dom.btnCreateRoom.addEventListener('click', () => {
-          const activeSideBtn = document.querySelector('.online-side-btn.active, [data-online-side].active');
-          const side = (activeSideBtn && activeSideBtn.dataset.onlineSide) ? activeSideBtn.dataset.onlineSide : 'random';
+          const side = this.settings.onlineSide || 'random';
           this.createOnlineRoom(side);
         });
       }
@@ -788,23 +806,48 @@
       document.addEventListener('keydown', (e) => this._handleKeyboardShortcuts(e));
     }
 
+    /* --------------------------------------------------------------------------
+       PIECE OWNERSHIP & TURN PERMISSIONS
+       -------------------------------------------------------------------------- */
+    isOwnPiece(piece) {
+      if (!piece || piece === ' ') return false;
+      if (this.mode === 'online' || this.mode === 'ai') {
+        // Human player ONLY controls their assigned playerColor
+        return (this.playerColor === 'w') ? (piece === piece.toUpperCase()) : (piece === piece.toLowerCase());
+      }
+      // In local PvP mode, piece belongs to whoever's turn it is
+      const turn = this.game.getTurn();
+      return (turn === 'w') ? (piece === piece.toUpperCase()) : (piece === piece.toLowerCase());
+    }
+
+    canInteractWithBoard() {
+      if (this.game.isGameOver() || this.isCustomGameOver) return false;
+      if (this.isAiThinking) return false;
+      if (this.mode === 'online') {
+        if (!this.peerClient || !this.peerClient.isConnected()) return false;
+        if (this.game.getTurn() !== this.playerColor) return false;
+      }
+      if (this.mode === 'ai') {
+        if (this.game.getTurn() !== this.playerColor) return false;
+      }
+      return true;
+    }
+
     _setupBoardInteractions() {
       if (!this.dom.chessboard) return;
-
       this.dom.chessboard.addEventListener('pointerdown', (e) => this._onPointerDown(e));
-      this.dom.chessboard.addEventListener('click', (e) => this._handleBoardClick(e));
     }
 
     _onPointerDown(e) {
       // Only accept primary pointer button (left click or touch)
       if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
 
+      if (this.game.isGameOver() || this.isCustomGameOver) return;
+
       if (this.isAiThinking) {
         this.showToast('Stockfish is calculating...', 'info');
         return;
       }
-
-      if (this.game.isGameOver()) return;
 
       const squareEl = e.target.closest('.square');
       if (!squareEl) return;
@@ -813,29 +856,28 @@
       const y = parseInt(squareEl.dataset.y, 10);
       if (isNaN(x) || isNaN(y)) return;
 
-      const turn = this.game.getTurn();
-      if (this.mode === 'ai' && turn !== this.playerColor) {
-        return;
-      }
       if (this.mode === 'online') {
         if (!this.peerClient || !this.peerClient.isConnected()) {
           this.showToast('Conéctate a una sala online para jugar.', 'info');
           return;
         }
-        if (turn !== this.playerColor) {
+        if (this.game.getTurn() !== this.playerColor) {
           this.showToast('Es el turno de tu rival.', 'info');
           return;
         }
       }
 
-      const piece = this.game.getPiece(x, y);
-      const isOwnPiece = piece && (
-        (turn === 'w' && piece === piece.toUpperCase()) ||
-        (turn === 'b' && piece === piece.toLowerCase())
-      );
+      if (this.mode === 'ai') {
+        if (this.game.getTurn() !== this.playerColor) {
+          return;
+        }
+      }
 
-      // If clicking an opponent piece or empty square when no piece is selected, return immediately so drag/interaction cannot start
-      if (!isOwnPiece && !this.selectedSquare) {
+      const piece = this.game.getPiece(x, y);
+      const isOwn = this.isOwnPiece(piece);
+
+      // If no piece is currently selected, user can ONLY interact with their own piece
+      if (!this.selectedSquare && !isOwn) {
         return;
       }
 
@@ -847,7 +889,7 @@
         startX: e.clientX,
         startY: e.clientY,
         startSquare: { x, y },
-        isOwnPiece: !!isOwnPiece,
+        isOwnPiece: isOwn,
         dragInitiated: false,
         ghostEl: null,
         originSquareEl: squareEl,
@@ -864,45 +906,47 @@
       if (e.pointerId !== this.pointerInteraction.pointerId) return;
 
       const state = this.pointerInteraction;
+      if (!state.isOwnPiece) return;
+
       const dx = e.clientX - state.startX;
       const dy = e.clientY - state.startY;
       const dist = Math.hypot(dx, dy);
 
       // Initiate drag if threshold passed (> 6px) and pointer started on player's own piece
       if (!state.dragInitiated && dist > 6) {
-        if (state.isOwnPiece) {
-          state.dragInitiated = true;
+        if (!this.canInteractWithBoard()) return;
 
-          // Select starting piece if not selected yet
-          this.selectedSquare = { x: state.startSquare.x, y: state.startSquare.y };
-          this.legalMovesForSelected = this.game.getLegalMoves(state.startSquare.x, state.startSquare.y);
-          this.render();
+        state.dragInitiated = true;
 
-          // Mark origin square as dragging
-          const refreshedOrigin = this._getSquareElement(state.startSquare.x, state.startSquare.y);
-          if (refreshedOrigin) {
-            refreshedOrigin.classList.add('is-dragging');
-            state.originSquareEl = refreshedOrigin;
-          }
+        // Select starting piece if not selected yet
+        this.selectedSquare = { x: state.startSquare.x, y: state.startSquare.y };
+        this.legalMovesForSelected = this.game.getLegalMoves(state.startSquare.x, state.startSquare.y);
+        this.render();
 
-          // Create floating drag ghost
-          const ghost = document.createElement('div');
-          ghost.className = 'drag-ghost';
-
-          // Rotate ghost if piece is rotated in face-to-face mode
-          const isWhitePiece = (state.piece === state.piece.toUpperCase());
-          const isTopPiece = this.boardFlipped ? isWhitePiece : !isWhitePiece;
-          const isFaceToFace = (this.settings.faceToFace !== false) && (this.mode === 'pvp' || this.settings.alwaysFaceToFace);
-          if (isFaceToFace && isTopPiece) {
-            ghost.classList.add('rotated-piece');
-          }
-
-          ghost.innerHTML = this.pieces.getPieceSVG(state.piece, this.settings.pieceStyle);
-          ghost.style.left = `${e.clientX}px`;
-          ghost.style.top = `${e.clientY}px`;
-          document.body.appendChild(ghost);
-          state.ghostEl = ghost;
+        // Mark origin square as dragging
+        const refreshedOrigin = this._getSquareElement(state.startSquare.x, state.startSquare.y);
+        if (refreshedOrigin) {
+          refreshedOrigin.classList.add('is-dragging');
+          state.originSquareEl = refreshedOrigin;
         }
+
+        // Create floating drag ghost
+        const ghost = document.createElement('div');
+        ghost.className = 'drag-ghost';
+
+        // Rotate ghost if piece is rotated in face-to-face mode
+        const isWhitePiece = (state.piece === state.piece.toUpperCase());
+        const isTopPiece = this.boardFlipped ? isWhitePiece : !isWhitePiece;
+        const isFaceToFace = (this.settings.faceToFace !== false) && (this.mode === 'pvp' || this.settings.alwaysFaceToFace);
+        if (isFaceToFace && isTopPiece) {
+          ghost.classList.add('rotated-piece');
+        }
+
+        ghost.innerHTML = this.pieces.getPieceSVG(state.piece, this.settings.pieceStyle);
+        ghost.style.left = `${e.clientX}px`;
+        ghost.style.top = `${e.clientY}px`;
+        document.body.appendChild(ghost);
+        state.ghostEl = ghost;
       }
 
       if (state.dragInitiated && state.ghostEl) {
@@ -931,41 +975,9 @@
         state.originSquareEl.classList.remove('is-dragging');
       }
 
-      // Suppress subsequent synthetic click events
-      this._ignoreNextClick = true;
-      setTimeout(() => {
-        this._ignoreNextClick = false;
-      }, 100);
-
       if (state.dragInitiated) {
         // --- DRAG AND DROP RESOLUTION ---
-        if (!state.isOwnPiece) {
-          this.selectedSquare = null;
-          this.legalMovesForSelected = [];
-          this.render();
-          return;
-        }
-
-        const turn = this.game.getTurn();
-        const isPieceOfTurn = state.piece && (
-          (turn === 'w' && state.piece === state.piece.toUpperCase()) ||
-          (turn === 'b' && state.piece === state.piece.toLowerCase())
-        );
-        if (!isPieceOfTurn) {
-          this.selectedSquare = null;
-          this.legalMovesForSelected = [];
-          this.render();
-          return;
-        }
-
-        if (this.mode === 'ai' && turn !== this.playerColor) {
-          this.selectedSquare = null;
-          this.legalMovesForSelected = [];
-          this.render();
-          return;
-        }
-
-        if (this.mode === 'online' && turn !== this.playerColor) {
+        if (!state.isOwnPiece || !this.canInteractWithBoard()) {
           this.selectedSquare = null;
           this.legalMovesForSelected = [];
           this.render();
@@ -973,7 +985,6 @@
         }
 
         const target = this._getSquareFromPoint(e.clientX, e.clientY);
-
         if (target) {
           const tx = target.x;
           const ty = target.y;
@@ -1078,56 +1089,20 @@
       return null;
     }
 
-    _handleBoardClick(e) {
-      if (this._ignoreNextClick) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-
-      // Accessible keyboard click support
-      const squareEl = e.target.closest('.square');
-      if (!squareEl) return;
-
-      const x = parseInt(squareEl.dataset.x, 10);
-      const y = parseInt(squareEl.dataset.y, 10);
-      if (isNaN(x) || isNaN(y)) return;
-
-      this.handleSquareSelect(x, y);
-    }
-
     /**
      * Core move selection & execution logic
      */
     handleSquareSelect(x, y) {
-      if (this.isAiThinking) {
-        this.showToast('Stockfish is calculating...', 'info');
-        return;
-      }
-
-      if (this.game.isGameOver()) return;
-
-      if (this.mode === 'online') {
-        if (!this.peerClient || !this.peerClient.isConnected()) {
-          this.showToast('Conéctate a una sala online para jugar.', 'info');
-          return;
-        }
-        if (this.game.getTurn() !== this.playerColor) {
+      if (!this.canInteractWithBoard()) {
+        if (this.mode === 'online' && this.peerClient && this.peerClient.isConnected() && this.game.getTurn() !== this.playerColor) {
           this.showToast('Es el turno de tu rival.', 'info');
-          return;
         }
-      }
-
-      if (this.mode === 'ai' && this.game.getTurn() !== this.playerColor) {
         return;
       }
 
       const turn = this.game.getTurn();
       const clickedPiece = this.game.getPiece(x, y);
-      const isPieceOfCurrentTurn = clickedPiece && (
-        (turn === 'w' && clickedPiece === clickedPiece.toUpperCase()) ||
-        (turn === 'b' && clickedPiece === clickedPiece.toLowerCase())
-      );
+      const isOwn = this.isOwnPiece(clickedPiece);
 
       // Scenario 1: Piece is already selected
       if (this.selectedSquare) {
@@ -1160,8 +1135,8 @@
           return;
         }
 
-        // 1c. Clicking ANOTHER piece of the current turn switches selection
-        if (isPieceOfCurrentTurn) {
+        // 1c. Clicking ANOTHER piece of the player's own pieces switches selection
+        if (isOwn) {
           this.selectedSquare = { x, y };
           this.legalMovesForSelected = this.game.getLegalMoves(x, y);
           this.render();
@@ -1176,7 +1151,7 @@
       }
 
       // Scenario 2: No piece selected yet -> Clicking own piece selects it and reveals legal moves
-      if (isPieceOfCurrentTurn) {
+      if (isOwn) {
         this.selectedSquare = { x, y };
         this.legalMovesForSelected = this.game.getLegalMoves(x, y);
         this.render();
@@ -1438,40 +1413,98 @@
       this.lastMove = null;
       this.pendingPromotionMove = null;
       this.isAiThinking = false;
+      this.isCustomGameOver = false;
       this.evalScore = 0.0;
+      if (this.dom.modalGameOver) this.dom.modalGameOver.classList.remove('open');
+      if (this.dom.modalPromotion) this.dom.modalPromotion.classList.remove('open');
+
+      if (this.settings.playerColor === 'random') {
+        this.playerColor = (Math.random() < 0.5) ? 'w' : 'b';
+        this.boardFlipped = (this.playerColor === 'b');
+      }
 
       this.render();
       this.showToast('New game started', 'info');
 
       // If AI mode and playing as Black, AI plays White first move
-      if (this.mode === 'ai' && this.playerColor === 'b') {
-        setTimeout(() => this.triggerAIMove(), 500);
+      if (this.mode === 'ai' && this.playerColor === 'b' && this.game.getTurn() === 'w') {
+        setTimeout(() => this.triggerAIMove(), 600);
       }
     }
 
     handleResign() {
-      if (this.game.isGameOver()) return;
+      if (this.game.isGameOver() || this.isCustomGameOver) return;
+
+      if (typeof confirm === 'function') {
+        const confirmed = confirm('¿Estás seguro de que deseas rendirte?');
+        if (!confirmed) return;
+      }
+
+      this.isCustomGameOver = true;
+
       if (this.mode === 'online' && this.peerClient && this.peerClient.isConnected()) {
         this.peerClient.sendResign();
         const winner = (this.playerColor === 'w') ? 'Black' : 'White';
-        this.audio.play('game_end');
+        if (this.audio && this.audio.play) this.audio.play('game_end');
         this.showGameOverModalCustom(`${winner} Wins!`, 'Has abandonado la partida.', '🏳️');
+        this.showToast('Te has rendido.', 'info');
         return;
       }
-      const turn = this.game.getTurn();
-      const winner = turn === 'w' ? 'Black' : 'White';
-      this.audio.play('game_end');
+
+      const turn = (this.mode === 'ai') ? this.playerColor : this.game.getTurn();
+      const winner = (turn === 'w') ? 'Black' : 'White';
+      if (this.audio && this.audio.play) this.audio.play('game_end');
       this.showGameOverModalCustom(`${winner} Wins!`, `${turn === 'w' ? 'White' : 'Black'} resigned the game.`, '🏳️');
+      this.showToast('Partida finalizada por abandono.', 'info');
     }
 
     handleOfferDraw() {
-      if (this.game.isGameOver()) return;
-      if (this.mode === 'online' && this.peerClient && this.peerClient.isConnected()) {
-        this.peerClient.sendDrawOffer();
-        this.showToast('Oferta de tablas enviada a tu rival... 🤝', 'info');
+      if (this.game.isGameOver() || this.isCustomGameOver) return;
+
+      if (this.mode === 'online') {
+        if (this.peerClient && this.peerClient.isConnected()) {
+          this.peerClient.sendDrawOffer();
+          this.showToast('Oferta de tablas enviada a tu rival... 🤝', 'info');
+        } else {
+          this.showToast('No estás conectado a una partida online.', 'error');
+        }
         return;
       }
-      this.audio.play('game_end');
+
+      if (this.mode === 'ai') {
+        // Stockfish evaluates if the position is balanced between -1.5 and +1.5
+        const evalScore = (typeof this.evalScore === 'number' && !isNaN(this.evalScore)) ? this.evalScore : 0;
+        const isBalanced = (evalScore >= -1.5 && evalScore <= 1.5);
+        if (isBalanced) {
+          this.isCustomGameOver = true;
+          if (this.audio && this.audio.play) this.audio.play('game_end');
+          this.showGameOverModalCustom('Partida Empatada', 'Stockfish acepta la oferta de tablas en posición equilibrada.', '🤝');
+          this.showToast('Stockfish ha aceptado las tablas.', 'info');
+        } else {
+          this.showToast('Stockfish rechaza la oferta de tablas en esta posición.', 'info');
+        }
+        return;
+      }
+
+      if (this.mode === 'pvp') {
+        let accepted = true;
+        if (typeof confirm === 'function') {
+          accepted = confirm('¿El rival acepta la oferta de tablas?');
+        }
+        if (accepted) {
+          this.isCustomGameOver = true;
+          if (this.audio && this.audio.play) this.audio.play('game_end');
+          this.showGameOverModalCustom('Partida Empatada', 'Acuerdo mutuo de tablas entre ambos jugadores.', '🤝');
+          this.showToast('Partida finalizada por acuerdo de tablas.', 'info');
+        } else {
+          this.showToast('La oferta de tablas fue rechazada.', 'info');
+        }
+        return;
+      }
+
+      // Default fallback
+      this.isCustomGameOver = true;
+      if (this.audio && this.audio.play) this.audio.play('game_end');
       this.showGameOverModalCustom('Game Drawn', 'Agreement by both players.', '🤝');
     }
 
@@ -1623,9 +1656,13 @@
     }
 
     setPlayerColor(side) {
-      this.playerColor = side;
       this.settings.playerColor = side;
-      this.boardFlipped = (side === 'b');
+      if (side === 'random') {
+        this.playerColor = (Math.random() < 0.5) ? 'w' : 'b';
+      } else {
+        this.playerColor = side;
+      }
+      this.boardFlipped = (this.playerColor === 'b');
       this._saveSettings();
       this._syncSettingsFormControls();
       this.restartGame();
@@ -1704,6 +1741,7 @@
 
       this.peerClient.on('draw_response', (data) => {
         if (data.accepted) {
+          this.isCustomGameOver = true;
           this.showToast('¡Tu rival ha aceptado las tablas! Partida empatada.', 'info');
           this.showGameOverModalCustom('Partida Empatada', 'Acuerdo mutuo de tablas.', '🤝');
         } else {
@@ -1729,8 +1767,9 @@
       });
 
       this.peerClient.on('resign', (data) => {
+        this.isCustomGameOver = true;
         const winner = (data.color === 'w') ? 'Black' : 'White';
-        this.audio.play('game_end');
+        if (this.audio && this.audio.play) this.audio.play('game_end');
         this.showToast('¡Tu rival se ha rendido! Has ganado.', 'success');
         this.showGameOverModalCustom(`${winner} Wins!`, 'Tu rival abandonó la partida.', '🏆');
       });
@@ -1742,6 +1781,7 @@
           this.boardFlipped = (this.playerColor === 'b');
           this.game.resetGame();
           this.lastMove = null;
+          this.isCustomGameOver = false;
           this.evalScore = 0.0;
           this.render();
           this.showToast('¡Revancha iniciada! Colores intercambiados.', 'success');
@@ -1794,12 +1834,13 @@
     }
 
     _handleRemoteDrawOffer() {
-      const accept = confirm('Tu rival te ofrece tablas (empate). ¿Aceptas?');
+      const accept = (typeof confirm === 'function') ? confirm('Tu rival te ofrece tablas (empate). ¿Aceptas?') : true;
       if (this.peerClient) {
         this.peerClient.sendDrawResponse(accept);
       }
       if (accept) {
-        this.audio.play('game_end');
+        this.isCustomGameOver = true;
+        if (this.audio && this.audio.play) this.audio.play('game_end');
         this.showGameOverModalCustom('Partida Empatada', 'Acuerdo mutuo de tablas.', '🤝');
       }
     }
