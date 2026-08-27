@@ -1553,6 +1553,304 @@ button {
 }
 
 /* ==========================================================================
+   ONLINE MULTIPLAYER & WEBRTC P2P LOBBY
+   ========================================================================== */
+.online-modal-card {
+  max-width: 440px;
+  width: 95%;
+}
+
+.modal-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.modal-tab-btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: 9px;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.modal-tab-btn.active {
+  background: var(--accent-blue);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(56, 139, 253, 0.4);
+}
+
+.tab-pane {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tab-pane.active {
+  display: flex;
+}
+
+/* Room Code Card */
+.room-code-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.room-code-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.room-code-badge {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #38bdf8;
+  text-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+  background: rgba(15, 23, 42, 0.8);
+  padding: 8px 24px;
+  border-radius: 12px;
+  border: 2px dashed rgba(56, 189, 248, 0.5);
+  user-select: all;
+  -webkit-user-select: all;
+}
+
+/* QR Code Display */
+.qrcode-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.qrcode-box {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qrcode-box img,
+.qrcode-box canvas {
+  display: block !important;
+  max-width: 140px;
+  max-height: 140px;
+}
+
+.qrcode-hint {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+/* Action Buttons Grid */
+.online-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn-online-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary-blue {
+  background: var(--accent-blue);
+  color: #ffffff;
+}
+
+.btn-primary-blue:hover {
+  background: #2563eb;
+}
+
+.btn-secondary-glass {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-secondary-glass:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Join Input Box */
+.join-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 8px;
+}
+
+.room-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #ffffff;
+  transition: border-color var(--transition-fast);
+}
+
+.room-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 12px rgba(56, 139, 253, 0.3);
+}
+
+/* Online Status HUD Pill */
+.online-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.online-status-pill.connected {
+  border-color: rgba(35, 134, 54, 0.6);
+  color: #4ade80;
+}
+
+.online-status-pill.waiting {
+  border-color: rgba(234, 179, 8, 0.6);
+  color: #fde047;
+}
+
+.online-status-pill.error {
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #fca5a5;
+}
+
+.status-dot-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.online-status-pill.waiting .status-dot-pulse {
+  animation: pulseDot 1.4s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+/* Floating Emoji Reactions Bar */
+.floating-reaction-bar {
+  display: none; /* Shown in online mode */
+  position: fixed;
+  right: 14px;
+  bottom: calc(var(--dock-height) + 42px + env(safe-area-inset-bottom, 8px));
+  background: rgba(15, 20, 28, 0.88);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  padding: 4px 8px;
+  z-index: 45;
+  box-shadow: var(--shadow-md);
+  align-items: center;
+  gap: 4px;
+}
+
+.floating-reaction-bar.visible {
+  display: flex;
+}
+
+.reaction-emoji-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.15s ease, background 0.15s ease;
+  line-height: 1;
+}
+
+.reaction-emoji-btn:hover,
+.reaction-emoji-btn:active {
+  transform: scale(1.35);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Floating Emoji Screen Animation */
+.floating-reaction-bubble {
+  position: fixed;
+  font-size: 3.2rem;
+  pointer-events: none;
+  z-index: 99999;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
+  animation: floatEmojiUp 2.2s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
+}
+
+@keyframes floatEmojiUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.6) rotate(-10deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0px) scale(1.2) rotate(5deg);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-90px) scale(1.1) rotate(-5deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-160px) scale(0.9) rotate(10deg);
+  }
+}
+
+/* ==========================================================================
    RESPONSIVE MEDIA QUERIES (Desktop / Tablet / Landscape)
    ========================================================================== */
 @media (min-width: 769px) {

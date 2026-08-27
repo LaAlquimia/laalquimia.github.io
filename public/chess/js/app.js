@@ -62,7 +62,23 @@
       // 7. Initial Render
       this.render();
 
-      // 8. If Player is Black vs AI, trigger AI initial move
+      // 8. Online Multiplayer P2P Client Init
+      this._initPeerClient();
+
+      // 9. Check URL query parameter ?room=XXXX
+      if (typeof window !== 'undefined' && window.location) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomCode = urlParams.get('room');
+        if (roomCode) {
+          setTimeout(() => {
+            this.openOnlineModal('join');
+            if (this.dom.joinRoomInput) this.dom.joinRoomInput.value = roomCode.toUpperCase();
+            this.joinOnlineRoom(roomCode);
+          }, 400);
+        }
+      }
+
+      // 10. If Player is Black vs AI, trigger AI initial move
       if (this.mode === 'ai' && this.playerColor === 'b' && this.game.getTurn() === 'w') {
         setTimeout(() => this.triggerAIMove(), 600);
       }
@@ -220,6 +236,7 @@
         gameOverIcon: document.getElementById('gameover-icon'),
 
         // Header and Dock buttons
+        btnHeaderOnline: document.getElementById('btn-header-online'),
         btnHeaderSettings: document.getElementById('btn-header-settings'),
         btnHeaderFlip: document.getElementById('btn-header-flip'),
         btnHeaderNewGame: document.getElementById('btn-header-newgame'),
@@ -227,11 +244,34 @@
         btnHeaderTheme: document.getElementById('btn-header-theme'),
         btnHeaderTabletop: document.getElementById('btn-header-tabletop'),
 
+        btnDockOnline: document.getElementById('btn-dock-online'),
         btnDockUndo: document.getElementById('btn-dock-undo'),
         btnDockNewGame: document.getElementById('btn-dock-newgame'),
         btnDockFlip: document.getElementById('btn-dock-flip'),
         btnDockSettings: document.getElementById('btn-dock-settings'),
-        btnDockDifficulty: document.getElementById('btn-dock-difficulty'),
+
+        // Online P2P Elements
+        onlineStatusHud: document.getElementById('online-status-hud'),
+        onlineStatusText: document.getElementById('online-status-text'),
+        onlineReactionBar: document.getElementById('online-reaction-bar'),
+        modalOnline: document.getElementById('modal-online'),
+        tabBtnCreate: document.getElementById('tab-btn-create'),
+        tabBtnJoin: document.getElementById('tab-btn-join'),
+        tabPaneCreate: document.getElementById('tab-pane-create'),
+        tabPaneJoin: document.getElementById('tab-pane-join'),
+        btnCreateRoom: document.getElementById('btn-create-room'),
+        hostRoomDetails: document.getElementById('host-room-details'),
+        hostRoomCode: document.getElementById('host-room-code'),
+        hostWaitingStatus: document.getElementById('host-waiting-status'),
+        onlineQrcodeContainer: document.getElementById('online-qrcode-container'),
+        btnCopyRoomLink: document.getElementById('btn-copy-room-link'),
+        btnShareRoomLink: document.getElementById('btn-share-room-link'),
+        joinRoomInput: document.getElementById('join-room-input'),
+        btnPasteRoomCode: document.getElementById('btn-paste-room-code'),
+        btnJoinRoom: document.getElementById('btn-join-room'),
+        joinStatusContainer: document.getElementById('join-status-container'),
+        joinWaitingStatus: document.getElementById('join-waiting-status'),
+        joinStatusText: document.getElementById('join-status-text'),
 
         // Sidebar action buttons
         btnSidebarNewGame: document.getElementById('btn-sidebar-newgame'),
@@ -401,9 +441,19 @@
 
       // Top Player Data
       const topIsActive = (turn === topColor);
-      const topName = (this.mode === 'ai') 
-        ? (topColor === this.playerColor ? 'You' : `Stockfish (${DIFFICULTY_MAP[this.difficulty]?.name || 'AI'})`)
-        : (topColor === 'w' ? 'White (Player 1)' : 'Black (Player 2)');
+      let topName = 'Player 2';
+      let bottomName = 'Player 1';
+
+      if (this.mode === 'ai') {
+        topName = (topColor === this.playerColor ? 'You' : `Stockfish (${DIFFICULTY_MAP[this.difficulty]?.name || 'AI'})`);
+        bottomName = (bottomColor === this.playerColor ? 'You' : `Stockfish (${DIFFICULTY_MAP[this.difficulty]?.name || 'AI'})`);
+      } else if (this.mode === 'online') {
+        topName = (topColor === this.playerColor ? 'Tú (Local)' : (this.peerClient?.opponentName || 'Rival Online'));
+        bottomName = (bottomColor === this.playerColor ? 'Tú (Local)' : (this.peerClient?.opponentName || 'Rival Online'));
+      } else {
+        topName = (topColor === 'w' ? 'White (Player 1)' : 'Black (Player 2)');
+        bottomName = (bottomColor === 'w' ? 'White (Player 1)' : 'Black (Player 2)');
+      }
 
       if (this.dom.topPlayerBar) {
         this.dom.topPlayerBar.classList.toggle('active-turn', topIsActive);
@@ -426,9 +476,6 @@
 
       // Bottom Player Data
       const bottomIsActive = (turn === bottomColor);
-      const bottomName = (this.mode === 'ai') 
-        ? (bottomColor === this.playerColor ? 'You' : `Stockfish (${DIFFICULTY_MAP[this.difficulty]?.name || 'AI'})`)
-        : (bottomColor === 'w' ? 'White (Player 1)' : 'Black (Player 2)');
 
       if (this.dom.bottomPlayerBar) {
         this.dom.bottomPlayerBar.classList.toggle('active-turn', bottomIsActive);
@@ -572,6 +619,7 @@
       this._setupBoardInteractions();
 
       // 2. Header Action Buttons
+      if (this.dom.btnHeaderOnline) this.dom.btnHeaderOnline.addEventListener('click', () => this.openOnlineModal('create'));
       if (this.dom.btnHeaderSettings) this.dom.btnHeaderSettings.addEventListener('click', () => this.openSettingsModal());
       if (this.dom.btnHeaderFlip) this.dom.btnHeaderFlip.addEventListener('click', () => this.flipBoard());
       if (this.dom.btnHeaderNewGame) this.dom.btnHeaderNewGame.addEventListener('click', () => this.restartGame());
@@ -580,13 +628,110 @@
       if (this.dom.btnHeaderTabletop) this.dom.btnHeaderTabletop.addEventListener('click', () => this.toggleFaceToFace());
 
       // 3. Mobile Bottom Dock
+      if (this.dom.btnDockOnline) this.dom.btnDockOnline.addEventListener('click', () => this.openOnlineModal('create'));
       if (this.dom.btnDockUndo) this.dom.btnDockUndo.addEventListener('click', () => this.undoMove());
       if (this.dom.btnDockNewGame) this.dom.btnDockNewGame.addEventListener('click', () => this.restartGame());
       if (this.dom.btnDockFlip) this.dom.btnDockFlip.addEventListener('click', () => this.flipBoard());
       if (this.dom.btnDockSettings) this.dom.btnDockSettings.addEventListener('click', () => this.openSettingsModal());
-      if (this.dom.btnDockDifficulty) this.dom.btnDockDifficulty.addEventListener('click', () => this.openSettingsModal());
 
-      // 4. Desktop Sidebar Buttons
+      // 4. Online Modal Event Listeners
+      if (this.dom.tabBtnCreate) this.dom.tabBtnCreate.addEventListener('click', () => this.switchOnlineTab('create'));
+      if (this.dom.tabBtnJoin) this.dom.tabBtnJoin.addEventListener('click', () => this.switchOnlineTab('join'));
+
+      // Online Side Chooser
+      document.querySelectorAll('[data-online-side]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('[data-online-side]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+
+      // Create Room
+      if (this.dom.btnCreateRoom) {
+        this.dom.btnCreateRoom.addEventListener('click', () => {
+          const activeSideBtn = document.querySelector('[data-online-side].active');
+          const side = activeSideBtn ? activeSideBtn.dataset.onlineSide : 'random';
+          this.createOnlineRoom(side);
+        });
+      }
+
+      // Copy Room Link
+      if (this.dom.btnCopyRoomLink) {
+        this.dom.btnCopyRoomLink.addEventListener('click', () => {
+          if (this.peerClient && this.peerClient.roomCode) {
+            const link = PeerChessClient.getShareableLink(this.peerClient.roomCode);
+            navigator.clipboard.writeText(link).then(() => {
+              this.showToast('¡Enlace de sala copiado! 📋', 'success');
+            }).catch(() => {
+              this.showToast(link, 'info');
+            });
+          }
+        });
+      }
+
+      // Share Room Link
+      if (this.dom.btnShareRoomLink) {
+        this.dom.btnShareRoomLink.addEventListener('click', () => {
+          if (this.peerClient && this.peerClient.roomCode) {
+            const link = PeerChessClient.getShareableLink(this.peerClient.roomCode);
+            if (navigator.share) {
+              navigator.share({
+                title: 'Partida de Ajedrez Online',
+                text: '¡Únete a mi partida de ajedrez en vivo!',
+                url: link
+              }).catch(() => {});
+            } else {
+              navigator.clipboard.writeText(link).then(() => {
+                this.showToast('¡Enlace copiado al portapapeles! 📋', 'success');
+              });
+            }
+          }
+        });
+      }
+
+      // Paste Room Code
+      if (this.dom.btnPasteRoomCode) {
+        this.dom.btnPasteRoomCode.addEventListener('click', () => {
+          navigator.clipboard.readText().then(text => {
+            if (this.dom.joinRoomInput && text) {
+              this.dom.joinRoomInput.value = text.trim().toUpperCase();
+            }
+          }).catch(() => {
+            this.showToast('No se pudo leer el portapapeles', 'info');
+          });
+        });
+      }
+
+      // Join Room
+      if (this.dom.btnJoinRoom) {
+        this.dom.btnJoinRoom.addEventListener('click', () => {
+          const code = this.dom.joinRoomInput ? this.dom.joinRoomInput.value : '';
+          this.joinOnlineRoom(code);
+        });
+      }
+      if (this.dom.joinRoomInput) {
+        this.dom.joinRoomInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            this.joinOnlineRoom(this.dom.joinRoomInput.value);
+          }
+        });
+      }
+
+      // Emoji Reactions
+      document.querySelectorAll('.reaction-emoji-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const emoji = btn.dataset.emoji;
+          if (emoji && this.peerClient && this.peerClient.isConnected()) {
+            this.peerClient.sendEmoji(emoji);
+            this.showFloatingEmoji(emoji);
+            this.audio.play('move');
+          } else {
+            this.showFloatingEmoji(emoji);
+          }
+        });
+      });
+
+      // 5. Desktop Sidebar Buttons
       if (this.dom.btnSidebarNewGame) this.dom.btnSidebarNewGame.addEventListener('click', () => this.restartGame());
       if (this.dom.btnSidebarUndo) this.dom.btnSidebarUndo.addEventListener('click', () => this.undoMove());
       if (this.dom.btnSidebarFlip) this.dom.btnSidebarFlip.addEventListener('click', () => this.flipBoard());
@@ -594,10 +739,10 @@
       if (this.dom.btnSidebarResign) this.dom.btnSidebarResign.addEventListener('click', () => this.handleResign());
       if (this.dom.btnSidebarDraw) this.dom.btnSidebarDraw.addEventListener('click', () => this.handleOfferDraw());
 
-      // 5. Settings Form Listeners
+      // 6. Settings Form Listeners
       this._bindSettingsFormEvents();
 
-      // 6. Keyboard Shortcuts
+      // 7. Keyboard Shortcuts
       document.addEventListener('keydown', (e) => this._handleKeyboardShortcuts(e));
     }
 
@@ -629,6 +774,16 @@
       const turn = this.game.getTurn();
       if (this.mode === 'ai' && turn !== this.playerColor) {
         return;
+      }
+      if (this.mode === 'online') {
+        if (!this.peerClient || !this.peerClient.isConnected()) {
+          this.showToast('Conéctate a una sala online para jugar.', 'info');
+          return;
+        }
+        if (turn !== this.playerColor) {
+          this.showToast('Es el turno de tu rival.', 'info');
+          return;
+        }
       }
 
       const piece = this.game.getPiece(x, y);
@@ -942,11 +1097,22 @@
     /**
      * Execute a move on the board and handle sound & AI triggers
      */
-    executeMove(from, to, promotion = 'Q') {
+    executeMove(from, to, promotion = 'Q', isRemote = false) {
       const moveResult = this.game.makeMove(from, to, promotion);
       if (!moveResult) {
         this.audio.play('illegal');
         return false;
+      }
+
+      // If online mode and move was made locally by the player, transmit via WebRTC DataChannel
+      if (this.mode === 'online' && !isRemote && this.peerClient && this.peerClient.isConnected()) {
+        this.peerClient.sendMove({
+          from,
+          to,
+          promotion,
+          san: moveResult.san,
+          fen: this.game.getFEN()
+        });
       }
 
       // Update Last Move
@@ -973,8 +1139,8 @@
       // Update UI
       this.render();
 
-      // Recalculate evaluation if in PvP mode or human move against AI
-      if (this.mode === 'pvp' || (this.mode === 'ai' && this.game.getTurn() === this.playerColor)) {
+      // Recalculate evaluation if in PvP or Online mode or human move against AI
+      if (this.mode === 'pvp' || this.mode === 'online' || (this.mode === 'ai' && this.game.getTurn() === this.playerColor)) {
         this.recalculateEvaluation();
       }
 
@@ -1121,6 +1287,16 @@
         this.isAiThinking = false;
       }
 
+      if (this.mode === 'online') {
+        if (!this.peerClient || !this.peerClient.isConnected()) {
+          this.showToast('No estás conectado a una sala online.', 'error');
+          return;
+        }
+        this.peerClient.sendUndoRequest();
+        this.showToast('Solicitud para deshacer enviada al rival... ⏳', 'info');
+        return;
+      }
+
       const history = this.game.getHistory();
       if (history.length === 0) {
         this.showToast('No moves to undo.', 'info');
@@ -1152,7 +1328,6 @@
         this.recalculateEvaluation();
       }
 
-      this.audio.play('move');
       this.render();
       this.showToast('Move undone', 'info');
     }
@@ -1186,6 +1361,13 @@
 
     handleResign() {
       if (this.game.isGameOver()) return;
+      if (this.mode === 'online' && this.peerClient && this.peerClient.isConnected()) {
+        this.peerClient.sendResign();
+        const winner = (this.playerColor === 'w') ? 'Black' : 'White';
+        this.audio.play('game_end');
+        this.showGameOverModalCustom(`${winner} Wins!`, 'Has abandonado la partida.', '🏳️');
+        return;
+      }
       const turn = this.game.getTurn();
       const winner = turn === 'w' ? 'Black' : 'White';
       this.audio.play('game_end');
@@ -1194,6 +1376,11 @@
 
     handleOfferDraw() {
       if (this.game.isGameOver()) return;
+      if (this.mode === 'online' && this.peerClient && this.peerClient.isConnected()) {
+        this.peerClient.sendDrawOffer();
+        this.showToast('Oferta de tablas enviada a tu rival... 🤝', 'info');
+        return;
+      }
       this.audio.play('game_end');
       this.showGameOverModalCustom('Game Drawn', 'Agreement by both players.', '🤝');
     }
@@ -1352,12 +1539,294 @@
       this.restartGame();
     }
 
-    setGameMode(mode) {
+    setGameMode(mode, reset = true) {
       this.mode = mode;
       this.settings.gameMode = mode;
       this._saveSettings();
       this._syncSettingsFormControls();
-      this.restartGame();
+
+      // Show/hide floating reaction bar based on mode
+      if (this.dom.onlineReactionBar) {
+        this.dom.onlineReactionBar.classList.toggle('visible', mode === 'online');
+      }
+      if (this.dom.onlineStatusHud) {
+        this.dom.onlineStatusHud.style.display = (mode === 'online') ? 'inline-flex' : 'none';
+      }
+
+      if (reset) {
+        this.restartGame();
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       ONLINE MULTIPLAYER / PEERJS P2P INTEGRATION
+       -------------------------------------------------------------------------- */
+    _initPeerClient() {
+      if (typeof PeerChessClient === 'undefined') return;
+
+      this.peerClient = new PeerChessClient({ playerName: 'Jugador' });
+
+      this.peerClient.on('status', (info) => {
+        this._updateOnlineStatusHUD(info);
+      });
+
+      this.peerClient.on('connected', (info) => {
+        this.setGameMode('online', false);
+        this.playerColor = info.assignedColor;
+        this.boardFlipped = (this.playerColor === 'b');
+        this.game.resetGame();
+        this.evalScore = 0.0;
+        this.lastMove = null;
+        this.selectedSquare = null;
+        this.legalMovesForSelected = [];
+        this.render();
+
+        // Close online modal
+        if (this.dom.modalOnline) this.dom.modalOnline.classList.remove('open');
+        this.showToast(`¡Conectado! Juegas con ${this.playerColor === 'w' ? 'Blancas ♔' : 'Negras ♚'}`, 'success');
+      });
+
+      this.peerClient.on('disconnected', (info) => {
+        this.showToast(info.reason || 'El rival se ha desconectado.', 'error');
+        this._updateOnlineStatusHUD({ status: 'disconnected', message: 'Desconectado' });
+      });
+
+      this.peerClient.on('move', (data) => {
+        this._onRemoteMove(data);
+      });
+
+      this.peerClient.on('emoji', (data) => {
+        if (data && data.emoji) {
+          this.showFloatingEmoji(data.emoji);
+          this.audio.play('move');
+        }
+      });
+
+      this.peerClient.on('draw_offered', () => {
+        this._handleRemoteDrawOffer();
+      });
+
+      this.peerClient.on('draw_response', (data) => {
+        if (data.accepted) {
+          this.showToast('¡Tu rival ha aceptado las tablas! Partida empatada.', 'info');
+          this.showGameOverModalCustom('Partida Empatada', 'Acuerdo mutuo de tablas.', '🤝');
+        } else {
+          this.showToast('Tu rival ha rechazado la oferta de tablas.', 'info');
+        }
+      });
+
+      this.peerClient.on('undo_requested', () => {
+        this._handleRemoteUndoRequest();
+      });
+
+      this.peerClient.on('undo_response', (data) => {
+        if (data.accepted) {
+          this.game.undo();
+          this.game.undo();
+          this.lastMove = null;
+          this.render();
+          this.recalculateEvaluation();
+          this.showToast('Se deshizo la última jugada.', 'info');
+        } else {
+          this.showToast('Tu rival no aceptó deshacer la jugada.', 'info');
+        }
+      });
+
+      this.peerClient.on('resign', (data) => {
+        const winner = (data.color === 'w') ? 'Black' : 'White';
+        this.audio.play('game_end');
+        this.showToast('¡Tu rival se ha rendido! Has ganado.', 'success');
+        this.showGameOverModalCustom(`${winner} Wins!`, 'Tu rival abandonó la partida.', '🏆');
+      });
+
+      this.peerClient.on('rematch', (data) => {
+        if (data.accepted) {
+          // Switch colors for rematch
+          this.playerColor = (this.playerColor === 'w') ? 'b' : 'w';
+          this.boardFlipped = (this.playerColor === 'b');
+          this.game.resetGame();
+          this.lastMove = null;
+          this.evalScore = 0.0;
+          this.render();
+          this.showToast('¡Revancha iniciada! Colores intercambiados.', 'success');
+          if (this.dom.modalGameOver) this.dom.modalGameOver.classList.remove('open');
+        } else {
+          this._handleRemoteRematchRequest();
+        }
+      });
+
+      this.peerClient.on('ping', (data) => {
+        if (this.dom.onlineStatusText) {
+          this.dom.onlineStatusText.textContent = `Online (${data.pingMs}ms)`;
+        }
+      });
+
+      this.peerClient.on('error', (err) => {
+        this.showToast(err.message || 'Error de conexión P2P', 'error');
+      });
+    }
+
+    _updateOnlineStatusHUD(info) {
+      if (!this.dom.onlineStatusHud || !this.dom.onlineStatusText) return;
+
+      this.dom.onlineStatusHud.className = `online-status-pill ${info.status}`;
+      if (info.status === 'connected') {
+        this.dom.onlineStatusHud.style.display = 'inline-flex';
+        this.dom.onlineStatusText.textContent = `Online (${info.pingMs || 15}ms)`;
+      } else if (info.status === 'waiting') {
+        this.dom.onlineStatusHud.style.display = 'inline-flex';
+        this.dom.onlineStatusText.textContent = 'Esperando rival...';
+      } else if (info.status === 'connecting') {
+        this.dom.onlineStatusHud.style.display = 'inline-flex';
+        this.dom.onlineStatusText.textContent = 'Conectando...';
+      } else if (this.mode === 'online') {
+        this.dom.onlineStatusHud.style.display = 'inline-flex';
+        this.dom.onlineStatusText.textContent = 'Desconectado';
+      } else {
+        this.dom.onlineStatusHud.style.display = 'none';
+      }
+    }
+
+    _onRemoteMove(data) {
+      if (!data || !data.from || !data.to) return;
+      const executed = this.executeMove(data.from, data.to, data.promotion || 'Q', true);
+      if (!executed && data.fen) {
+        // Fallback sync FEN if state diverged
+        this.game.loadFEN(data.fen);
+        this.render();
+      }
+    }
+
+    _handleRemoteDrawOffer() {
+      const accept = confirm('Tu rival te ofrece tablas (empate). ¿Aceptas?');
+      if (this.peerClient) {
+        this.peerClient.sendDrawResponse(accept);
+      }
+      if (accept) {
+        this.audio.play('game_end');
+        this.showGameOverModalCustom('Partida Empatada', 'Acuerdo mutuo de tablas.', '🤝');
+      }
+    }
+
+    _handleRemoteUndoRequest() {
+      const accept = confirm('Tu rival solicita deshacer la última jugada. ¿Aceptas?');
+      if (this.peerClient) {
+        this.peerClient.sendUndoResponse(accept);
+      }
+      if (accept) {
+        this.game.undo();
+        this.game.undo();
+        this.lastMove = null;
+        this.render();
+        this.recalculateEvaluation();
+        this.showToast('Se deshizo la última jugada.', 'info');
+      }
+    }
+
+    _handleRemoteRematchRequest() {
+      const accept = confirm('¡Tu rival solicita una revancha! ¿Deseas jugar otra partida?');
+      if (this.peerClient) {
+        this.peerClient.sendRematch(accept);
+      }
+      if (accept) {
+        this.playerColor = (this.playerColor === 'w') ? 'b' : 'w';
+        this.boardFlipped = (this.playerColor === 'b');
+        this.game.resetGame();
+        this.lastMove = null;
+        this.evalScore = 0.0;
+        this.render();
+        this.showToast('¡Revancha iniciada! Colores intercambiados.', 'success');
+        if (this.dom.modalGameOver) this.dom.modalGameOver.classList.remove('open');
+      }
+    }
+
+    createOnlineRoom(preferredColor = 'random') {
+      if (!this.peerClient) return;
+
+      if (this.dom.btnCreateRoom) this.dom.btnCreateRoom.disabled = true;
+      if (this.dom.hostRoomDetails) this.dom.hostRoomDetails.style.display = 'none';
+
+      this.peerClient.createRoom({ preferredColor })
+        .then(result => {
+          if (this.dom.btnCreateRoom) this.dom.btnCreateRoom.disabled = false;
+          if (this.dom.hostRoomCode) this.dom.hostRoomCode.textContent = result.roomCode;
+          if (this.dom.hostRoomDetails) this.dom.hostRoomDetails.style.display = 'flex';
+
+          // Generate QR code
+          if (this.dom.onlineQrcodeContainer && typeof QRCode !== 'undefined') {
+            this.dom.onlineQrcodeContainer.innerHTML = '';
+            new QRCode(this.dom.onlineQrcodeContainer, {
+              text: result.shareLink,
+              width: 140,
+              height: 140,
+              colorDark: '#0f172a',
+              colorLight: '#ffffff',
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          }
+
+          this.showToast(`Sala ${result.roomCode} creada. Esperando rival...`, 'info');
+        })
+        .catch(err => {
+          if (this.dom.btnCreateRoom) this.dom.btnCreateRoom.disabled = false;
+          this.showToast(`Error al crear sala: ${err.message}`, 'error');
+        });
+    }
+
+    joinOnlineRoom(code) {
+      if (!this.peerClient) return;
+      const sanitized = PeerChessClient.sanitizeRoomCode(code);
+      if (!sanitized) {
+        this.showToast('Ingresa un código de sala válido.', 'error');
+        return;
+      }
+
+      if (this.dom.joinStatusContainer) this.dom.joinStatusContainer.style.display = 'block';
+      if (this.dom.btnJoinRoom) this.dom.btnJoinRoom.disabled = true;
+
+      this.peerClient.joinRoom(sanitized)
+        .then(() => {
+          if (this.dom.btnJoinRoom) this.dom.btnJoinRoom.disabled = false;
+          if (this.dom.joinStatusContainer) this.dom.joinStatusContainer.style.display = 'none';
+        })
+        .catch(err => {
+          if (this.dom.btnJoinRoom) this.dom.btnJoinRoom.disabled = false;
+          if (this.dom.joinStatusContainer) this.dom.joinStatusContainer.style.display = 'none';
+          this.showToast(err.message || 'No se pudo conectar a la sala.', 'error');
+        });
+    }
+
+    openOnlineModal(tab = 'create') {
+      if (this.dom.modalOnline) {
+        this.dom.modalOnline.classList.add('open');
+        this.switchOnlineTab(tab);
+      }
+    }
+
+    switchOnlineTab(tab) {
+      if (this.dom.tabBtnCreate && this.dom.tabBtnJoin) {
+        this.dom.tabBtnCreate.classList.toggle('active', tab === 'create');
+        this.dom.tabBtnJoin.classList.toggle('active', tab === 'join');
+      }
+      if (this.dom.tabPaneCreate && this.dom.tabPaneJoin) {
+        this.dom.tabPaneCreate.classList.toggle('active', tab === 'create');
+        this.dom.tabPaneJoin.classList.toggle('active', tab === 'join');
+      }
+    }
+
+    showFloatingEmoji(emoji) {
+      const bubble = document.createElement('div');
+      bubble.className = 'floating-reaction-bubble';
+      bubble.textContent = emoji;
+      const randomX = Math.floor(Math.random() * (window.innerWidth - 120)) + 60;
+      const randomY = Math.floor(Math.random() * (window.innerHeight / 2)) + (window.innerHeight / 3);
+      bubble.style.left = `${randomX}px`;
+      bubble.style.top = `${randomY}px`;
+      document.body.appendChild(bubble);
+
+      setTimeout(() => {
+        bubble.remove();
+      }, 2300);
     }
 
     openSettingsModal() {

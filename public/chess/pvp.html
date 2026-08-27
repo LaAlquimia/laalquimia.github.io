@@ -25,9 +25,16 @@
       <span class="brand-icon">⚔️</span>
       <h1 class="app-title">Chess HTML</h1>
       <span id="mode-badge" class="mode-badge pvp">PASS & PLAY</span>
+      <div id="online-status-hud" class="online-status-pill" style="display: none;">
+        <span class="status-dot-pulse"></span>
+        <span id="online-status-text">Online</span>
+      </div>
     </div>
 
     <div class="header-actions">
+      <button id="btn-header-online" class="btn-icon" title="Multijugador Online / LAN P2P" aria-label="Online Multiplayer">
+        🌐
+      </button>
       <button id="btn-header-tabletop" class="btn-icon active" title="Modo Mesa / Cara a Cara (Girar fichas rival 180°)" aria-label="Modo Mesa">
         👥
       </button>
@@ -165,6 +172,10 @@
 
     <!-- 2. Action Buttons Row -->
     <div class="dock-actions-row">
+      <button id="btn-dock-online" class="dock-btn">
+        <span class="btn-icon-svg">🌐</span>
+        <span class="btn-label">Online</span>
+      </button>
       <button id="btn-dock-undo" class="dock-btn">
         <span class="btn-icon-svg">↶</span>
         <span class="btn-label">Undo</span>
@@ -208,6 +219,7 @@
           <select id="setting-game-mode" class="custom-select">
             <option value="pvp" selected>2-Player Pass & Play</option>
             <option value="ai">Play vs Stockfish AI</option>
+            <option value="online">🌐 Online / LAN P2P</option>
           </select>
         </div>
 
@@ -372,17 +384,124 @@
     </div>
   </div>
 
-  <!-- 4. Floating Toast Notification Container -->
+  <!-- 4. Online Multiplayer & LAN P2P Modal -->
+  <div id="modal-online" class="modal-backdrop">
+    <div class="modal-card online-modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">🌐 Multijugador Online & LAN</h2>
+        <button class="btn-icon" data-close-modal aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tabs: Host vs Join -->
+        <div class="modal-tabs">
+          <button id="tab-btn-create" class="modal-tab-btn active">Crear Sala</button>
+          <button id="tab-btn-join" class="modal-tab-btn">Unirse a Sala</button>
+        </div>
+
+        <!-- Tab 1: Create Room Pane -->
+        <div id="tab-pane-create" class="tab-pane active">
+          <div class="settings-section">
+            <span class="section-label">Jugar con</span>
+            <div class="side-chooser-grid" style="grid-template-columns: repeat(3, 1fr);">
+              <button class="side-chooser-btn active" data-online-side="random">
+                <span>🎲</span> Aleatorio
+              </button>
+              <button class="side-chooser-btn" data-online-side="w">
+                <span>♔</span> Blancas
+              </button>
+              <button class="side-chooser-btn" data-online-side="b">
+                <span>♚</span> Negras
+              </button>
+            </div>
+          </div>
+
+          <button id="btn-create-room" class="btn-primary-action" style="padding: 12px; font-size: 0.95rem;">
+            ⚡ Crear Sala de Juego
+          </button>
+
+          <!-- Room Created Details Box -->
+          <div id="host-room-details" class="room-code-card" style="display: none;">
+            <span class="room-code-label">Código de Sala</span>
+            <div id="host-room-code" class="room-code-badge">----</div>
+
+            <!-- QR Code Container -->
+            <div class="qrcode-wrapper">
+              <div id="online-qrcode-container" class="qrcode-box"></div>
+              <span class="qrcode-hint">📱 Escanea con la cámara del celular para unirte</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="online-actions-grid">
+              <button id="btn-copy-room-link" class="btn-online-action btn-primary-blue">
+                📋 Copiar Enlace
+              </button>
+              <button id="btn-share-room-link" class="btn-online-action btn-secondary-glass">
+                📲 Compartir
+              </button>
+            </div>
+
+            <div id="host-waiting-status" class="online-status-pill waiting">
+              <span class="status-dot-pulse"></span>
+              <span>Esperando que el rival se conecte...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Join Room Pane -->
+        <div id="tab-pane-join" class="tab-pane">
+          <div class="join-input-group">
+            <label class="section-label" for="join-room-input">Ingresa el Código de 4 Letras</label>
+            <div class="input-with-button">
+              <input type="text" id="join-room-input" class="room-input" placeholder="ABCD" maxlength="8" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+              <button id="btn-paste-room-code" class="btn-online-action btn-secondary-glass" title="Pegar código">
+                📋 Pegar
+              </button>
+            </div>
+          </div>
+
+          <button id="btn-join-room" class="btn-primary-action" style="padding: 12px; font-size: 0.95rem;">
+            🚀 Conectarse a la Sala
+          </button>
+
+          <div id="join-status-container" style="display: none; text-align: center;">
+            <div id="join-waiting-status" class="online-status-pill waiting">
+              <span class="status-dot-pulse"></span>
+              <span id="join-status-text">Conectando con el anfitrión...</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Floating Emoji Reactions Bar (Online Mode) -->
+  <div id="online-reaction-bar" class="floating-reaction-bar">
+    <button class="reaction-emoji-btn" data-emoji="👏" title="Aplausos">👏</button>
+    <button class="reaction-emoji-btn" data-emoji="🔥" title="Fuego">🔥</button>
+    <button class="reaction-emoji-btn" data-emoji="😮" title="Sorprendido">😮</button>
+    <button class="reaction-emoji-btn" data-emoji="♟️" title="Peón">♟️</button>
+    <button class="reaction-emoji-btn" data-emoji="👑" title="Corona">👑</button>
+    <button class="reaction-emoji-btn" data-emoji="💀" title="Calavera">💀</button>
+    <button class="reaction-emoji-btn" data-emoji="😂" title="Risa">😂</button>
+    <button class="reaction-emoji-btn" data-emoji="🤝" title="Buen Juego">🤝</button>
+  </div>
+
+  <!-- 6. Floating Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- =========================================================================
        JAVASCRIPT MODULES & CORE SCRIPTS
        ========================================================================= -->
+  <script src="js/peerjs.min.js"></script>
+  <script src="js/qrcode.min.js"></script>
   <script src="js/pieces.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/chess-core.js"></script>
   <script src="js/stockfish-bridge.js"></script>
-  <script src="js/app.js?v=2.1"></script>
+  <script src="js/peer-chess.js"></script>
+  <script src="js/app.js?v=2.2"></script>
 
 </body>
 </html>
