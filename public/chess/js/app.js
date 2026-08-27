@@ -41,6 +41,7 @@
       this.lastMove = null; // { from: {x,y}, to: {x,y} }
       this.pendingPromotionMove = null; // { from: {x,y}, to: {x,y} }
       this.isAiThinking = false;
+      this.isCustomGameOver = false;
       this.evalScore = 0.0;
       this.pointerInteraction = null;
       this._ignoreNextClick = false;
@@ -166,9 +167,11 @@
         el.classList.toggle('active', el.dataset.diff === this.settings.difficulty);
       });
 
-      // Side chooser
-      document.querySelectorAll('.side-chooser-btn').forEach(el => {
-        el.classList.toggle('active', el.dataset.side === this.playerColor);
+      // Side chooser (White / Black)
+      document.querySelectorAll('.settings-side-btn, [data-side]').forEach(el => {
+        if (el.dataset.side) {
+          el.classList.toggle('active', el.dataset.side === this.playerColor);
+        }
       });
 
       // Mode badge
@@ -244,6 +247,8 @@
         btnHeaderTheme: document.getElementById('btn-header-theme'),
         btnHeaderTabletop: document.getElementById('btn-header-tabletop'),
 
+        btnDockDraw: document.getElementById('btn-dock-draw'),
+        btnDockResign: document.getElementById('btn-dock-resign'),
         btnDockOnline: document.getElementById('btn-dock-online'),
         btnDockUndo: document.getElementById('btn-dock-undo'),
         btnDockNewGame: document.getElementById('btn-dock-newgame'),
@@ -254,6 +259,8 @@
         onlineStatusHud: document.getElementById('online-status-hud'),
         onlineStatusText: document.getElementById('online-status-text'),
         onlineReactionBar: document.getElementById('online-reaction-bar'),
+        reactionPillToggle: document.getElementById('reaction-pill-toggle'),
+        reactionEmojisList: document.getElementById('reaction-emojis-list'),
         modalOnline: document.getElementById('modal-online'),
         tabBtnCreate: document.getElementById('tab-btn-create'),
         tabBtnJoin: document.getElementById('tab-btn-join'),
@@ -628,6 +635,8 @@
       if (this.dom.btnHeaderTabletop) this.dom.btnHeaderTabletop.addEventListener('click', () => this.toggleFaceToFace());
 
       // 3. Mobile Bottom Dock
+      if (this.dom.btnDockDraw) this.dom.btnDockDraw.addEventListener('click', () => this.handleOfferDraw());
+      if (this.dom.btnDockResign) this.dom.btnDockResign.addEventListener('click', () => this.handleResign());
       if (this.dom.btnDockOnline) this.dom.btnDockOnline.addEventListener('click', () => this.openOnlineModal('create'));
       if (this.dom.btnDockUndo) this.dom.btnDockUndo.addEventListener('click', () => this.undoMove());
       if (this.dom.btnDockNewGame) this.dom.btnDockNewGame.addEventListener('click', () => this.restartGame());
@@ -639,9 +648,9 @@
       if (this.dom.tabBtnJoin) this.dom.tabBtnJoin.addEventListener('click', () => this.switchOnlineTab('join'));
 
       // Online Side Chooser
-      document.querySelectorAll('[data-online-side]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          document.querySelectorAll('[data-online-side]').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.online-side-btn, [data-online-side]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.online-side-btn, [data-online-side]').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
         });
       });
@@ -649,8 +658,8 @@
       // Create Room
       if (this.dom.btnCreateRoom) {
         this.dom.btnCreateRoom.addEventListener('click', () => {
-          const activeSideBtn = document.querySelector('[data-online-side].active');
-          const side = activeSideBtn ? activeSideBtn.dataset.onlineSide : 'random';
+          const activeSideBtn = document.querySelector('.online-side-btn.active, [data-online-side].active');
+          const side = (activeSideBtn && activeSideBtn.dataset.onlineSide) ? activeSideBtn.dataset.onlineSide : 'random';
           this.createOnlineRoom(side);
         });
       }
@@ -718,14 +727,47 @@
       }
 
       // Emoji Reactions
+      const reactionToggle = this.dom.reactionPillToggle || document.getElementById('reaction-pill-toggle');
+      const reactionBar = this.dom.onlineReactionBar || document.getElementById('online-reaction-bar');
+
+      if (reactionToggle && reactionBar) {
+        reactionToggle.addEventListener('click', (e) => {
+          if (e && e.stopPropagation) e.stopPropagation();
+          reactionBar.classList.toggle('expanded');
+        });
+      }
+
+      if (typeof document !== 'undefined' && document.addEventListener) {
+        document.addEventListener('click', (e) => {
+          if (reactionBar && reactionBar.classList && reactionBar.classList.contains('expanded')) {
+            if (reactionBar.contains && typeof reactionBar.contains === 'function') {
+              if (!reactionBar.contains(e.target)) {
+                reactionBar.classList.remove('expanded');
+              }
+            } else if (e.target !== reactionBar && e.target !== reactionToggle) {
+              reactionBar.classList.remove('expanded');
+            }
+          }
+        });
+      }
+
       document.querySelectorAll('.reaction-emoji-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const emoji = btn.dataset.emoji;
-          if (emoji && this.peerClient && this.peerClient.isConnected()) {
+        btn.addEventListener('click', (e) => {
+          if (e && e.stopPropagation) e.stopPropagation();
+          const emoji = btn.dataset ? btn.dataset.emoji : btn.getAttribute('data-emoji');
+          
+          if (btn.classList) {
+            btn.classList.add('clicked');
+            setTimeout(() => {
+              if (btn.classList) btn.classList.remove('clicked');
+            }, 400);
+          }
+
+          if (emoji && this.peerClient && typeof this.peerClient.sendEmoji === 'function' && this.peerClient.isConnected()) {
             this.peerClient.sendEmoji(emoji);
             this.showFloatingEmoji(emoji);
-            this.audio.play('move');
-          } else {
+            if (this.audio && this.audio.play) this.audio.play('move');
+          } else if (emoji) {
             this.showFloatingEmoji(emoji);
           }
         });
@@ -791,6 +833,11 @@
         (turn === 'w' && piece === piece.toUpperCase()) ||
         (turn === 'b' && piece === piece.toLowerCase())
       );
+
+      // If clicking an opponent piece or empty square when no piece is selected, return immediately so drag/interaction cannot start
+      if (!isOwnPiece && !this.selectedSquare) {
+        return;
+      }
 
       // Clean up any lingering drag state
       this._cleanupDragGhost();
@@ -892,6 +939,39 @@
 
       if (state.dragInitiated) {
         // --- DRAG AND DROP RESOLUTION ---
+        if (!state.isOwnPiece) {
+          this.selectedSquare = null;
+          this.legalMovesForSelected = [];
+          this.render();
+          return;
+        }
+
+        const turn = this.game.getTurn();
+        const isPieceOfTurn = state.piece && (
+          (turn === 'w' && state.piece === state.piece.toUpperCase()) ||
+          (turn === 'b' && state.piece === state.piece.toLowerCase())
+        );
+        if (!isPieceOfTurn) {
+          this.selectedSquare = null;
+          this.legalMovesForSelected = [];
+          this.render();
+          return;
+        }
+
+        if (this.mode === 'ai' && turn !== this.playerColor) {
+          this.selectedSquare = null;
+          this.legalMovesForSelected = [];
+          this.render();
+          return;
+        }
+
+        if (this.mode === 'online' && turn !== this.playerColor) {
+          this.selectedSquare = null;
+          this.legalMovesForSelected = [];
+          this.render();
+          return;
+        }
+
         const target = this._getSquareFromPoint(e.clientX, e.clientY);
 
         if (target) {
@@ -1027,17 +1107,27 @@
 
       if (this.game.isGameOver()) return;
 
+      if (this.mode === 'online') {
+        if (!this.peerClient || !this.peerClient.isConnected()) {
+          this.showToast('Conéctate a una sala online para jugar.', 'info');
+          return;
+        }
+        if (this.game.getTurn() !== this.playerColor) {
+          this.showToast('Es el turno de tu rival.', 'info');
+          return;
+        }
+      }
+
+      if (this.mode === 'ai' && this.game.getTurn() !== this.playerColor) {
+        return;
+      }
+
       const turn = this.game.getTurn();
       const clickedPiece = this.game.getPiece(x, y);
       const isPieceOfCurrentTurn = clickedPiece && (
         (turn === 'w' && clickedPiece === clickedPiece.toUpperCase()) ||
         (turn === 'b' && clickedPiece === clickedPiece.toLowerCase())
       );
-
-      // In AI Mode, human can only interact when it is human's turn
-      if (this.mode === 'ai' && turn !== this.playerColor) {
-        return;
-      }
 
       // Scenario 1: Piece is already selected
       if (this.selectedSquare) {
@@ -1450,10 +1540,12 @@
         });
       });
 
-      // Side Chooser (White / Black)
-      document.querySelectorAll('.side-chooser-btn').forEach(el => {
+      // Side Chooser (White / Black) in Settings Modal
+      document.querySelectorAll('.settings-side-btn, [data-side]').forEach(el => {
         el.addEventListener('click', () => {
-          this.setPlayerColor(el.dataset.side);
+          if (el.dataset.side) {
+            this.setPlayerColor(el.dataset.side);
+          }
         });
       });
 
@@ -1547,7 +1639,11 @@
 
       // Show/hide floating reaction bar based on mode
       if (this.dom.onlineReactionBar) {
-        this.dom.onlineReactionBar.classList.toggle('visible', mode === 'online');
+        const isOnline = mode === 'online';
+        this.dom.onlineReactionBar.classList.toggle('visible', isOnline);
+        if (!isOnline) {
+          this.dom.onlineReactionBar.classList.remove('expanded');
+        }
       }
       if (this.dom.onlineStatusHud) {
         this.dom.onlineStatusHud.style.display = (mode === 'online') ? 'inline-flex' : 'none';
@@ -1815,17 +1911,23 @@
     }
 
     showFloatingEmoji(emoji) {
+      if (!emoji || typeof document === 'undefined' || !document.createElement || !document.body) return;
       const bubble = document.createElement('div');
       bubble.className = 'floating-reaction-bubble';
       bubble.textContent = emoji;
-      const randomX = Math.floor(Math.random() * (window.innerWidth - 120)) + 60;
-      const randomY = Math.floor(Math.random() * (window.innerHeight / 2)) + (window.innerHeight / 3);
+
+      const innerW = (typeof window !== 'undefined' && window.innerWidth) ? window.innerWidth : 800;
+      const innerH = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 600;
+      const randomX = Math.floor(Math.random() * Math.max(100, innerW - 120)) + 60;
+      const randomY = Math.floor(Math.random() * Math.max(100, innerH / 2)) + Math.floor(innerH / 3);
       bubble.style.left = `${randomX}px`;
       bubble.style.top = `${randomY}px`;
       document.body.appendChild(bubble);
 
       setTimeout(() => {
-        bubble.remove();
+        if (bubble && typeof bubble.remove === 'function') {
+          bubble.remove();
+        }
       }, 2300);
     }
 

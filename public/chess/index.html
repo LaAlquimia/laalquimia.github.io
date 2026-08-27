@@ -105,6 +105,25 @@
         </div>
       </div>
 
+      <!-- Online Mode Emoji Reaction Bar / Expandable Pill -->
+      <div id="online-reaction-bar" class="reaction-bar-container floating-reaction-bar">
+        <button class="reaction-pill-toggle" id="reaction-pill-toggle" type="button" aria-label="Reacciones emoji" title="Reaccionar con emoji">
+          <span class="reaction-pill-icon">💬</span>
+          <span class="reaction-pill-label">Reaccionar</span>
+          <span class="reaction-pill-chevron">›</span>
+        </button>
+        <div class="reaction-emojis-list" id="reaction-emojis-list">
+          <button class="reaction-emoji-btn" data-emoji="👏" title="Aplausos" aria-label="Aplausos">👏</button>
+          <button class="reaction-emoji-btn" data-emoji="🔥" title="Fuego" aria-label="Fuego">🔥</button>
+          <button class="reaction-emoji-btn" data-emoji="😮" title="Sorprendido" aria-label="Sorprendido">😮</button>
+          <button class="reaction-emoji-btn" data-emoji="♟️" title="Peón" aria-label="Peón">♟️</button>
+          <button class="reaction-emoji-btn" data-emoji="👑" title="Corona" aria-label="Corona">👑</button>
+          <button class="reaction-emoji-btn" data-emoji="💀" title="Calavera" aria-label="Calavera">💀</button>
+          <button class="reaction-emoji-btn" data-emoji="😂" title="Risa" aria-label="Risa">😂</button>
+          <button class="reaction-emoji-btn" data-emoji="🤝" title="Buen Juego" aria-label="Buen Juego">🤝</button>
+        </div>
+      </div>
+
     </section>
 
     <!-- RIGHT / DESKTOP SIDEBAR PANEL -->
@@ -130,23 +149,23 @@
 
       <!-- Quick Action Buttons -->
       <div class="sidebar-actions-grid">
-        <button id="btn-sidebar-newgame" class="btn-sidebar btn-primary">
-          <span>↻</span> New Game
+        <button id="btn-sidebar-newgame" class="btn-sidebar btn-primary" title="Nueva partida">
+          <span>↻</span> Nueva Partida
         </button>
-        <button id="btn-sidebar-undo" class="btn-sidebar">
-          <span>↶</span> Undo Move
+        <button id="btn-sidebar-undo" class="btn-sidebar" title="Deshacer última jugada">
+          <span>↶</span> Deshacer
         </button>
-        <button id="btn-sidebar-flip" class="btn-sidebar">
-          <span>⇅</span> Flip Board
+        <button id="btn-sidebar-draw" class="btn-sidebar btn-sidebar-draw" title="Ofrecer o pedir tablas (empate)">
+          <span>🤝</span> Ofrecer Tablas
         </button>
-        <button id="btn-sidebar-settings" class="btn-sidebar">
-          <span>⚙️</span> Settings
+        <button id="btn-sidebar-resign" class="btn-sidebar btn-sidebar-resign" title="Rendirse y abandonar la partida">
+          <span>🏳️</span> Rendirse
         </button>
-        <button id="btn-sidebar-draw" class="btn-sidebar">
-          <span>🤝</span> Claim Draw
+        <button id="btn-sidebar-flip" class="btn-sidebar" title="Girar tablero">
+          <span>⇅</span> Girar Tablero
         </button>
-        <button id="btn-sidebar-resign" class="btn-sidebar">
-          <span>🏳️</span> Resign
+        <button id="btn-sidebar-settings" class="btn-sidebar" title="Configuración">
+          <span>⚙️</span> Ajustes
         </button>
       </div>
 
@@ -169,25 +188,33 @@
 
     <!-- 2. Action Buttons Row -->
     <div class="dock-actions-row">
-      <button id="btn-dock-online" class="dock-btn">
+      <button id="btn-dock-draw" class="dock-btn btn-dock-draw" title="Ofrecer Tablas (Empate)">
+        <span class="btn-icon-svg">🤝</span>
+        <span class="btn-label">Tablas</span>
+      </button>
+      <button id="btn-dock-resign" class="dock-btn btn-dock-resign" title="Rendirse">
+        <span class="btn-icon-svg">🏳️</span>
+        <span class="btn-label">Rendirse</span>
+      </button>
+      <button id="btn-dock-undo" class="dock-btn" title="Deshacer jugada">
+        <span class="btn-icon-svg">↶</span>
+        <span class="btn-label">Deshacer</span>
+      </button>
+      <button id="btn-dock-newgame" class="dock-btn" title="Nueva partida">
+        <span class="btn-icon-svg">↻</span>
+        <span class="btn-label">Nueva</span>
+      </button>
+      <button id="btn-dock-online" class="dock-btn" title="Multijugador Online">
         <span class="btn-icon-svg">🌐</span>
         <span class="btn-label">Online</span>
       </button>
-      <button id="btn-dock-undo" class="dock-btn">
-        <span class="btn-icon-svg">↶</span>
-        <span class="btn-label">Undo</span>
-      </button>
-      <button id="btn-dock-newgame" class="dock-btn">
-        <span class="btn-icon-svg">↻</span>
-        <span class="btn-label">New</span>
-      </button>
-      <button id="btn-dock-flip" class="dock-btn">
+      <button id="btn-dock-flip" class="dock-btn" title="Girar tablero">
         <span class="btn-icon-svg">⇅</span>
-        <span class="btn-label">Flip</span>
+        <span class="btn-label">Girar</span>
       </button>
-      <button id="btn-dock-settings" class="dock-btn">
+      <button id="btn-dock-settings" class="dock-btn" title="Configuración">
         <span class="btn-icon-svg">⚙️</span>
-        <span class="btn-label">Settings</span>
+        <span class="btn-label">Ajustes</span>
       </button>
     </div>
   </nav>
@@ -234,10 +261,10 @@
         <div class="settings-section">
           <span class="section-label">Play As</span>
           <div class="side-chooser-grid">
-            <button class="side-chooser-btn active" data-side="w">
+            <button class="settings-side-btn side-chooser-btn active" data-side="w">
               <span>♔</span> White (First)
             </button>
-            <button class="side-chooser-btn" data-side="b">
+            <button class="settings-side-btn side-chooser-btn" data-side="b">
               <span>♚</span> Black (Second)
             </button>
           </div>
@@ -423,13 +450,13 @@
           <div class="settings-section">
             <span class="section-label">Jugar con</span>
             <div class="side-chooser-grid" style="grid-template-columns: repeat(3, 1fr);">
-              <button class="side-chooser-btn active" data-online-side="random">
+              <button class="online-side-btn side-chooser-btn active" data-online-side="random">
                 <span>🎲</span> Aleatorio
               </button>
-              <button class="side-chooser-btn" data-online-side="w">
+              <button class="online-side-btn side-chooser-btn" data-online-side="w">
                 <span>♔</span> Blancas
               </button>
-              <button class="side-chooser-btn" data-online-side="b">
+              <button class="online-side-btn side-chooser-btn" data-online-side="b">
                 <span>♚</span> Negras
               </button>
             </div>
@@ -495,19 +522,7 @@
     </div>
   </div>
 
-  <!-- 5. Floating Emoji Reactions Bar (Online Mode) -->
-  <div id="online-reaction-bar" class="floating-reaction-bar">
-    <button class="reaction-emoji-btn" data-emoji="👏" title="Aplausos">👏</button>
-    <button class="reaction-emoji-btn" data-emoji="🔥" title="Fuego">🔥</button>
-    <button class="reaction-emoji-btn" data-emoji="😮" title="Sorprendido">😮</button>
-    <button class="reaction-emoji-btn" data-emoji="♟️" title="Peón">♟️</button>
-    <button class="reaction-emoji-btn" data-emoji="👑" title="Corona">👑</button>
-    <button class="reaction-emoji-btn" data-emoji="💀" title="Calavera">💀</button>
-    <button class="reaction-emoji-btn" data-emoji="😂" title="Risa">😂</button>
-    <button class="reaction-emoji-btn" data-emoji="🤝" title="Buen Juego">🤝</button>
-  </div>
-
-  <!-- 6. Floating Toast Notification Container -->
+  <!-- 5. Floating Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- =========================================================================
