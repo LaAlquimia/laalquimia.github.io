@@ -338,6 +338,12 @@ button {
   border-color: rgba(63, 185, 80, 0.4);
 }
 
+/* Face-to-Face / Tabletop mode (Rotates top player bar 180° for opponent sitting opposite) */
+.player-bar.face-to-face-top {
+  transform: rotate(180deg);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 [data-board-theme="cyber"] .player-bar.active-turn {
   background: rgba(0, 240, 255, 0.08);
   border-color: rgba(0, 240, 255, 0.4);
@@ -651,6 +657,23 @@ button {
   transform: translate(-50%, -50%);
   filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
   will-change: left, top;
+}
+
+.drag-ghost.rotated-piece {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+/* Face-to-Face Opponent Piece Rotation (180deg) */
+.piece-svg.rotated-piece {
+  transform: rotate(180deg);
+}
+
+.square:hover .piece-svg.rotated-piece {
+  transform: rotate(180deg) scale(1.04);
+}
+
+.square:active .piece-svg.rotated-piece {
+  transform: rotate(180deg) scale(0.96);
 }
 
 .drag-ghost * {
@@ -1308,6 +1331,64 @@ button {
 .side-chooser-btn.active {
   border-color: var(--accent-blue);
   background: rgba(56, 139, 253, 0.15);
+  color: var(--accent-blue);
+}
+
+/* Setting Toggle Switch & Row */
+.setting-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #334155;
+  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 26px;
+  border: 1px solid var(--border-color);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: var(--accent-primary, #10b981);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(22px);
 }
 
 /* ==========================================================================

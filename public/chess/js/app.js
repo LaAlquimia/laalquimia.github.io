@@ -80,7 +80,8 @@
         isMuted: false,
         difficulty: 'medium',
         gameMode: 'ai',
-        playerColor: 'w'
+        playerColor: 'w',
+        faceToFace: true
       };
 
       // Check URL query parameters for mode preset (e.g., pvp.html or ?mode=pvp)
@@ -164,6 +165,15 @@
       if (this.dom.btnHeaderMute) {
         this.dom.btnHeaderMute.classList.toggle('active', !this.audio.isMuted());
       }
+
+      // Face-to-Face Tabletop Toggle & Header Button
+      const faceToFaceToggle = document.getElementById('setting-face-to-face');
+      if (faceToFaceToggle) {
+        faceToFaceToggle.checked = (this.settings.faceToFace !== false);
+      }
+      if (this.dom.btnHeaderTabletop) {
+        this.dom.btnHeaderTabletop.classList.toggle('active', (this.settings.faceToFace !== false));
+      }
     }
 
     /* --------------------------------------------------------------------------
@@ -215,6 +225,7 @@
         btnHeaderNewGame: document.getElementById('btn-header-newgame'),
         btnHeaderMute: document.getElementById('btn-header-mute'),
         btnHeaderTheme: document.getElementById('btn-header-theme'),
+        btnHeaderTabletop: document.getElementById('btn-header-tabletop'),
 
         btnDockUndo: document.getElementById('btn-dock-undo'),
         btnDockNewGame: document.getElementById('btn-dock-newgame'),
@@ -342,6 +353,15 @@
             if (pieceSvgString) {
               const pieceWrapper = document.createElement('div');
               pieceWrapper.className = 'piece-svg';
+
+              // Face-to-Face Tabletop mode: Rotate top player pieces 180° so opponent sees them right-side-up
+              const isWhitePiece = (piece === piece.toUpperCase());
+              const isTopPiece = flipped ? isWhitePiece : !isWhitePiece;
+              const isFaceToFace = (this.settings.faceToFace !== false) && (this.mode === 'pvp' || this.settings.alwaysFaceToFace);
+              if (isFaceToFace && isTopPiece) {
+                pieceWrapper.classList.add('rotated-piece');
+              }
+
               pieceWrapper.innerHTML = pieceSvgString;
               sq.appendChild(pieceWrapper);
             }
@@ -376,6 +396,9 @@
       const topColor = flipped ? 'w' : 'b';
       const bottomColor = flipped ? 'b' : 'w';
 
+      // Face-to-Face Tabletop mode check
+      const isFaceToFace = (this.settings.faceToFace !== false) && (this.mode === 'pvp' || this.settings.alwaysFaceToFace);
+
       // Top Player Data
       const topIsActive = (turn === topColor);
       const topName = (this.mode === 'ai') 
@@ -384,6 +407,7 @@
 
       if (this.dom.topPlayerBar) {
         this.dom.topPlayerBar.classList.toggle('active-turn', topIsActive);
+        this.dom.topPlayerBar.classList.toggle('face-to-face-top', isFaceToFace);
       }
       if (this.dom.topPlayerName) {
         this.dom.topPlayerName.textContent = topName;
@@ -553,6 +577,7 @@
       if (this.dom.btnHeaderNewGame) this.dom.btnHeaderNewGame.addEventListener('click', () => this.restartGame());
       if (this.dom.btnHeaderMute) this.dom.btnHeaderMute.addEventListener('click', () => this.toggleMute());
       if (this.dom.btnHeaderTheme) this.dom.btnHeaderTheme.addEventListener('click', () => this.cycleBoardTheme());
+      if (this.dom.btnHeaderTabletop) this.dom.btnHeaderTabletop.addEventListener('click', () => this.toggleFaceToFace());
 
       // 3. Mobile Bottom Dock
       if (this.dom.btnDockUndo) this.dom.btnDockUndo.addEventListener('click', () => this.undoMove());
@@ -661,6 +686,15 @@
           // Create floating drag ghost
           const ghost = document.createElement('div');
           ghost.className = 'drag-ghost';
+
+          // Rotate ghost if piece is rotated in face-to-face mode
+          const isWhitePiece = (state.piece === state.piece.toUpperCase());
+          const isTopPiece = this.boardFlipped ? isWhitePiece : !isWhitePiece;
+          const isFaceToFace = (this.settings.faceToFace !== false) && (this.mode === 'pvp' || this.settings.alwaysFaceToFace);
+          if (isFaceToFace && isTopPiece) {
+            ghost.classList.add('rotated-piece');
+          }
+
           ghost.innerHTML = this.pieces.getPieceSVG(state.piece, this.settings.pieceStyle);
           ghost.style.left = `${e.clientX}px`;
           ghost.style.top = `${e.clientY}px`;
@@ -1244,6 +1278,14 @@
         });
       }
 
+      // Face-to-Face Tabletop Toggle
+      const faceToFaceToggle = document.getElementById('setting-face-to-face');
+      if (faceToFaceToggle) {
+        faceToFaceToggle.addEventListener('change', (e) => {
+          this.setFaceToFace(e.target.checked);
+        });
+      }
+
       // Close buttons
       document.querySelectorAll('[data-close-modal]').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -1251,6 +1293,18 @@
           if (modal) modal.classList.remove('open');
         });
       });
+    }
+
+    setFaceToFace(enabled) {
+      this.settings.faceToFace = !!enabled;
+      this._saveSettings();
+      this._syncSettingsFormControls();
+      this.render();
+      this.showToast(this.settings.faceToFace ? 'Modo Mesa activado (fichas rival giradas 180°)' : 'Orientación estándar activada', 'info');
+    }
+
+    toggleFaceToFace() {
+      this.setFaceToFace(!this.settings.faceToFace);
     }
 
     setBoardTheme(theme) {
