@@ -1921,30 +1921,32 @@ button {
 }
 
 /* ==========================================================================
-   EXPANDABLE EMOJI REACTIONS PILL / BAR (Online Multiplayer)
+   EMBEDDED EMOJI REACTIONS PILL / BAR (Inside Bottom Player Bar)
    ========================================================================== */
 .reaction-bar-container,
+.embedded-reaction-bar,
 .floating-reaction-bar {
   display: none; /* Shown in online mode via .visible */
   position: relative;
-  margin: 8px auto 4px auto;
+  margin: 0 4px;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(15, 23, 42, 0.88);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 9999px;
-  padding: 4px 10px;
-  z-index: 40;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  z-index: 15;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
-  max-width: calc(100% - 16px);
-  width: fit-content;
+  max-width: min(58vw, 360px);
+  overflow: hidden;
 }
 
 .reaction-bar-container.visible,
+.embedded-reaction-bar.visible,
 .floating-reaction-bar.visible {
   display: inline-flex;
 }
@@ -1953,29 +1955,30 @@ button {
 .reaction-bar-container:hover,
 .reaction-bar-container:focus-within,
 .reaction-bar-container.expanded {
-  background: rgba(15, 23, 42, 0.96);
-  border-color: rgba(56, 139, 253, 0.55);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55), 0 0 18px rgba(56, 139, 253, 0.35);
+  background: rgba(15, 23, 42, 0.98);
+  border-color: rgba(56, 139, 253, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(56, 139, 253, 0.3);
 }
 
-/* Toggle Pill Trigger Button */
+/* Toggle Pill Trigger Button (Icon Only) */
 .reaction-pill-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 0;
   background: transparent;
   border: none;
   color: var(--text-primary);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 3px 5px;
   border-radius: 9999px;
   font-family: inherit;
-  font-size: 0.84rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  transition: all 0.25s ease;
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: transform 0.25s ease, filter 0.25s ease;
   white-space: nowrap;
   outline: none;
+  flex-shrink: 0;
 }
 
 .reaction-pill-toggle:focus-visible {
@@ -1992,31 +1995,10 @@ button {
 .reaction-pill-toggle:hover .reaction-pill-icon,
 .reaction-bar-container:hover .reaction-pill-icon,
 .reaction-bar-container.expanded .reaction-pill-icon {
-  transform: scale(1.18) rotate(-6deg);
+  transform: scale(1.2) rotate(-6deg);
 }
 
-.reaction-pill-label {
-  color: var(--text-primary);
-  opacity: 0.92;
-  transition: color 0.2s ease;
-}
-
-.reaction-pill-chevron {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--accent-blue);
-  line-height: 1;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  display: inline-block;
-}
-
-.reaction-bar-container:hover .reaction-pill-chevron,
-.reaction-bar-container:focus-within .reaction-pill-chevron,
-.reaction-bar-container.expanded .reaction-pill-chevron {
-  transform: rotate(90deg);
-}
-
-/* Emoji Tray List (Single neat horizontal row) */
+/* Emoji Tray List (Single neat horizontal scrollable row) */
 .reaction-emojis-list {
   display: flex;
   flex-direction: row;
@@ -2025,28 +2007,32 @@ button {
   gap: 4px;
   max-width: 0;
   opacity: 0;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   pointer-events: none;
-  transform: scaleX(0.85);
-  transform-origin: left center;
   white-space: nowrap;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
   transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               opacity 0.25s ease,
-              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              padding 0.3s ease,
-              margin 0.3s ease;
+              padding 0.25s ease,
+              margin 0.25s ease;
+}
+
+.reaction-emojis-list::-webkit-scrollbar {
+  display: none;
 }
 
 /* Expanding the Emoji Tray on Hover or Expanded Class */
 .reaction-bar-container:hover .reaction-emojis-list,
 .reaction-bar-container:focus-within .reaction-emojis-list,
 .reaction-bar-container.expanded .reaction-emojis-list {
-  max-width: 480px;
+  max-width: min(50vw, 320px);
   opacity: 1;
   pointer-events: auto;
-  transform: scaleX(1);
-  margin-left: 6px;
-  padding-left: 8px;
+  margin-left: 4px;
+  padding: 2px 4px;
   border-left: 1px solid rgba(255, 255, 255, 0.16);
 }
 
@@ -2054,8 +2040,8 @@ button {
 .reaction-emoji-btn {
   background: transparent;
   border: none;
-  font-size: 1.3rem;
-  padding: 4px 6px;
+  font-size: 1.25rem;
+  padding: 2px 4px;
   cursor: pointer;
   border-radius: 50%;
   flex-shrink: 0;
