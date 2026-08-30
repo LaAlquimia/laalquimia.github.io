@@ -9,12 +9,12 @@
   const STORAGE_KEY = 'chess_app_settings_v2';
 
   const DIFFICULTY_MAP = {
-    beginner: { level: 1, name: 'Beginner', depth: 2, movetime: 250 },
-    easy:     { level: 2, name: 'Easy', depth: 4, movetime: 450 },
-    medium:   { level: 3, name: 'Medium', depth: 8, movetime: 850 },
-    hard:     { level: 4, name: 'Hard', depth: 12, movetime: 1600 },
-    expert:   { level: 5, name: 'Expert', depth: 16, movetime: 2600 },
-    maximum:  { level: 6, name: 'Maximum', depth: 20, movetime: 4000 }
+    beginner: { level: 1, skill: 1, name: 'Principiante', depth: 4, movetime: 350 },
+    easy:     { level: 2, skill: 5, name: 'Fácil', depth: 6, movetime: 600 },
+    medium:   { level: 3, skill: 10, name: 'Intermedio', depth: 10, movetime: 1000 },
+    hard:     { level: 4, skill: 15, name: 'Avanzado', depth: 14, movetime: 1800 },
+    expert:   { level: 5, skill: 18, name: 'Experto', depth: 18, movetime: 2600 },
+    maximum:  { level: 6, skill: 20, name: 'Gran Maestro (3200+)', depth: 22, movetime: 4500 }
   };
 
   class ChessApp {
@@ -1690,41 +1690,73 @@
 
       if (!this.ai) return;
 
+      if (forceHint) {
+        this.showToast('💡 Stockfish calculando jugada óptima (Prof. 18-22)...', 'info');
+      }
+
+      const applyMoveCandidate = (uciMove, depth = 16, evalInfo = null) => {
+        if (!uciMove || uciMove === '(none)' || uciMove.length < 4) return;
+        if (this.game.getFEN() !== requestFen || this.game.getTurn() !== requestTurn) return;
+
+        const fromSq = uciMove.slice(0, 2);
+        const toSq = uciMove.slice(2, 4);
+        const from = this._squareToCoords(fromSq);
+        const to = this._squareToCoords(toSq);
+        if (!from || !to) return;
+
+        let san = uciMove;
+        const legalMoves = this.game.getLegalMoves(from.x, from.y);
+        const matchMove = legalMoves.find(m => m.x === to.x && m.y === to.y);
+        if (matchMove && matchMove.san) {
+          san = matchMove.san;
+        }
+
+        this.suggestedMove = {
+          from,
+          to,
+          uci: uciMove,
+          san: san,
+          depth: depth,
+          score: evalInfo ? evalInfo.score : null,
+          pv: evalInfo ? evalInfo.pv : ''
+        };
+
+        this.render();
+      };
+
+      // Full-power Stockfish calculation (Skill 20 / Depth 20+)
       this.ai.findBestMove(
         fen,
-        { skill: 20, depth: 12, movetime: 350 },
+        { skill: 20, depth: 20, movetime: forceHint ? 2500 : 2000 },
         (bestMove, ponder, evaluation) => {
           if (this.game.getFEN() !== requestFen || this.game.getTurn() !== requestTurn) {
             return;
           }
-          if (!bestMove || bestMove === '(none)' || bestMove.length < 4) {
-            return;
+
+          if (bestMove) {
+            applyMoveCandidate(bestMove, evaluation ? evaluation.depth : 20, evaluation);
           }
 
-          const fromSq = bestMove.slice(0, 2);
-          const toSq = bestMove.slice(2, 4);
-          const from = this._squareToCoords(fromSq);
-          const to = this._squareToCoords(toSq);
-          if (!from || !to) return;
+          if (forceHint && this.suggestedMove) {
+            const evalStr = evaluation && evaluation.score
+              ? (evaluation.score.type === 'mate' ? `Mate #${evaluation.score.mate}` : `Eval ${evaluation.score.value >= 0 ? '+' : ''}${evaluation.score.value.toFixed(1)}`)
+              : '';
+            const depthStr = evaluation && evaluation.depth ? `Prof. ${evaluation.depth}` : 'Prof. 20';
+            const pvSnippet = evaluation && evaluation.pv
+              ? ` — Línea: ${evaluation.pv.split(' ').slice(0, 4).join(' ')}`
+              : '';
 
-          let san = bestMove;
-          const legalMoves = this.game.getLegalMoves(from.x, from.y);
-          const matchMove = legalMoves.find(m => m.x === to.x && m.y === to.y);
-          if (matchMove && matchMove.san) {
-            san = matchMove.san;
+            this.showToast(`💡 Stockfish GM [${depthStr}${evalStr ? ' | ' + evalStr : ''}]: ${this.suggestedMove.san} (${this.suggestedMove.uci})${pvSnippet}`, 'info');
           }
-
-          this.suggestedMove = {
-            from,
-            to,
-            uci: bestMove,
-            san: san
-          };
-
-          this.render();
-
-          if (forceHint) {
-            this.showToast(`💡 Sugerencia Stockfish: ${san} (${bestMove})`, 'info');
+        },
+        (evalInfo) => {
+          // Progressive candidate move stream as Stockfish searches deeper
+          if (evalInfo && evalInfo.score) {
+            this.evalScore = evalInfo.score.whiteValue || 0;
+            this._renderEvaluation();
+          }
+          if (evalInfo && evalInfo.candidateMove && evalInfo.depth >= 4) {
+            applyMoveCandidate(evalInfo.candidateMove, evalInfo.depth, evalInfo);
           }
         }
       ).catch(err => {

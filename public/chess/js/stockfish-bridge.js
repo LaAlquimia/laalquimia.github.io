@@ -22,8 +22,10 @@
     medium: { skill: 8, depth: 8, movetime: 800 },
     hard: { skill: 14, depth: 12, movetime: 1500 },
     expert: { skill: 18, depth: 16, movetime: 2500 },
-    maximum: { skill: 20, depth: 20, movetime: 4000 },
-    max: { skill: 20, depth: 20, movetime: 4000 }
+    maximum: { skill: 20, depth: 22, movetime: 4500 },
+    max: { skill: 20, depth: 22, movetime: 4500 },
+    grandmaster: { skill: 20, depth: 22, movetime: 4500 },
+    gm: { skill: 20, depth: 22, movetime: 4500 }
   };
 
   /**
@@ -39,6 +41,17 @@
       if (!isNaN(num)) diff = num;
     }
 
+    if (typeof diff === 'object' && diff !== null) {
+      const skill = (diff.skill !== undefined) ? diff.skill : ((diff.level !== undefined) ? Math.min(20, Math.round(diff.level * 3.33)) : 20);
+      const depth = (diff.depth !== undefined) ? diff.depth : 18;
+      const movetime = (diff.movetime !== undefined) ? diff.movetime : 2500;
+      return {
+        skill: Math.max(0, Math.min(20, skill)),
+        depth: Math.max(1, depth),
+        movetime: Math.max(100, movetime)
+      };
+    }
+
     if (typeof diff === 'number') {
       // Map 1-25 numeric values
       const skill = Math.max(0, Math.min(20, Math.round(diff * 0.8)));
@@ -47,8 +60,8 @@
       return { skill, depth, movetime };
     }
 
-    // Default to medium
-    return { ...DIFFICULTY_PRESETS.medium };
+    // Default to maximum strength for hints / suggestions
+    return { ...DIFFICULTY_PRESETS.maximum };
   }
 
   /**
@@ -63,6 +76,8 @@
       nps: 0,
       time: 0,
       pv: '',
+      candidateMove: null,
+      pvMoves: [],
       currmove: '',
       raw: line
     };
@@ -99,6 +114,10 @@
         info.currmove = tokens[i + 1];
       } else if (token === 'pv') {
         info.pv = tokens.slice(i + 1).join(' ');
+        info.pvMoves = tokens.slice(i + 1);
+        if (info.pvMoves.length > 0 && info.pvMoves[0] && info.pvMoves[0] !== '(none)') {
+          info.candidateMove = info.pvMoves[0];
+        }
         break;
       }
     }
@@ -194,8 +213,23 @@
       line = line.trim();
       if (this.onLog) this.onLog(`< ${line}`);
 
-      // Ready checks
-      if (line === 'uciok' || line === 'readyok') {
+      // Ready checks & High-performance Engine Tuning
+      if (line === 'uciok') {
+        const threads = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency)
+          ? Math.min(4, Math.max(1, navigator.hardwareConcurrency - 1))
+          : 2;
+        this._send(`setoption name Threads value ${threads}`);
+        this._send('setoption name Hash value 64');
+        this._send('setoption name UCI_LimitStrength value false');
+        this._send('setoption name Skill Level value 20');
+        this._send('setoption name Move Overhead value 20');
+        this._send('setoption name Contempt value 0');
+        this._send('setoption name MultiPV value 1');
+        this._send('isready');
+        return;
+      }
+
+      if (line === 'readyok') {
         this.isReady = true;
         this._flushReadyResolvers(true);
         return;
@@ -291,7 +325,14 @@
       const clamped = Math.max(0, Math.min(20, Math.round(skill)));
       if (this.currentSkillLevel !== clamped) {
         this.currentSkillLevel = clamped;
-        this._send(`setoption name Skill Level value ${clamped}`);
+        if (clamped >= 20) {
+          this._send('setoption name UCI_LimitStrength value false');
+          this._send('setoption name Skill Level value 20');
+        } else {
+          this._send(`setoption name Skill Level value ${clamped}`);
+          this._send('setoption name UCI_LimitStrength value true');
+          this._send(`setoption name UCI_Elo value ${800 + clamped * 115}`);
+        }
       }
     }
 
@@ -305,12 +346,17 @@
      * @param {Function} [onEvaluationCallback] Callback (evalInfo)
      * @returns {Promise<{bestMove: string, ponder: string, evaluation: Object}>}
      */
-    findBestMove(fen, difficulty = 'medium', onBestMoveCallback = null, onEvaluationCallback = null) {
+    findBestMove(fen, difficulty = 'maximum', onBestMoveCallback = null, onEvaluationCallback = null) {
       return new Promise((resolve, reject) => {
         // If worker is unavailable, execute fallback
         if (!this.isAvailable || !this.worker) {
           const fallbackResult = this._executeFallback(fen);
-          if (onBestMoveCallback) onBestMoveCallback(fallbackResult.bestMove, null, fallbackResult.evaluation);
+          if (onEvaluationCallback && fallbackResult.evaluation) {
+            onEvaluationCallback(fallbackResult.evaluation);
+          }
+          if (onBestMoveCallback) {
+            onBestMoveCallback(fallbackResult.bestMove, null, fallbackResult.evaluation);
+          }
           return resolve(fallbackResult);
         }
 
@@ -320,7 +366,7 @@
         }
 
         const config = typeof difficulty === 'object' && difficulty !== null
-          ? { ...DIFFICULTY_PRESETS.medium, ...difficulty }
+          ? parseDifficulty(difficulty)
           : parseDifficulty(difficulty);
 
         // Active player turn from FEN
@@ -347,7 +393,7 @@
         } else if (config.movetime) {
           this._send(`go movetime ${config.movetime}`);
         } else {
-          this._send('go depth 10');
+          this._send('go depth 20');
         }
       });
     }
@@ -356,11 +402,11 @@
      * Continuous evaluation mode for analyzing positions / eval bar
      * 
      * @param {string} fen FEN string
-     * @param {number} depth Depth to search (default: 12)
+     * @param {number} depth Depth to search (default: 16)
      * @param {Function} onEvaluationCallback Callback streaming evaluation info
      * @returns {Promise<Object>} Final evaluation
      */
-    evaluate(fen, depth = 12, onEvaluationCallback = null) {
+    evaluate(fen, depth = 16, onEvaluationCallback = null) {
       return this.findBestMove(fen, { skill: 20, depth: depth, movetime: null }, null, onEvaluationCallback);
     }
 
@@ -409,12 +455,12 @@
     }
 
     /**
-     * Built-in fallback AI when Web Worker is disabled or unavailable
+     * Built-in Tactical Minimax Fallback AI with Piece-Square Tables & Quiescence Search
      */
     _executeFallback(fen) {
       let bestMove = null;
+      let evalScore = 0;
 
-      // If ChessGame is available in environment, select the best legal move using basic heuristics
       const ChessEngine = (typeof global.ChessGame !== 'undefined')
         ? global.ChessGame
         : (typeof require === 'function' ? require('./chess-core.js').ChessGame : null);
@@ -422,21 +468,171 @@
       if (ChessEngine) {
         try {
           const game = new ChessEngine(fen);
+          const turn = game.getTurn(); // 'w' | 'b'
           const legalMoves = game.getAllLegalMoves();
 
           if (legalMoves.length > 0) {
-            // Prioritize captures and checks, then random legal moves
-            const captures = legalMoves.filter(m => m.isCapture);
-            const promotions = legalMoves.filter(m => m.isPromotion);
+            // Piece values for positional evaluation
+            const PIECE_VALS = { 'p': 100, 'n': 320, 'b': 330, 'r': 500, 'q': 900, 'k': 20000 };
 
-            let chosenMove = null;
-            if (promotions.length > 0) {
-              chosenMove = promotions[Math.floor(Math.random() * promotions.length)];
-            } else if (captures.length > 0) {
-              chosenMove = captures[Math.floor(Math.random() * captures.length)];
-            } else {
-              chosenMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
+            // Piece-Square Tables (White perspective; flipped for Black)
+            const PST = {
+              p: [
+                 0,  0,  0,  0,  0,  0,  0,  0,
+                50, 50, 50, 50, 50, 50, 50, 50,
+                10, 10, 20, 30, 30, 20, 10, 10,
+                 5,  5, 10, 25, 25, 10,  5,  5,
+                 0,  0,  0, 20, 20,  0,  0,  0,
+                 5, -5,-10,  0,  0,-10, -5,  5,
+                 5, 10, 10,-20,-20, 10, 10,  5,
+                 0,  0,  0,  0,  0,  0,  0,  0
+              ],
+              n: [
+                -50,-40,-30,-30,-30,-30,-40,-50,
+                -40,-20,  0,  0,  0,  0,-20,-40,
+                -30,  0, 10, 15, 15, 10,  0,-30,
+                -30,  5, 15, 20, 20, 15,  5,-30,
+                -30,  0, 15, 20, 20, 15,  0,-30,
+                -30,  5, 10, 15, 15, 10,  5,-30,
+                -40,-20,  0,  5,  5,  0,-20,-40,
+                -50,-40,-30,-30,-30,-30,-40,-50
+              ],
+              b: [
+                -20,-10,-10,-10,-10,-10,-10,-20,
+                -10,  0,  0,  0,  0,  0,  0,-10,
+                -10,  0,  5, 10, 10,  5,  0,-10,
+                -10,  5,  5, 10, 10,  5,  5,-10,
+                -10,  0, 10, 10, 10, 10,  0,-10,
+                -10, 10, 10, 10, 10, 10, 10,-10,
+                -10,  5,  0,  0,  0,  0,  5,-10,
+                -20,-10,-10,-10,-10,-10,-10,-20
+              ],
+              r: [
+                  0,  0,  0,  0,  0,  0,  0,  0,
+                  5, 10, 10, 10, 10, 10, 10,  5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                  0,  0,  0,  5,  5,  0,  0,  0
+              ],
+              q: [
+                -20,-10,-10, -5, -5,-10,-10,-20,
+                -10,  0,  0,  0,  0,  0,  0,-10,
+                -10,  0,  5,  5,  5,  5,  0,-10,
+                 -5,  0,  5,  5,  5,  5,  0, -5,
+                  0,  0,  5,  5,  5,  5,  0, -5,
+                -10,  5,  5,  5,  5,  5,  0,-10,
+                -10,  0,  5,  0,  0,  0,  0,-10,
+                -20,-10,-10, -5, -5,-10,-10,-20
+              ],
+              k: [
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                -20,-30,-30,-40,-40,-30,-30,-20,
+                -10,-20,-20,-20,-20,-20,-20,-10,
+                 20, 20,  0,  0,  0,  0, 20, 20,
+                 20, 30, 10,  0,  0, 10, 30, 20
+              ]
+            };
+
+            const evaluateStatic = (g) => {
+              let score = 0;
+              for (let y = 0; y < 8; y++) {
+                for (let x = 0; x < 8; x++) {
+                  const p = g.board ? g.board[y][x] : (typeof g.getPiece === 'function' ? g.getPiece(x, y) : ' ');
+                  if (!p || p === ' ') continue;
+                  const isWhite = (p === p.toUpperCase());
+                  const type = p.toLowerCase();
+                  const val = PIECE_VALS[type] || 0;
+                  const idx = isWhite ? (y * 8 + x) : ((7 - y) * 8 + x);
+                  const pstVal = (PST[type] && PST[type][idx]) ? PST[type][idx] : 0;
+                  const totalPiece = val + pstVal;
+                  score += isWhite ? totalPiece : -totalPiece;
+                }
+              }
+              return score;
+            };
+
+            // Order moves: captures & promotions first
+            const orderMoves = (moves) => {
+              return moves.sort((a, b) => {
+                let scoreA = 0;
+                let scoreB = 0;
+                if (a.isPromotion) scoreA += 800;
+                if (b.isPromotion) scoreB += 800;
+                if (a.isCapture) scoreA += 400;
+                if (b.isCapture) scoreB += 400;
+                return scoreB - scoreA;
+              });
+            };
+
+            // Alpha-Beta Minimax
+            const alphaBeta = (g, depth, alpha, beta, isWhite) => {
+              if (depth === 0 || g.isGameOver()) {
+                return evaluateStatic(g);
+              }
+
+              const moves = orderMoves(g.getAllLegalMoves());
+              if (moves.length === 0) {
+                if (g.isInCheck && g.isInCheck(g.getTurn())) {
+                  return isWhite ? -100000 : 100000;
+                }
+                return 0;
+              }
+
+              if (isWhite) {
+                let maxEval = -Infinity;
+                for (const m of moves) {
+                  g.makeMove(m.from, m.to, m.promotion || 'Q');
+                  const evaluation = alphaBeta(g, depth - 1, alpha, beta, false);
+                  g.undoMove();
+                  maxEval = Math.max(maxEval, evaluation);
+                  alpha = Math.max(alpha, evaluation);
+                  if (beta <= alpha) break;
+                }
+                return maxEval;
+              } else {
+                let minEval = Infinity;
+                for (const m of moves) {
+                  g.makeMove(m.from, m.to, m.promotion || 'Q');
+                  const evaluation = alphaBeta(g, depth - 1, alpha, beta, true);
+                  g.undoMove();
+                  minEval = Math.min(minEval, evaluation);
+                  beta = Math.min(beta, evaluation);
+                  if (beta <= alpha) break;
+                }
+                return minEval;
+              }
+            };
+
+            const isWhiteTurn = (turn === 'w');
+            let bestVal = isWhiteTurn ? -Infinity : Infinity;
+            let chosenMove = legalMoves[0];
+            const sortedMoves = orderMoves(legalMoves);
+
+            for (const m of sortedMoves) {
+              game.makeMove(m.from, m.to, m.promotion || 'Q');
+              const val = alphaBeta(game, 2, -Infinity, Infinity, !isWhiteTurn);
+              game.undoMove();
+
+              if (isWhiteTurn) {
+                if (val > bestVal) {
+                  bestVal = val;
+                  chosenMove = m;
+                }
+              } else {
+                if (val < bestVal) {
+                  bestVal = val;
+                  chosenMove = m;
+                }
+              }
             }
+
+            evalScore = (bestVal === -Infinity || bestVal === Infinity) ? 0 : (bestVal / 100);
 
             const fromSq = (typeof game.coordsToSquare === 'function')
               ? game.coordsToSquare(chosenMove.from.x, chosenMove.from.y)
@@ -457,8 +653,8 @@
         bestMove: bestMove,
         ponder: null,
         evaluation: {
-          depth: 1,
-          score: { type: 'cp', value: 0, whiteValue: 0 },
+          depth: 3,
+          score: { type: 'cp', value: evalScore, whiteValue: evalScore },
           pv: bestMove || '',
           fallback: true
         }
@@ -474,3 +670,4 @@
     window.StockfishAI = StockfishAI;
   }
 })(typeof window !== 'undefined' ? window : globalThis);
+
