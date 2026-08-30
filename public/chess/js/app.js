@@ -742,12 +742,12 @@
           }
         }, { passive: false });
 
-        // Prevent double-tap zoom on quick taps
+        // Prevent double-tap zoom on quick taps (without blocking rapid button / emoji taps)
         let lastTouchEndTime = 0;
         document.addEventListener('touchend', (e) => {
           const now = Date.now();
           if (now - lastTouchEndTime <= 300) {
-            if (e.target && !e.target.closest('input, textarea, select')) {
+            if (e.target && !e.target.closest('input, textarea, select, button, .reaction-emoji-btn, #reaction-pill-toggle, .reaction-bar-container')) {
               if (e.cancelable && e.preventDefault) e.preventDefault();
             }
           }
@@ -948,18 +948,22 @@
           const emoji = btn.dataset ? btn.dataset.emoji : btn.getAttribute('data-emoji');
           
           if (btn.classList) {
+            btn.classList.remove('clicked');
+            if (typeof btn.offsetWidth === 'number') {
+              void btn.offsetWidth; // trigger reflow for instant re-pop animation
+            }
             btn.classList.add('clicked');
             setTimeout(() => {
               if (btn.classList) btn.classList.remove('clicked');
-            }, 400);
+            }, 300);
           }
 
-          if (emoji && this.peerClient && typeof this.peerClient.sendEmoji === 'function' && this.peerClient.isConnected()) {
-            this.peerClient.sendEmoji(emoji);
+          if (emoji) {
             this.showFloatingEmoji(emoji);
             if (this.audio && this.audio.play) this.audio.play('move');
-          } else if (emoji) {
-            this.showFloatingEmoji(emoji);
+            if (this.peerClient && typeof this.peerClient.sendEmoji === 'function' && this.peerClient.isConnected()) {
+              this.peerClient.sendEmoji(emoji);
+            }
           }
         });
       });
@@ -2604,17 +2608,28 @@
 
       const innerW = (typeof window !== 'undefined' && window.innerWidth) ? window.innerWidth : 800;
       const innerH = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 600;
-      const randomX = Math.floor(Math.random() * Math.max(100, innerW - 120)) + 60;
-      const randomY = Math.floor(Math.random() * Math.max(100, innerH / 2)) + Math.floor(innerH / 3);
+      
+      // Dynamic random distribution across board center area
+      const minX = Math.max(30, Math.floor(innerW * 0.15));
+      const maxX = Math.min(innerW - 80, Math.floor(innerW * 0.85));
+      const randomX = Math.floor(Math.random() * (maxX - minX)) + minX;
+      const randomY = Math.floor(Math.random() * (innerH * 0.35)) + Math.floor(innerH * 0.38);
+      const randomRot = Math.floor(Math.random() * 32) - 16;
+      const randomScale = (0.95 + Math.random() * 0.35).toFixed(2);
+
       bubble.style.left = `${randomX}px`;
       bubble.style.top = `${randomY}px`;
+      if (bubble.style.setProperty) {
+        bubble.style.setProperty('--emoji-rot', `${randomRot}deg`);
+        bubble.style.setProperty('--emoji-scale', randomScale);
+      }
       document.body.appendChild(bubble);
 
       setTimeout(() => {
         if (bubble && typeof bubble.remove === 'function') {
           bubble.remove();
         }
-      }, 2300);
+      }, 2100);
     }
 
     openSettingsModal() {
