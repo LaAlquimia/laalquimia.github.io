@@ -721,6 +721,40 @@
        CLICK & TOUCH INTERACTIONS (Unified Pointer System)
        -------------------------------------------------------------------------- */
     _bindEvents() {
+      // 0. Disable accidental browser pinch-to-zoom and multi-touch zoom gestures (iPad & mobile)
+      if (typeof document !== 'undefined' && document.addEventListener) {
+        document.addEventListener('gesturestart', (e) => {
+          if (e && e.preventDefault) e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('gesturechange', (e) => {
+          if (e && e.preventDefault) e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('gestureend', (e) => {
+          if (e && e.preventDefault) e.preventDefault();
+        }, { passive: false });
+
+        // Prevent multi-touch pinch zoom on touch devices
+        document.addEventListener('touchstart', (e) => {
+          if (e.touches && e.touches.length > 1) {
+            if (e.preventDefault) e.preventDefault();
+          }
+        }, { passive: false });
+
+        // Prevent double-tap zoom on quick taps
+        let lastTouchEndTime = 0;
+        document.addEventListener('touchend', (e) => {
+          const now = Date.now();
+          if (now - lastTouchEndTime <= 300) {
+            if (e.target && !e.target.closest('input, textarea, select')) {
+              if (e.cancelable && e.preventDefault) e.preventDefault();
+            }
+          }
+          lastTouchEndTime = now;
+        }, { passive: false });
+      }
+
       // 1. Board Interaction (Pointer events for drag & tap)
       this._setupBoardInteractions();
 
