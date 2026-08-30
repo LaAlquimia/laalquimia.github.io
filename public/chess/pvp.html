@@ -39,6 +39,9 @@
     </div>
 
     <div class="header-actions">
+      <button id="btn-header-profile" class="btn-icon" title="Mi Perfil y Salas Activas" aria-label="Mi Perfil">
+        👤
+      </button>
       <button id="btn-header-hint" class="btn-icon" title="Pista / Sugerencia IA (H)" aria-label="Sugerencia IA">
         💡
       </button>
@@ -69,6 +72,21 @@
     </div>
   </header>
 
+  <!-- Floating Reconnection Notification Banner -->
+  <div id="online-reconnect-banner" class="reconnect-banner" style="display: none;">
+    <div class="reconnect-banner-content">
+      <span class="reconnect-icon">⚡</span>
+      <div class="reconnect-text">
+        <strong>Partida Online Activa:</strong>
+        <span id="reconnect-banner-details">Sala K9A2 vs Rival</span>
+      </div>
+    </div>
+    <div class="reconnect-banner-actions">
+      <button id="btn-reconnect-resume" class="btn-banner-action primary">▶️ Reanudar</button>
+      <button id="btn-reconnect-dismiss" class="btn-banner-action dismiss" title="Descartar">✕</button>
+    </div>
+  </div>
+
   <!-- =========================================================================
        MAIN CONTAINER (Mobile 100vw & Desktop 2-Column)
        ========================================================================= -->
@@ -77,8 +95,8 @@
     <!-- LEFT / MAIN: Board & Player Bars -->
     <section class="board-column">
       
-      <!-- Top / Opponent Player Bar -->
-      <div id="top-player-bar" class="player-bar">
+      <!-- Top / Opponent Player Bar (Tabletop Rotated 180deg) -->
+      <div id="top-player-bar" class="player-bar tabletop-rotated">
         <div class="player-info">
           <div id="top-player-avatar" class="player-avatar avatar-black">
             ♚<span class="turn-glow-dot"></span>
@@ -103,11 +121,11 @@
       <!-- Bottom / User Player Bar -->
       <div id="bottom-player-bar" class="player-bar active-turn">
         <div class="player-info">
-          <div id="bottom-player-avatar" class="player-avatar avatar-white">
+          <div id="bottom-player-avatar" class="player-avatar avatar-white" title="Toca para ver tu perfil y salas activas">
             ♔<span class="turn-glow-dot"></span>
           </div>
           <div class="player-meta">
-            <span id="bottom-player-name" class="player-name">Player 1 (White)</span>
+            <span id="bottom-player-name" class="player-name" title="Toca para ver tu perfil y salas activas">Player 1 (White)</span>
             <span id="bottom-player-status" class="player-status-badge">Active Turn</span>
           </div>
         </div>
@@ -123,32 +141,39 @@
         <button class="reaction-pill-toggle" id="reaction-pill-toggle" type="button" aria-label="Reacciones emoji" title="Reaccionar con emoji">
           <span class="reaction-pill-icon">💬</span>
           <span class="reaction-pill-label">Reaccionar</span>
-          <span class="reaction-pill-chevron">›</span>
+          <span class="reaction-pill-chevron">▾</span>
         </button>
-        <div class="reaction-emojis-list" id="reaction-emojis-list">
-          <button class="reaction-emoji-btn" data-emoji="👏" title="Aplausos" aria-label="Aplausos">👏</button>
-          <button class="reaction-emoji-btn" data-emoji="🔥" title="Fuego" aria-label="Fuego">🔥</button>
-          <button class="reaction-emoji-btn" data-emoji="😮" title="Sorprendido" aria-label="Sorprendido">😮</button>
-          <button class="reaction-emoji-btn" data-emoji="♟️" title="Peón" aria-label="Peón">♟️</button>
-          <button class="reaction-emoji-btn" data-emoji="👑" title="Corona" aria-label="Corona">👑</button>
-          <button class="reaction-emoji-btn" data-emoji="💀" title="Calavera" aria-label="Calavera">💀</button>
-          <button class="reaction-emoji-btn" data-emoji="😂" title="Risa" aria-label="Risa">😂</button>
-          <button class="reaction-emoji-btn" data-emoji="🤝" title="Buen Juego" aria-label="Buen Juego">🤝</button>
+
+        <div class="reaction-emojis-menu" id="reaction-emojis-menu">
+          <button class="emoji-btn" data-emoji="👏" title="Aplausos">👏</button>
+          <button class="emoji-btn" data-emoji="🔥" title="En llamas">🔥</button>
+          <button class="emoji-btn" data-emoji="😮" title="Sorprendido">😮</button>
+          <button class="emoji-btn" data-emoji="♟️" title="Peón">♟️</button>
+          <button class="emoji-btn" data-emoji="👑" title="Corona">👑</button>
+          <button class="emoji-btn" data-emoji="💀" title="Calavera">💀</button>
+          <button class="emoji-btn" data-emoji="😂" title="Risas">😂</button>
+          <button class="emoji-btn" data-emoji="🤝" title="Respeto">🤝</button>
         </div>
       </div>
 
     </section>
 
-    <!-- RIGHT / DESKTOP SIDEBAR PANEL -->
+    <!-- RIGHT: Desktop Sidebar (Controls, Info & Moves) -->
     <aside class="sidebar-panel">
       
-      <!-- Evaluation Bar -->
-      <div class="eval-bar-wrapper">
-        <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);">EVAL</span>
-        <div class="eval-meter">
-          <div id="eval-fill-white" class="eval-fill-white"></div>
+      <!-- Game Info Header -->
+      <div class="sidebar-header-card">
+        <div class="game-status-row">
+          <span id="sidebar-status-text" class="status-main-text">White to move</span>
+          <span id="sidebar-game-mode-badge" class="mode-badge pvp">2P PvP</span>
         </div>
-        <span id="eval-score-text" class="eval-score-text">0.0</span>
+        <div id="sidebar-eval-bar" class="eval-bar-wrapper">
+          <span class="eval-label">Eval:</span>
+          <div class="eval-meter">
+            <div id="sidebar-eval-fill-white" class="eval-fill-white"></div>
+          </div>
+          <span id="sidebar-eval-score" class="eval-score">0.0</span>
+        </div>
       </div>
 
       <!-- Move History Box -->
@@ -162,6 +187,9 @@
 
       <!-- Quick Action Buttons -->
       <div class="sidebar-actions-grid">
+        <button id="btn-sidebar-profile" class="btn-sidebar" title="Mi Perfil y Salas Activas">
+          <span>👤</span> Mi Perfil & Salas
+        </button>
         <button id="btn-sidebar-hint" class="btn-sidebar" title="Pista / Sugerencia Stockfish IA (H)">
           <span>💡</span> Pista IA
         </button>
@@ -204,6 +232,10 @@
 
     <!-- 2. Action Buttons Row -->
     <div class="dock-actions-row">
+      <button id="btn-dock-profile" class="dock-btn" title="Mi Perfil & Salas">
+        <span class="btn-icon-svg">👤</span>
+        <span class="btn-label">Perfil</span>
+      </button>
       <button id="btn-dock-hint" class="dock-btn" title="Pista / Sugerencia IA">
         <span class="btn-icon-svg">💡</span>
         <span class="btn-label">Pista</span>
@@ -562,7 +594,81 @@
     </div>
   </div>
 
-  <!-- 5. Floating Toast Notification Container -->
+  <!-- 5. Player Profile & Active Rooms Modal -->
+  <div id="modal-profile" class="modal-backdrop">
+    <div class="modal-card profile-modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title">👤 Perfil & Salas Activas</h2>
+        <button class="btn-icon" data-close-modal aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Profile Header Hero Card -->
+        <div class="profile-card-hero">
+          <div class="profile-avatar-wrapper">
+            <div id="profile-current-avatar" class="profile-hero-avatar" title="Toca para cambiar avatar">🧙‍♂️</div>
+            <button id="btn-change-avatar" class="btn-change-avatar" title="Cambiar Avatar">✏️</button>
+          </div>
+          
+          <div class="profile-hero-info">
+            <div class="profile-name-row">
+              <input type="text" id="profile-name-input" class="profile-name-input" maxlength="20" placeholder="Tu Nombre / Apodo" value="Alquimista">
+              <button id="btn-save-profile-name" class="btn-save-name" title="Guardar Nombre">💾</button>
+            </div>
+            <div class="profile-id-row">
+              <span class="profile-id-badge" id="profile-id-badge">ID: usr_8f4b2a</span>
+              <button id="btn-copy-player-id" class="btn-copy-id" title="Copiar ID de Jugador">📋</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Avatar Picker Grid (Collapsible) -->
+        <div id="avatar-picker-grid" class="avatar-picker-grid" style="display: none;"></div>
+
+        <!-- Stats Bar -->
+        <div class="profile-stats-grid">
+          <div class="stat-card win">
+            <span class="stat-number" id="stat-wins">0</span>
+            <span class="stat-label">Victorias 🏆</span>
+          </div>
+          <div class="stat-card loss">
+            <span class="stat-number" id="stat-losses">0</span>
+            <span class="stat-label">Derrotas 🏳️</span>
+          </div>
+          <div class="stat-card draw">
+            <span class="stat-number" id="stat-draws">0</span>
+            <span class="stat-label">Tablas 🤝</span>
+          </div>
+          <div class="stat-card total">
+            <span class="stat-number" id="stat-total">0</span>
+            <span class="stat-label">Partidas</span>
+          </div>
+        </div>
+
+        <!-- Profile Tabs: Active Rooms vs Match History -->
+        <div class="modal-tabs profile-tabs">
+          <button id="tab-btn-active-rooms" class="modal-tab-btn active">🎮 Salas Activas (<span id="active-rooms-count">0</span>)</button>
+          <button id="tab-btn-match-history" class="modal-tab-btn">📜 Historial (<span id="match-history-count">0</span>)</button>
+        </div>
+
+        <!-- Tab 1: Active Rooms List -->
+        <div id="tab-pane-active-rooms" class="tab-pane active">
+          <div id="active-rooms-list" class="active-rooms-list"></div>
+        </div>
+
+        <!-- Tab 2: Match History List -->
+        <div id="tab-pane-match-history" class="tab-pane">
+          <div id="match-history-list" class="match-history-list"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary-action" data-close-modal>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Floating Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- =========================================================================
@@ -575,7 +681,8 @@
   <script src="js/chess-core.js"></script>
   <script src="js/stockfish-bridge.js"></script>
   <script src="js/peer-chess.js"></script>
-  <script src="js/app.js?v=2.2"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/app.js?v=2.3"></script>
 
 </body>
 </html>

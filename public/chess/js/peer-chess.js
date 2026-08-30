@@ -4,12 +4,13 @@
  * 
  * Features:
  * - Room hosting with 4-character codes (e.g. "K7A9") & direct join links
+ * - Persistent Player ID & Session Reconnection (survives page reloads & internet drops)
  * - Color assignment negotiation (White, Black, Random)
  * - Real-time move synchronization via RTCDataChannel (< 20ms latency)
  * - Live Ping / Latency counter & automatic connection health checks
  * - Draw offers, Undo requests, Resignation, Rematch coordination
  * - Live floating emoji reactions & chat gestures
- * - Safe fallback & graceful disconnection handling
+ * - Safe fallback & graceful auto-reconnect handling
  * 
  * @author Google DeepMind - Antigravity Agent
  */
@@ -97,22 +98,33 @@
       this.assignedColor = 'w'; // 'w' or 'b'
       this.opponentColor = 'b';
       this.preferredColor = 'random'; // 'w', 'b', or 'random'
-      this.playerName = options.playerName || 'Player';
-      this.opponentName = 'Opponent';
+      
+      this.playerId = options.playerId || 'usr_' + Math.random().toString(36).substring(2, 8);
+      this.playerName = options.playerName || 'Alquimista';
+      this.playerAvatar = options.playerAvatar || '🧙‍♂️';
+      this.opponentName = 'Rival Online';
+      this.opponentAvatar = '♟️';
 
-      this.status = 'disconnected'; // 'disconnected' | 'connecting' | 'waiting' | 'connected' | 'error'
+      this.currentFen = options.currentFen || null;
+      this.currentHistory = options.currentHistory || [];
+      this.currentTurn = 'w';
+
+      this.status = 'disconnected'; // 'disconnected' | 'connecting' | 'waiting' | 'connected' | 'reconnecting' | 'error'
       this.pingMs = 0;
       this._pingTimer = null;
       this._lastPingTimestamp = 0;
       this._handshakeTimer = null;
+      this._reconnectAttempts = 0;
+      this._maxReconnectAttempts = 5;
+      this._reconnectTimer = null;
 
       // Event listeners
       this._listeners = new Map();
     }
 
     /**
-     * Event subscription: 'connected', 'disconnected', 'status', 'move', 'emoji',
-     * 'draw_offered', 'draw_response', 'undo_requested', 'undo_response', 'resign', 'rematch', 'ping'
+     * Event subscription: 'connected', 'disconnected', 'reconnecting', 'reconnected', 'status', 'move', 'emoji',
+     * 'draw_offered', 'draw_response', 'undo_requested', 'undo_response', 'resign', 'rematch', 'ping', 'opponent_info'
      */
     on(event, callback) {
       if (!this._listeners.has(event)) {
@@ -147,27 +159,33 @@
     }
 
     /**
+     * Set active game board state for reconnection syncing
+     */
+    updateGameState(fen, history = [], turn = 'w') {
+      this.currentFen = fen;
+      this.currentHistory = history;
+      this.currentTurn = turn;
+    }
+
+    /**
      * Host creates a new room with a random 4-letter code
-     * 
-     * @param {Object} [config]
-     * @param {string} [config.preferredColor='random'] 'w', 'b', or 'random'
-     * @param {string} [config.playerName='Host']
-     * @returns {Promise<{roomCode: string, shareLink: string}>}
      */
     createRoom(config = {}) {
       this.leaveRoom();
 
       this.isHost = true;
       this.preferredColor = config.preferredColor || 'random';
-      this.playerName = config.playerName || this.playerName || 'Host';
+      this.playerName = config.playerName || this.playerName || 'Alquimista';
+      this.playerAvatar = config.playerAvatar || this.playerAvatar || '🧙‍♂️';
+      this.playerId = config.playerId || this.playerId;
       this.roomCode = generateRoomCode();
       this.peerId = roomCodeToPeerId(this.roomCode);
 
-      this._setStatus('connecting', `Creating room ${this.roomCode}...`);
+      this._setStatus('connecting', `Creando sala ${this.roomCode}...`);
 
       return new Promise((resolve, reject) => {
         if (typeof Peer === 'undefined') {
-          const err = new Error('PeerJS library is not loaded.');
+          const err = new Error('Librería PeerJS no disponible.');
           this._setStatus('error', err.message);
           return reject(err);
         }
@@ -182,7 +200,7 @@
         this.peer.on('open', (id) => {
           this.peerId = id;
           this.roomCode = peerIdToRoomCode(id);
-          this._setStatus('waiting', `Room ${this.roomCode} created. Waiting for opponent...`);
+          this._setStatus('waiting', `Sala ${this.roomCode} creada. Esperando rival...`);
           resolve({
             roomCode: this.roomCode,
             shareLink: getShareableLink(this.roomCode)
@@ -190,10 +208,10 @@
         });
 
         this.peer.on('connection', (conn) => {
-          // If already connected, reject incoming duplicate connections
+          // If already connected, reject incoming duplicate connections unless it's a reconnection
           if (this.conn && this.conn.open) {
-            conn.close();
-            return;
+            // Setup new connection to allow opponent reconnection
+            try { this.conn.close(); } catch(e) {}
           }
           this._setupConnection(conn);
         });
@@ -207,7 +225,7 @@
             this.createRoom(config).then(resolve).catch(reject);
             return;
           }
-          this._setStatus('error', err.message || 'Connection error');
+          this._setStatus('error', err.message || 'Error de conexión');
           this._emit('error', err);
           reject(err);
         });
@@ -222,21 +240,19 @@
 
     /**
      * Guest joins an existing room by code
-     * 
-     * @param {string} roomCode 4-letter room code (e.g. "K7A9")
-     * @param {Object} [config]
-     * @param {string} [config.playerName='Guest']
-     * @returns {Promise<boolean>}
      */
     joinRoom(roomCode, config = {}) {
       this.leaveRoom();
 
       this.isHost = false;
       this.roomCode = sanitizeRoomCode(roomCode);
-      this.playerName = config.playerName || this.playerName || 'Guest';
+      this.playerName = config.playerName || this.playerName || 'Alquimista';
+      this.playerAvatar = config.playerAvatar || this.playerAvatar || '🧙‍♂️';
+      this.playerId = config.playerId || this.playerId;
+      const isReconnect = !!config.isReconnect;
 
       if (!this.roomCode || this.roomCode.length < 3) {
-        const err = new Error('Invalid room code.');
+        const err = new Error('Código de sala inválido.');
         this._setStatus('error', err.message);
         return Promise.reject(err);
       }
@@ -244,11 +260,11 @@
       this.peerId = null; // Random client peer ID
       const hostPeerId = roomCodeToPeerId(this.roomCode);
 
-      this._setStatus('connecting', `Connecting to room ${this.roomCode}...`);
+      this._setStatus('connecting', `${isReconnect ? 'Reconectando' : 'Conectando'} a la sala ${this.roomCode}...`);
 
       return new Promise((resolve, reject) => {
         if (typeof Peer === 'undefined') {
-          const err = new Error('PeerJS library is not loaded.');
+          const err = new Error('Librería PeerJS no disponible.');
           this._setStatus('error', err.message);
           return reject(err);
         }
@@ -263,7 +279,7 @@
         let connectionTimeout = setTimeout(() => {
           if (this.status !== 'connected') {
             this.leaveRoom();
-            const err = new Error('No se pudo conectar con el anfitrión. Verifica que el código de sala sea correcto.');
+            const err = new Error('No se pudo conectar con el anfitrión. Verifica que el anfitrión siga en la sala.');
             this._setStatus('error', err.message);
             reject(err);
           }
@@ -276,21 +292,23 @@
             serialization: 'json'
           });
 
-          this._setupConnection(conn);
+          this._setupConnection(conn, isReconnect);
 
           const onConnectedHandler = () => {
             clearTimeout(connectionTimeout);
             this.off('connected', onConnectedHandler);
+            this.off('reconnected', onConnectedHandler);
             resolve(true);
           };
           this.on('connected', onConnectedHandler);
+          this.on('reconnected', onConnectedHandler);
         });
 
         this.peer.on('error', (err) => {
           clearTimeout(connectionTimeout);
           console.warn('PeerJS Guest Error:', err);
           if (err.type === 'peer-unavailable') {
-            const friendlyErr = new Error(`Sala "${this.roomCode}" no encontrada. Verifica el código.`);
+            const friendlyErr = new Error(`Sala "${this.roomCode}" no encontrada o el anfitrión se desconectó.`);
             this._setStatus('error', friendlyErr.message);
             this._emit('error', friendlyErr);
             reject(friendlyErr);
@@ -304,57 +322,122 @@
     }
 
     /**
+     * Resume / Reconnect to an existing room (Host or Guest)
+     */
+    resumeRoom(roomCode, savedSession = {}) {
+      this.roomCode = sanitizeRoomCode(roomCode);
+      this.isHost = (savedSession.role === 'host');
+      this.assignedColor = savedSession.assignedColor || 'w';
+      this.opponentColor = (this.assignedColor === 'w') ? 'b' : 'w';
+      this.opponentName = savedSession.opponentName || 'Rival Online';
+      this.opponentAvatar = savedSession.opponentAvatar || '♟️';
+      this.currentFen = savedSession.fen || null;
+      this.currentHistory = savedSession.moveHistory || [];
+
+      if (this.isHost) {
+        this.peerId = roomCodeToPeerId(this.roomCode);
+        return new Promise((resolve, reject) => {
+          this.leaveRoom();
+          this._setStatus('connecting', `Reanudando sala ${this.roomCode}...`);
+
+          try {
+            this.peer = new Peer(this.peerId, this.options);
+          } catch (err) {
+            return reject(err);
+          }
+
+          this.peer.on('open', (id) => {
+            this.peerId = id;
+            this._setStatus('waiting', `Sala ${this.roomCode} reanudada. Esperando que el rival se reconecte...`);
+            resolve({ roomCode: this.roomCode, shareLink: getShareableLink(this.roomCode) });
+          });
+
+          this.peer.on('connection', (conn) => {
+            this._setupConnection(conn);
+          });
+
+          this.peer.on('error', (err) => {
+            this._setStatus('error', err.message || 'Error al reanudar sala');
+            reject(err);
+          });
+        });
+      } else {
+        return this.joinRoom(this.roomCode, { isReconnect: true, playerName: this.playerName });
+      }
+    }
+
+    /**
      * Bind connection events for DataChannel
      */
-    _setupConnection(conn) {
+    _setupConnection(conn, isReconnect = false) {
       this.conn = conn;
 
       conn.on('open', () => {
         if (this.isHost) {
-          // Determine colors based on host preference
-          let hostColor = this.preferredColor;
-          if (hostColor === 'random') {
-            hostColor = (Math.random() < 0.5) ? 'w' : 'b';
-          }
-          const guestColor = (hostColor === 'w') ? 'b' : 'w';
-
-          this.assignedColor = hostColor;
-          this.opponentColor = guestColor;
-
-          // Send welcome handshake to Guest
-          this._send({
-            type: 'WELCOME',
-            payload: {
-              hostColor: hostColor,
-              guestColor: guestColor,
-              hostName: this.playerName
+          if (!isReconnect) {
+            // Determine colors based on host preference
+            let hostColor = this.preferredColor;
+            if (hostColor === 'random') {
+              hostColor = (Math.random() < 0.5) ? 'w' : 'b';
             }
-          });
+            const guestColor = (hostColor === 'w') ? 'b' : 'w';
 
-          this._onConnected();
-        } else {
-          // Guest sends initial HELLO handshake to Host
-          const sendHello = () => {
+            this.assignedColor = hostColor;
+            this.opponentColor = guestColor;
+
+            // Send welcome handshake to Guest
             this._send({
-              type: 'HELLO',
+              type: 'WELCOME',
               payload: {
-                guestName: this.playerName
+                hostColor: hostColor,
+                guestColor: guestColor,
+                hostName: this.playerName,
+                hostAvatar: this.playerAvatar,
+                hostId: this.playerId
               }
             });
+
+            this._onConnected();
+          }
+        } else {
+          // Guest sends handshake (HELLO or RECONNECT)
+          const sendHandshake = () => {
+            if (isReconnect || this.currentFen) {
+              this._send({
+                type: 'RECONNECT',
+                payload: {
+                  guestId: this.playerId,
+                  guestName: this.playerName,
+                  guestAvatar: this.playerAvatar,
+                  roomCode: this.roomCode,
+                  fen: this.currentFen,
+                  moveCount: this.currentHistory.length
+                }
+              });
+            } else {
+              this._send({
+                type: 'HELLO',
+                payload: {
+                  guestName: this.playerName,
+                  guestAvatar: this.playerAvatar,
+                  guestId: this.playerId
+                }
+              });
+            }
           };
 
-          sendHello();
+          sendHandshake();
 
-          // Resilient retry: keep sending HELLO every 500ms until WELCOME arrives
+          // Resilient retry: keep sending handshake until ACK arrives
           this._stopHandshakeTimer();
-          let helloCount = 0;
+          let count = 0;
           this._handshakeTimer = setInterval(() => {
-            if (this.status === 'connected' || helloCount >= 10) {
+            if (this.status === 'connected' || count >= 10) {
               this._stopHandshakeTimer();
               return;
             }
-            helloCount++;
-            sendHello();
+            count++;
+            sendHandshake();
           }, 500);
           if (this._handshakeTimer && typeof this._handshakeTimer.unref === 'function') {
             this._handshakeTimer.unref();
@@ -367,12 +450,12 @@
       });
 
       conn.on('close', () => {
-        this._onDisconnected('El rival se ha desconectado.');
+        this._handleConnectionDrop();
       });
 
       conn.on('error', (err) => {
         console.warn('PeerConnection Error:', err);
-        this._onDisconnected(err.message || 'Conexión perdida');
+        this._handleConnectionDrop(err.message);
       });
     }
 
@@ -382,17 +465,19 @@
       switch (msg.type) {
         case 'HELLO':
           if (this.isHost) {
-            if (msg.payload && msg.payload.guestName) {
-              this.opponentName = msg.payload.guestName;
-              this._emit('opponent_info', { name: this.opponentName });
+            if (msg.payload) {
+              if (msg.payload.guestName) this.opponentName = msg.payload.guestName;
+              if (msg.payload.guestAvatar) this.opponentAvatar = msg.payload.guestAvatar;
+              this._emit('opponent_info', { name: this.opponentName, avatar: this.opponentAvatar, id: msg.payload.guestId });
             }
-            // Always reply with WELCOME so guest is guaranteed to receive it
             this._send({
               type: 'WELCOME',
               payload: {
                 hostColor: this.assignedColor,
                 guestColor: this.opponentColor,
-                hostName: this.playerName
+                hostName: this.playerName,
+                hostAvatar: this.playerAvatar,
+                hostId: this.playerId
               }
             });
             this._onConnected();
@@ -405,12 +490,15 @@
             this.assignedColor = msg.payload.guestColor || 'b';
             this.opponentColor = msg.payload.hostColor || 'w';
             this.opponentName = msg.payload.hostName || 'Host';
+            this.opponentAvatar = msg.payload.hostAvatar || '👑';
 
             // Send acknowledgment back to Host
             this._send({
               type: 'WELCOME_ACK',
               payload: {
-                guestName: this.playerName
+                guestName: this.playerName,
+                guestAvatar: this.playerAvatar,
+                guestId: this.playerId
               }
             });
 
@@ -421,14 +509,69 @@
         case 'WELCOME_ACK':
           if (this.isHost) {
             this._stopHandshakeTimer();
-            if (msg.payload && msg.payload.guestName) {
-              this.opponentName = msg.payload.guestName;
+            if (msg.payload) {
+              if (msg.payload.guestName) this.opponentName = msg.payload.guestName;
+              if (msg.payload.guestAvatar) this.opponentAvatar = msg.payload.guestAvatar;
             }
             this._onConnected();
           }
           break;
 
+        case 'RECONNECT':
+          // Reconnection request from opponent
+          if (msg.payload) {
+            if (msg.payload.guestName) this.opponentName = msg.payload.guestName;
+            if (msg.payload.guestAvatar) this.opponentAvatar = msg.payload.guestAvatar;
+          }
+          // Reply with authoritative game state
+          this._send({
+            type: 'RECONNECT_ACK',
+            payload: {
+              hostName: this.isHost ? this.playerName : this.opponentName,
+              guestName: this.isHost ? this.opponentName : this.playerName,
+              hostAvatar: this.isHost ? this.playerAvatar : this.opponentAvatar,
+              guestAvatar: this.isHost ? this.opponentAvatar : this.playerAvatar,
+              assignedColor: this.opponentColor,
+              opponentColor: this.assignedColor,
+              fen: this.currentFen,
+              history: this.currentHistory,
+              turn: this.currentTurn
+            }
+          });
+          this._emit('reconnected', {
+            opponentName: this.opponentName,
+            opponentAvatar: this.opponentAvatar,
+            fen: this.currentFen,
+            history: this.currentHistory
+          });
+          this._onConnected();
+          break;
+
+        case 'RECONNECT_ACK':
+          this._stopHandshakeTimer();
+          if (msg.payload) {
+            this.assignedColor = msg.payload.assignedColor || this.assignedColor;
+            this.opponentColor = msg.payload.opponentColor || this.opponentColor;
+            this.opponentName = (this.isHost ? msg.payload.guestName : msg.payload.hostName) || this.opponentName;
+            this.opponentAvatar = (this.isHost ? msg.payload.guestAvatar : msg.payload.hostAvatar) || this.opponentAvatar;
+            if (msg.payload.fen) this.currentFen = msg.payload.fen;
+            if (msg.payload.history) this.currentHistory = msg.payload.history;
+            if (msg.payload.turn) this.currentTurn = msg.payload.turn;
+          }
+          this._emit('reconnected', {
+            opponentName: this.opponentName,
+            opponentAvatar: this.opponentAvatar,
+            fen: this.currentFen,
+            history: this.currentHistory,
+            turn: this.currentTurn
+          });
+          this._onConnected();
+          break;
+
         case 'MOVE':
+          if (msg.payload && msg.payload.fen) {
+            this.currentFen = msg.payload.fen;
+          }
           this._emit('move', msg.payload);
           break;
 
@@ -461,7 +604,6 @@
           break;
 
         case 'PING':
-          // Reply immediately with PONG
           this._send({ type: 'PONG', payload: { t: msg.payload?.t || Date.now() } });
           break;
 
@@ -478,6 +620,101 @@
       }
     }
 
+    _handleConnectionDrop(reason = 'Conexión perdida con el rival.') {
+      this._stopPingInterval();
+      this._stopHandshakeTimer();
+
+      if (this.status === 'connected') {
+        this.status = 'reconnecting';
+        this._reconnectAttempts = 0;
+        this._emit('reconnecting', {
+          attempt: 1,
+          maxAttempts: this._maxReconnectAttempts,
+          message: 'Conexión interrumpida con el rival. Intentando reconectar automáticamente...'
+        });
+        this._attemptAutoReconnect();
+      } else if (this.status !== 'reconnecting') {
+        this._onDisconnected(reason);
+      }
+    }
+
+    _attemptAutoReconnect() {
+      if (this._reconnectAttempts >= this._maxReconnectAttempts) {
+        this._onDisconnected('No se pudo restablecer la conexión con el rival.');
+        return;
+      }
+
+      this._reconnectAttempts++;
+      this._reconnectTimer = setTimeout(() => {
+        if (this.status === 'reconnecting' && this.roomCode) {
+          this._emit('reconnecting', {
+            attempt: this._reconnectAttempts,
+            maxAttempts: this._maxReconnectAttempts,
+            message: `Reconectando (intento ${this._reconnectAttempts}/${this._maxReconnectAttempts})...`
+          });
+          if (this.isHost) {
+            if (this.peer && !this.peer.destroyed) {
+              this.peer.reconnect();
+            }
+          } else {
+            const hostPeerId = roomCodeToPeerId(this.roomCode);
+            if (this.peer && !this.peer.destroyed) {
+              const conn = this.peer.connect(hostPeerId, { reliable: true, serialization: 'json' });
+              this._setupConnection(conn, true);
+            }
+          }
+        }
+      }, 2500);
+
+      if (this._reconnectTimer && typeof this._reconnectTimer.unref === 'function') {
+        this._reconnectTimer.unref();
+      }
+    }
+
+    _onConnected() {
+      this._stopHandshakeTimer();
+      if (this._reconnectTimer) {
+        clearTimeout(this._reconnectTimer);
+        this._reconnectTimer = null;
+      }
+      this._reconnectAttempts = 0;
+      this._setStatus('connected', `Conectado con ${this.opponentName}`);
+      this._startPingInterval();
+
+      this._emit('connected', {
+        roomCode: this.roomCode,
+        isHost: this.isHost,
+        assignedColor: this.assignedColor,
+        opponentColor: this.opponentColor,
+        opponentName: this.opponentName,
+        opponentAvatar: this.opponentAvatar
+      });
+    }
+
+    _onDisconnected(reason = 'Desconectado de la sala.') {
+      this._stopPingInterval();
+      this._stopHandshakeTimer();
+      if (this._reconnectTimer) {
+        clearTimeout(this._reconnectTimer);
+        this._reconnectTimer = null;
+      }
+      this._setStatus('disconnected', reason);
+      this._emit('disconnected', { reason, roomCode: this.roomCode });
+    }
+
+    _send(payload) {
+      if (this.conn && this.conn.open) {
+        try {
+          this.conn.send(payload);
+          return true;
+        } catch (err) {
+          console.warn('PeerChessClient send error:', err);
+          return false;
+        }
+      }
+      return false;
+    }
+
     _stopHandshakeTimer() {
       if (this._handshakeTimer) {
         clearInterval(this._handshakeTimer);
@@ -485,107 +722,37 @@
       }
     }
 
-    _onConnected() {
-      if (this.status === 'connected') return;
-      this._stopHandshakeTimer();
-      this._setStatus('connected', `Connected with ${this.opponentName}`);
-      this._startPingInterval();
-      this._emit('connected', {
-        isHost: this.isHost,
-        roomCode: this.roomCode,
-        assignedColor: this.assignedColor,
-        opponentColor: this.opponentColor,
-        opponentName: this.opponentName
-      });
-    }
-
-    _onDisconnected(reason = 'Disconnected') {
-      this._stopHandshakeTimer();
-      this._stopPingInterval();
-      const wasConnected = (this.status === 'connected');
-      this._setStatus('disconnected', reason);
-      if (wasConnected) {
-        this._emit('disconnected', { reason });
-      }
-    }
-
-    _send(messageObj) {
-      if (this.conn && this.conn.open) {
-        try {
-          messageObj.timestamp = Date.now();
-          this.conn.send(messageObj);
-          return true;
-        } catch (err) {
-          console.warn('Peer send error:', err);
-        }
-      }
-      return false;
-    }
-
-    /**
-     * Send chess move to opponent
-     */
     sendMove(moveData) {
-      return this._send({
-        type: 'MOVE',
-        payload: {
-          from: moveData.from,
-          to: moveData.to,
-          promotion: moveData.promotion || 'Q',
-          san: moveData.san || '',
-          fen: moveData.fen || ''
-        }
-      });
+      if (moveData && moveData.fen) {
+        this.currentFen = moveData.fen;
+      }
+      return this._send({ type: 'MOVE', payload: moveData });
     }
 
-    /**
-     * Send animated emoji reaction
-     */
-    sendEmoji(emojiChar) {
-      return this._send({
-        type: 'EMOJI',
-        payload: { emoji: emojiChar }
-      });
+    sendEmoji(emoji) {
+      return this._send({ type: 'EMOJI', payload: { emoji: emoji } });
     }
 
-    /**
-     * Offer draw to opponent
-     */
     sendDrawOffer() {
-      return this._send({ type: 'DRAW_OFFER', payload: {} });
+      return this._send({ type: 'DRAW_OFFER', payload: { color: this.assignedColor } });
     }
 
-    /**
-     * Respond to draw offer (accepted: true|false)
-     */
-    sendDrawResponse(accepted) {
+    sendDrawResponse(accepted = false) {
       return this._send({ type: 'DRAW_RESPONSE', payload: { accepted: !!accepted } });
     }
 
-    /**
-     * Request undo from opponent
-     */
     sendUndoRequest() {
-      return this._send({ type: 'UNDO_REQUEST', payload: {} });
+      return this._send({ type: 'UNDO_REQUEST', payload: { color: this.assignedColor } });
     }
 
-    /**
-     * Respond to undo request (accepted: true|false)
-     */
-    sendUndoResponse(accepted) {
+    sendUndoResponse(accepted = false) {
       return this._send({ type: 'UNDO_RESPONSE', payload: { accepted: !!accepted } });
     }
 
-    /**
-     * Notify opponent of resignation
-     */
     sendResign() {
       return this._send({ type: 'RESIGN', payload: { color: this.assignedColor } });
     }
 
-    /**
-     * Propose or accept rematch
-     */
     sendRematch(accepted = false) {
       return this._send({ type: 'REMATCH', payload: { accepted: !!accepted } });
     }
@@ -610,12 +777,13 @@
       }
     }
 
-    /**
-     * Leave current room and close connections
-     */
     leaveRoom() {
       this._stopHandshakeTimer();
       this._stopPingInterval();
+      if (this._reconnectTimer) {
+        clearTimeout(this._reconnectTimer);
+        this._reconnectTimer = null;
+      }
       if (this.conn) {
         try {
           this.conn.close();
@@ -628,35 +796,33 @@
         } catch (e) {}
         this.peer = null;
       }
-      this.isHost = false;
-      this.roomCode = null;
-      this.peerId = null;
       this.status = 'disconnected';
-      this.pingMs = 0;
-      this._setStatus('disconnected', 'Left room');
     }
 
-    /**
-     * Check if currently connected in a live room
-     */
     isConnected() {
-      return (this.status === 'connected' && this.conn && this.conn.open);
+      return this.status === 'connected' && this.conn && this.conn.open;
     }
   }
 
-  // Helper static utilities
+  // Static Helpers
   PeerChessClient.generateRoomCode = generateRoomCode;
   PeerChessClient.sanitizeRoomCode = sanitizeRoomCode;
-  PeerChessClient.getShareableLink = getShareableLink;
   PeerChessClient.roomCodeToPeerId = roomCodeToPeerId;
   PeerChessClient.peerIdToRoomCode = peerIdToRoomCode;
+  PeerChessClient.getShareableLink = getShareableLink;
 
-  // Export to global window and module exports
+  // Export
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { PeerChessClient, generateRoomCode, sanitizeRoomCode, getShareableLink, roomCodeToPeerId, peerIdToRoomCode };
+    module.exports = {
+      PeerChessClient,
+      generateRoomCode,
+      sanitizeRoomCode,
+      roomCodeToPeerId,
+      peerIdToRoomCode,
+      getShareableLink
+    };
   }
-  if (typeof global !== 'undefined') {
-    global.PeerChessClient = PeerChessClient;
+  if (typeof window !== 'undefined') {
+    window.PeerChessClient = PeerChessClient;
   }
-
-})(typeof window !== 'undefined' ? window : global);
+})(typeof window !== 'undefined' ? window : globalThis);

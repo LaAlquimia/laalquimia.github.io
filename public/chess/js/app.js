@@ -25,8 +25,11 @@
         workerPath: './stockfish.js',
         onError: (err) => console.warn('AI Engine notice:', err)
       });
-      this.audio = ChessAudio;
-      this.pieces = ChessPieces;
+      this.audio = (typeof ChessAudio !== 'undefined') ? ChessAudio : null;
+      this.pieces = (typeof ChessPieces !== 'undefined') ? ChessPieces : null;
+      this.profileManager = (typeof global.playerProfile !== 'undefined')
+        ? global.playerProfile
+        : ((typeof PlayerProfileManager !== 'undefined') ? new PlayerProfileManager() : null);
 
       // 2. Application State & Settings
       this.settings = this._loadSettings();
@@ -67,6 +70,9 @@
 
       // 8. Online Multiplayer P2P Client Init
       this._initPeerClient();
+
+      // 9. Active online session reconnection banner check
+      this.checkActiveOnlineSessionBanner();
 
       // 9. Check URL query parameter ?room=XXXX
       if (typeof window !== 'undefined' && window.location) {
@@ -270,8 +276,9 @@
         gameOverReason: document.getElementById('gameover-reason'),
         gameOverIcon: document.getElementById('gameover-icon'),
 
-        // Header and Dock buttons
+        // Header, Sidebar, and Dock buttons
         btnHeaderOnline: document.getElementById('btn-header-online'),
+        btnHeaderProfile: document.getElementById('btn-header-profile'),
         btnHeaderSettings: document.getElementById('btn-header-settings'),
         btnHeaderFlip: document.getElementById('btn-header-flip'),
         btnHeaderNewGame: document.getElementById('btn-header-newgame'),
@@ -283,11 +290,41 @@
         btnDockDraw: document.getElementById('btn-dock-draw'),
         btnDockResign: document.getElementById('btn-dock-resign'),
         btnDockOnline: document.getElementById('btn-dock-online'),
+        btnDockProfile: document.getElementById('btn-dock-profile'),
         btnDockUndo: document.getElementById('btn-dock-undo'),
         btnDockNewGame: document.getElementById('btn-dock-newgame'),
         btnDockFlip: document.getElementById('btn-dock-flip'),
         btnDockSettings: document.getElementById('btn-dock-settings'),
         btnDockHint: document.getElementById('btn-dock-hint'),
+
+        // Profile & Active Rooms Elements
+        modalProfile: document.getElementById('modal-profile'),
+        btnSidebarProfile: document.getElementById('btn-sidebar-profile'),
+        profileCurrentAvatar: document.getElementById('profile-current-avatar'),
+        btnChangeAvatar: document.getElementById('btn-change-avatar'),
+        avatarPickerGrid: document.getElementById('avatar-picker-grid'),
+        profileNameInput: document.getElementById('profile-name-input'),
+        btnSaveProfileName: document.getElementById('btn-save-profile-name'),
+        profileIdBadge: document.getElementById('profile-id-badge'),
+        btnCopyPlayerId: document.getElementById('btn-copy-player-id'),
+        statWins: document.getElementById('stat-wins'),
+        statLosses: document.getElementById('stat-losses'),
+        statDraws: document.getElementById('stat-draws'),
+        statTotal: document.getElementById('stat-total'),
+        tabBtnActiveRooms: document.getElementById('tab-btn-active-rooms'),
+        tabBtnMatchHistory: document.getElementById('tab-btn-match-history'),
+        tabPaneActiveRooms: document.getElementById('tab-pane-active-rooms'),
+        tabPaneMatchHistory: document.getElementById('tab-pane-match-history'),
+        activeRoomsCount: document.getElementById('active-rooms-count'),
+        activeRoomsList: document.getElementById('active-rooms-list'),
+        matchHistoryCount: document.getElementById('match-history-count'),
+        matchHistoryList: document.getElementById('match-history-list'),
+
+        // Floating Reconnect Banner
+        onlineReconnectBanner: document.getElementById('online-reconnect-banner'),
+        reconnectBannerDetails: document.getElementById('reconnect-banner-details'),
+        btnReconnectResume: document.getElementById('btn-reconnect-resume'),
+        btnReconnectDismiss: document.getElementById('btn-reconnect-dismiss'),
 
         // Online P2P Elements
         onlineStatusHud: document.getElementById('online-status-hud'),
@@ -493,20 +530,35 @@
       // Face-to-Face Tabletop mode check (Strictly PvP mode only)
       const isFaceToFace = (this.mode === 'pvp') && (this.settings.faceToFace !== false);
 
+      const myProfile = this.profileManager ? this.profileManager.getProfile() : null;
+      const myName = myProfile?.playerName || 'You';
+      const myAvatar = myProfile?.avatar || '🧙‍♂️';
+
       // Top Player Data
       const topIsActive = (turn === topColor);
       let topName = 'Player 2';
-      let bottomName = 'Player 1';
+      let bottomName = myName;
+      let topAvatarContent = `${topColor === 'w' ? '♔' : '♚'}`;
+      let bottomAvatarContent = `<span style="font-size: 1.35rem; line-height: 1;">${myAvatar}</span>`;
 
       if (this.mode === 'ai') {
-        topName = (topColor === this.playerColor ? 'You' : `Stockfish (${DIFFICULTY_MAP[this.difficulty]?.name || 'AI'})`);
-        bottomName = (bottomColor === this.playerColor ? 'You' : `Stockfish (${DIFFICULTY_MAP[this.difficulty]?.name || 'AI'})`);
+        topName = (topColor === this.playerColor ? myName : `Stockfish (${DIFFICULTY_MAP[this.difficulty]?.name || 'IA'})`);
+        bottomName = (bottomColor === this.playerColor ? myName : `Stockfish (${DIFFICULTY_MAP[this.difficulty]?.name || 'IA'})`);
+        if (topColor !== this.playerColor) {
+          topAvatarContent = `<span style="font-size: 1.35rem; line-height: 1;">🤖</span>`;
+        }
       } else if (this.mode === 'online') {
-        topName = (topColor === this.playerColor ? 'Tú (Local)' : (this.peerClient?.opponentName || 'Rival Online'));
-        bottomName = (bottomColor === this.playerColor ? 'Tú (Local)' : (this.peerClient?.opponentName || 'Rival Online'));
+        const rivalName = this.peerClient?.opponentName || 'Rival Online';
+        const rivalAvatar = this.peerClient?.opponentAvatar || '♟️';
+        topName = (topColor === this.playerColor ? myName : rivalName);
+        bottomName = (bottomColor === this.playerColor ? myName : rivalName);
+        if (topColor !== this.playerColor) {
+          topAvatarContent = `<span style="font-size: 1.35rem; line-height: 1;">${rivalAvatar}</span>`;
+        }
       } else {
-        topName = (topColor === 'w' ? 'White (Player 1)' : 'Black (Player 2)');
-        bottomName = (bottomColor === 'w' ? 'White (Player 1)' : 'Black (Player 2)');
+        topName = (topColor === 'w' ? 'Blancas (Jugador 1)' : 'Negras (Jugador 2)');
+        bottomName = (bottomColor === 'w' ? 'Blancas (Jugador 1)' : 'Negras (Jugador 2)');
+        bottomAvatarContent = `${bottomColor === 'w' ? '♔' : '♚'}`;
       }
 
       if (this.dom.topPlayerBar) {
@@ -518,7 +570,7 @@
       }
       if (this.dom.topPlayerAvatar) {
         this.dom.topPlayerAvatar.className = `player-avatar avatar-${topColor === 'w' ? 'white' : 'black'}`;
-        this.dom.topPlayerAvatar.innerHTML = `${topColor === 'w' ? '♔' : '♚'}<span class="turn-glow-dot"></span>`;
+        this.dom.topPlayerAvatar.innerHTML = `${topAvatarContent}<span class="turn-glow-dot"></span>`;
       }
       if (this.dom.topPlayerStatus) {
         if (this.isAiThinking && topColor !== this.playerColor) {
@@ -539,7 +591,7 @@
       }
       if (this.dom.bottomPlayerAvatar) {
         this.dom.bottomPlayerAvatar.className = `player-avatar avatar-${bottomColor === 'w' ? 'white' : 'black'}`;
-        this.dom.bottomPlayerAvatar.innerHTML = `${bottomColor === 'w' ? '♔' : '♚'}<span class="turn-glow-dot"></span>`;
+        this.dom.bottomPlayerAvatar.innerHTML = `${bottomAvatarContent}<span class="turn-glow-dot"></span>`;
       }
       if (this.dom.bottomPlayerStatus) {
         if (this.isAiThinking && bottomColor !== this.playerColor) {
@@ -673,6 +725,7 @@
       this._setupBoardInteractions();
 
       // 2. Header Action Buttons
+      if (this.dom.btnHeaderProfile) this.dom.btnHeaderProfile.addEventListener('click', () => this.openProfileModal());
       if (this.dom.btnHeaderHint) this.dom.btnHeaderHint.addEventListener('click', () => this.requestAssistedHint(true));
       if (this.dom.btnHeaderOnline) this.dom.btnHeaderOnline.addEventListener('click', () => this.openOnlineModal('create'));
       if (this.dom.btnHeaderSettings) this.dom.btnHeaderSettings.addEventListener('click', () => this.openSettingsModal());
@@ -683,6 +736,7 @@
       if (this.dom.btnHeaderTabletop) this.dom.btnHeaderTabletop.addEventListener('click', () => this.toggleFaceToFace());
 
       // 3. Mobile Bottom Dock
+      if (this.dom.btnDockProfile) this.dom.btnDockProfile.addEventListener('click', () => this.openProfileModal());
       if (this.dom.btnDockHint) this.dom.btnDockHint.addEventListener('click', () => this.requestAssistedHint(true));
       if (this.dom.btnDockDraw) this.dom.btnDockDraw.addEventListener('click', () => this.handleOfferDraw());
       if (this.dom.btnDockResign) this.dom.btnDockResign.addEventListener('click', () => this.handleResign());
@@ -691,6 +745,57 @@
       if (this.dom.btnDockNewGame) this.dom.btnDockNewGame.addEventListener('click', () => this.restartGame());
       if (this.dom.btnDockFlip) this.dom.btnDockFlip.addEventListener('click', () => this.flipBoard());
       if (this.dom.btnDockSettings) this.dom.btnDockSettings.addEventListener('click', () => this.openSettingsModal());
+
+      // Profile Triggers on Player Bar
+      if (this.dom.bottomPlayerAvatar) {
+        this.dom.bottomPlayerAvatar.addEventListener('click', () => this.openProfileModal());
+      }
+      if (this.dom.bottomPlayerName) {
+        this.dom.bottomPlayerName.addEventListener('click', () => this.openProfileModal());
+      }
+      if (this.dom.btnSidebarProfile) {
+        this.dom.btnSidebarProfile.addEventListener('click', () => this.openProfileModal());
+      }
+
+      // Profile Modal Listeners
+      if (this.dom.tabBtnActiveRooms && this.dom.tabBtnMatchHistory) {
+        this.dom.tabBtnActiveRooms.addEventListener('click', () => this.switchProfileTab('rooms'));
+        this.dom.tabBtnMatchHistory.addEventListener('click', () => this.switchProfileTab('history'));
+      }
+      const toggleAvatarDrawer = () => {
+        if (this.dom.avatarPickerGrid) {
+          const isHidden = this.dom.avatarPickerGrid.style.display === 'none';
+          this.dom.avatarPickerGrid.style.display = isHidden ? 'grid' : 'none';
+          if (isHidden) this.renderAvatarPicker();
+        }
+      };
+      if (this.dom.btnChangeAvatar) this.dom.btnChangeAvatar.addEventListener('click', toggleAvatarDrawer);
+      if (this.dom.profileCurrentAvatar) this.dom.profileCurrentAvatar.addEventListener('click', toggleAvatarDrawer);
+      if (this.dom.btnSaveProfileName) this.dom.btnSaveProfileName.addEventListener('click', () => this.saveProfileName());
+      if (this.dom.profileNameInput) {
+        this.dom.profileNameInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') this.saveProfileName();
+        });
+      }
+      if (this.dom.btnCopyPlayerId) {
+        this.dom.btnCopyPlayerId.addEventListener('click', () => this.copyPlayerId());
+      }
+
+      // Reconnect Banner Buttons
+      if (this.dom.btnReconnectResume) {
+        this.dom.btnReconnectResume.addEventListener('click', () => {
+          const session = this.profileManager ? this.profileManager.getActiveSession() : null;
+          if (session && session.roomCode) {
+            this.resumeOnlineRoom(session.roomCode);
+          }
+        });
+      }
+      if (this.dom.btnReconnectDismiss) {
+        this.dom.btnReconnectDismiss.addEventListener('click', () => {
+          if (this.dom.onlineReconnectBanner) this.dom.onlineReconnectBanner.style.display = 'none';
+          if (this.profileManager) this.profileManager.clearActiveSession();
+        });
+      }
 
       // 4. Online Modal Event Listeners
       if (this.dom.tabBtnCreate) this.dom.tabBtnCreate.addEventListener('click', () => this.switchOnlineTab('create'));
@@ -1214,6 +1319,24 @@
           san: moveResult.san,
           fen: this.game.getFEN()
         });
+      }
+
+      // Save game state in active online room if in online mode
+      if (this.mode === 'online' && this.peerClient && this.peerClient.roomCode && this.profileManager) {
+        this.profileManager.saveActiveRoom({
+          roomCode: this.peerClient.roomCode,
+          role: this.peerClient.isHost ? 'host' : 'guest',
+          assignedColor: this.playerColor,
+          opponentName: this.peerClient.opponentName || 'Rival Online',
+          opponentAvatar: this.peerClient.opponentAvatar || '♟️',
+          fen: this.game.getFEN(),
+          moveHistory: this.game.getHistory().map(h => h.san || h.move),
+          turn: this.game.getTurn(),
+          status: 'active'
+        });
+        if (typeof this.peerClient.updateGameState === 'function') {
+          this.peerClient.updateGameState(this.game.getFEN(), this.game.getHistory(), this.game.getTurn());
+        }
       }
 
       // Update Last Move
@@ -1858,7 +1981,13 @@
     _initPeerClient() {
       if (typeof PeerChessClient === 'undefined') return;
 
-      this.peerClient = new PeerChessClient({ playerName: 'Jugador' });
+      const myProfile = this.profileManager ? this.profileManager.getProfile() : { playerId: 'usr_anon', playerName: 'Alquimista', avatar: '🧙‍♂️' };
+
+      this.peerClient = new PeerChessClient({
+        playerId: myProfile.playerId,
+        playerName: myProfile.playerName,
+        playerAvatar: myProfile.avatar
+      });
 
       this.peerClient.on('status', (info) => {
         this._updateOnlineStatusHUD(info);
@@ -1868,16 +1997,54 @@
         this.setGameMode('online', false);
         this.playerColor = info.assignedColor;
         this.boardFlipped = (this.playerColor === 'b');
-        this.game.resetGame();
         this.evalScore = 0.0;
         this.lastMove = null;
         this.selectedSquare = null;
         this.legalMovesForSelected = [];
         this.render();
 
-        // Close online modal
+        // Save active online room in profile
+        if (this.profileManager && info.roomCode) {
+          this.profileManager.saveActiveRoom({
+            roomCode: info.roomCode,
+            role: info.isHost ? 'host' : 'guest',
+            assignedColor: this.playerColor,
+            opponentName: info.opponentName || 'Rival Online',
+            opponentAvatar: info.opponentAvatar || '♟️',
+            fen: this.game.getFEN(),
+            moveHistory: [],
+            turn: this.game.getTurn(),
+            status: 'active'
+          });
+        }
+
+        // Close online & profile modals & dismiss banner
         if (this.dom.modalOnline) this.dom.modalOnline.classList.remove('open');
-        this.showToast(`¡Conectado! Juegas con ${this.playerColor === 'w' ? 'Blancas ♔' : 'Negras ♚'}`, 'success');
+        if (this.dom.modalProfile) this.dom.modalProfile.classList.remove('open');
+        if (this.dom.onlineReconnectBanner) this.dom.onlineReconnectBanner.style.display = 'none';
+
+        this.showToast(`¡Conectado con ${info.opponentName || 'rival'}! Juegas con ${this.playerColor === 'w' ? 'Blancas ♔' : 'Negras ♚'}`, 'success');
+      });
+
+      this.peerClient.on('reconnecting', (info) => {
+        this.showToast(info.message || 'Intentando reconectar con el rival...', 'info');
+        this._updateOnlineStatusHUD({ status: 'waiting', message: `Reconectando (${info.attempt}/${info.maxAttempts})` });
+      });
+
+      this.peerClient.on('reconnected', (data) => {
+        this.setGameMode('online', false);
+        if (data.opponentName) this.peerClient.opponentName = data.opponentName;
+        if (data.opponentAvatar) this.peerClient.opponentAvatar = data.opponentAvatar;
+        if (data.fen) {
+          this.game.loadFEN(data.fen);
+        }
+        this.playerColor = this.peerClient.assignedColor;
+        this.boardFlipped = (this.playerColor === 'b');
+        this.render();
+        this.recalculateEvaluation();
+        this.showToast(`¡Reconectado con éxito! Partida vs ${this.peerClient.opponentName} reanudada.`, 'success');
+        if (this.dom.modalProfile) this.dom.modalProfile.classList.remove('open');
+        if (this.dom.onlineReconnectBanner) this.dom.onlineReconnectBanner.style.display = 'none';
       });
 
       this.peerClient.on('disconnected', (info) => {
@@ -1892,7 +2059,7 @@
       this.peerClient.on('emoji', (data) => {
         if (data && data.emoji) {
           this.showFloatingEmoji(data.emoji);
-          this.audio.play('move');
+          if (this.audio && this.audio.play) this.audio.play('move');
         }
       });
 
@@ -2044,11 +2211,28 @@
       if (this.dom.btnCreateRoom) this.dom.btnCreateRoom.disabled = true;
       if (this.dom.hostRoomDetails) this.dom.hostRoomDetails.style.display = 'none';
 
-      this.peerClient.createRoom({ preferredColor })
+      const myProfile = this.profileManager ? this.profileManager.getProfile() : {};
+      this.peerClient.createRoom({
+        preferredColor,
+        playerName: myProfile.playerName || 'Alquimista',
+        playerAvatar: myProfile.avatar || '🧙‍♂️',
+        playerId: myProfile.playerId
+      })
         .then(result => {
           if (this.dom.btnCreateRoom) this.dom.btnCreateRoom.disabled = false;
           if (this.dom.hostRoomCode) this.dom.hostRoomCode.textContent = result.roomCode;
           if (this.dom.hostRoomDetails) this.dom.hostRoomDetails.style.display = 'flex';
+
+          if (this.profileManager) {
+            this.profileManager.saveActiveRoom({
+              roomCode: result.roomCode,
+              role: 'host',
+              assignedColor: (preferredColor === 'b' ? 'b' : 'w'),
+              opponentName: 'Esperando rival...',
+              fen: this.game.getFEN(),
+              status: 'waiting'
+            });
+          }
 
           // Generate QR code
           if (this.dom.onlineQrcodeContainer && typeof QRCode !== 'undefined') {
@@ -2082,7 +2266,12 @@
       if (this.dom.joinStatusContainer) this.dom.joinStatusContainer.style.display = 'block';
       if (this.dom.btnJoinRoom) this.dom.btnJoinRoom.disabled = true;
 
-      this.peerClient.joinRoom(sanitized)
+      const myProfile = this.profileManager ? this.profileManager.getProfile() : {};
+      this.peerClient.joinRoom(sanitized, {
+        playerName: myProfile.playerName || 'Alquimista',
+        playerAvatar: myProfile.avatar || '🧙‍♂️',
+        playerId: myProfile.playerId
+      })
         .then(() => {
           if (this.dom.btnJoinRoom) this.dom.btnJoinRoom.disabled = false;
           if (this.dom.joinStatusContainer) this.dom.joinStatusContainer.style.display = 'none';
@@ -2110,6 +2299,267 @@
         this.dom.tabPaneCreate.classList.toggle('active', tab === 'create');
         this.dom.tabPaneJoin.classList.toggle('active', tab === 'join');
       }
+    }
+
+    /* --------------------------------------------------------------------------
+       PROFILE & ACTIVE ROOMS MANAGEMENT
+       -------------------------------------------------------------------------- */
+    openProfileModal(tab = 'rooms') {
+      if (!this.dom.modalProfile) return;
+      this.renderProfileModal();
+      this.switchProfileTab(tab);
+      this.dom.modalProfile.classList.add('open');
+    }
+
+    renderProfileModal() {
+      if (!this.profileManager) return;
+      const profile = this.profileManager.getProfile();
+
+      if (this.dom.profileCurrentAvatar) this.dom.profileCurrentAvatar.textContent = profile.avatar;
+      if (this.dom.profileNameInput) this.dom.profileNameInput.value = profile.playerName;
+      if (this.dom.profileIdBadge) this.dom.profileIdBadge.textContent = `ID: ${profile.playerId}`;
+
+      const stats = profile.stats || { wins: 0, losses: 0, draws: 0, totalGames: 0 };
+      if (this.dom.statWins) this.dom.statWins.textContent = stats.wins;
+      if (this.dom.statLosses) this.dom.statLosses.textContent = stats.losses;
+      if (this.dom.statDraws) this.dom.statDraws.textContent = stats.draws;
+      if (this.dom.statTotal) this.dom.statTotal.textContent = stats.totalGames;
+
+      this.renderActiveRoomsList();
+      this.renderMatchHistoryList();
+    }
+
+    renderAvatarPicker() {
+      if (!this.dom.avatarPickerGrid || !this.profileManager) return;
+      const current = this.profileManager.getProfile().avatar;
+      const avatars = (typeof DEFAULT_AVATARS !== 'undefined') ? DEFAULT_AVATARS : ['🧙‍♂️', '👑', '⚔️', '♟️', '🐉', '⚡', '🦅', '🐺', '🦁', '🛡️', '🔥', '🏆', '🎩', '🤖', '🦊', '🦄'];
+      
+      this.dom.avatarPickerGrid.innerHTML = '';
+      avatars.forEach(av => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = `avatar-picker-item ${av === current ? 'active' : ''}`;
+        item.textContent = av;
+        item.addEventListener('click', () => {
+          this.selectAvatar(av);
+          if (this.dom.avatarPickerGrid) this.dom.avatarPickerGrid.style.display = 'none';
+        });
+        this.dom.avatarPickerGrid.appendChild(item);
+      });
+    }
+
+    selectAvatar(newAvatar) {
+      if (!this.profileManager) return;
+      this.profileManager.updateIdentity(null, newAvatar);
+      if (this.peerClient) this.peerClient.playerAvatar = newAvatar;
+      this.renderProfileModal();
+      this.render();
+      this.showToast(`Avatar actualizado: ${newAvatar}`, 'success');
+    }
+
+    saveProfileName(customName) {
+      if (!this.profileManager) return;
+      const newName = (typeof customName === 'string')
+        ? customName.trim()
+        : (this.dom.profileNameInput ? this.dom.profileNameInput.value.trim() : '');
+      if (!newName) {
+        this.showToast('Ingresa un nombre válido.', 'error');
+        return;
+      }
+      this.profileManager.updateIdentity(newName, null);
+      if (this.peerClient) this.peerClient.playerName = newName;
+      this.renderProfileModal();
+      this.render();
+      this.showToast(`Nombre guardado: "${newName}"`, 'success');
+    }
+
+    copyPlayerId() {
+      if (!this.profileManager) return;
+      const id = this.profileManager.getProfile().playerId;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(id).then(() => {
+          this.showToast(`ID copiado: ${id} 📋`, 'info');
+        });
+      } else {
+        this.showToast(`ID: ${id}`, 'info');
+      }
+    }
+
+    switchProfileTab(tab = 'rooms') {
+      if (this.dom.tabBtnActiveRooms && this.dom.tabBtnMatchHistory) {
+        this.dom.tabBtnActiveRooms.classList.toggle('active', tab === 'rooms');
+        this.dom.tabBtnMatchHistory.classList.toggle('active', tab === 'history');
+      }
+      if (this.dom.tabPaneActiveRooms && this.dom.tabPaneMatchHistory) {
+        this.dom.tabPaneActiveRooms.classList.toggle('active', tab === 'rooms');
+        this.dom.tabPaneMatchHistory.classList.toggle('active', tab === 'history');
+      }
+    }
+
+    renderActiveRoomsList() {
+      if (!this.dom.activeRoomsList || !this.profileManager) return;
+      const rooms = this.profileManager.getActiveRooms();
+      if (this.dom.activeRoomsCount) this.dom.activeRoomsCount.textContent = rooms.length;
+
+      this.dom.activeRoomsList.innerHTML = '';
+      if (rooms.length === 0) {
+        this.dom.activeRoomsList.innerHTML = `
+          <div class="empty-rooms-placeholder">
+            <span>♟️</span>
+            No tienes salas online activas.<br>
+            ¡Crea o únete a una partida para jugar con amigos!
+          </div>
+        `;
+        return;
+      }
+
+      rooms.forEach(room => {
+        const card = document.createElement('div');
+        card.className = 'active-room-card';
+        const isWhite = room.assignedColor === 'w';
+        const colorLabel = isWhite ? 'Blancas ♔' : 'Negras ♚';
+        const roleLabel = room.role === 'host' ? 'Anfitrión' : 'Invitado';
+        const timeAgo = this._formatTimeAgo(room.lastActivity || room.createdAt);
+
+        card.innerHTML = `
+          <div class="room-card-info">
+            <div class="room-card-header">
+              <span class="room-code-tag">Sala ${room.roomCode}</span>
+              <span class="room-side-tag">${colorLabel} (${roleLabel})</span>
+            </div>
+            <div class="room-opponent-text">${room.opponentAvatar || '♟️'} ${room.opponentName || 'Rival Online'}</div>
+            <div class="room-time-text">Última actividad: ${timeAgo}</div>
+          </div>
+          <div class="room-card-actions">
+            <button class="btn-resume-room" title="Reanudar y reconectar">▶️ Reanudar</button>
+            <button class="btn-abandon-room" title="Abandonar sala">🗑️</button>
+          </div>
+        `;
+
+        card.querySelector('.btn-resume-room').addEventListener('click', () => {
+          this.resumeOnlineRoom(room.roomCode);
+        });
+        card.querySelector('.btn-abandon-room').addEventListener('click', () => {
+          this.abandonOnlineRoom(room.roomCode);
+        });
+
+        this.dom.activeRoomsList.appendChild(card);
+      });
+    }
+
+    renderMatchHistoryList() {
+      if (!this.dom.matchHistoryList || !this.profileManager) return;
+      const history = this.profileManager.getHistory();
+      if (this.dom.matchHistoryCount) this.dom.matchHistoryCount.textContent = history.length;
+
+      this.dom.matchHistoryList.innerHTML = '';
+      if (history.length === 0) {
+        this.dom.matchHistoryList.innerHTML = `
+          <div class="empty-rooms-placeholder">
+            <span>📜</span>
+            No hay partidas registradas todavía.<br>
+            ¡Tus partidas terminadas aparecerán aquí!
+          </div>
+        `;
+        return;
+      }
+
+      history.forEach(m => {
+        const item = document.createElement('div');
+        item.className = 'match-history-item';
+        const resClass = m.result === 'win' ? 'win' : (m.result === 'loss' ? 'loss' : 'draw');
+        const resText = m.result === 'win' ? 'Victoria 🏆' : (m.result === 'loss' ? 'Derrota 🏳️' : 'Tablas 🤝');
+
+        item.innerHTML = `
+          <div class="match-item-left">
+            <span class="match-result-badge ${resClass}">${resText}</span>
+            <div class="match-meta-details">
+              <span class="match-meta-title">vs ${m.opponentName || 'Rival'} (${m.myColor === 'w' ? 'Blancas' : 'Negras'})</span>
+              <span class="match-meta-sub">${m.reason || 'Concluida'} • ${m.movesCount || 0} jugadas • ${m.date || ''}</span>
+            </div>
+          </div>
+          <button class="btn-copy-id" title="Copiar FEN" style="padding: 6px 8px; font-size: 0.9rem;">📋</button>
+        `;
+
+        item.querySelector('.btn-copy-id').addEventListener('click', () => {
+          if (m.fen && navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(m.fen).then(() => this.showToast('FEN de la partida copiado 📋', 'info'));
+          }
+        });
+
+        this.dom.matchHistoryList.appendChild(item);
+      });
+    }
+
+    resumeOnlineRoom(roomCode) {
+      if (!this.profileManager) return;
+      const rooms = this.profileManager.getActiveRooms();
+      const target = rooms.find(r => r.roomCode === roomCode) || this.profileManager.getActiveSession();
+      if (!target) {
+        this.showToast('Sala no encontrada en tus registros.', 'error');
+        return;
+      }
+
+      if (target.fen) {
+        this.game.loadFEN(target.fen);
+      }
+      this.playerColor = target.assignedColor || 'w';
+      this.boardFlipped = (this.playerColor === 'b');
+      this.setGameMode('online', false);
+      this.render();
+
+      if (this.dom.modalProfile) this.dom.modalProfile.classList.remove('open');
+      if (this.dom.onlineReconnectBanner) this.dom.onlineReconnectBanner.style.display = 'none';
+
+      if (this.peerClient && typeof this.peerClient.resumeRoom === 'function') {
+        this.peerClient.resumeRoom(roomCode, target)
+          .then(() => {
+            this.showToast(`Reconectando a sala ${roomCode}...`, 'info');
+          })
+          .catch(err => {
+            this.showToast(`Error al reanudar: ${err.message}`, 'error');
+          });
+      }
+    }
+
+    abandonOnlineRoom(roomCode) {
+      if (!this.profileManager) return;
+      this.profileManager.removeActiveRoom(roomCode);
+      if (!this.peerClient || this.peerClient.roomCode === roomCode || this.mode === 'online') {
+        if (this.peerClient && typeof this.peerClient.leaveRoom === 'function') {
+          this.peerClient.leaveRoom();
+        }
+        this.setGameMode('ai', false);
+      }
+      this.renderActiveRoomsList();
+      this.checkActiveOnlineSessionBanner();
+      this.showToast(`Sala ${roomCode} eliminada.`, 'info');
+    }
+
+    checkActiveOnlineSessionBanner() {
+      if (!this.dom.onlineReconnectBanner || !this.profileManager) return;
+      const session = this.profileManager.getActiveSession();
+      if (session && session.roomCode && this.mode !== 'online') {
+        const colorText = session.assignedColor === 'w' ? 'Blancas ♔' : 'Negras ♚';
+        if (this.dom.reconnectBannerDetails) {
+          this.dom.reconnectBannerDetails.textContent = `Sala ${session.roomCode} vs ${session.opponentName || 'Rival'} (${colorText})`;
+        }
+        this.dom.onlineReconnectBanner.style.display = 'flex';
+      } else {
+        this.dom.onlineReconnectBanner.style.display = 'none';
+      }
+    }
+
+    _formatTimeAgo(timestamp) {
+      if (!timestamp) return 'Reciente';
+      const diffMs = Date.now() - timestamp;
+      const mins = Math.floor(diffMs / 60000);
+      if (mins < 1) return 'Hace un momento';
+      if (mins < 60) return `Hace ${mins} min`;
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return `Hace ${hours} h`;
+      const days = Math.floor(hours / 24);
+      return `Hace ${days} d`;
     }
 
     showFloatingEmoji(emoji) {
@@ -2192,6 +2642,26 @@
         title = 'Draw by Repetition';
         reason = 'The exact position occurred 3 times.';
         icon = '🔄';
+      }
+
+      // Record in profile stats and history
+      if (this.profileManager) {
+        let outcome = 'draw';
+        if (state.isCheckmate) {
+          outcome = (state.turn === this.playerColor) ? 'loss' : 'win';
+        }
+        this.profileManager.recordMatch({
+          roomCode: this.peerClient?.roomCode || null,
+          mode: this.mode,
+          opponentName: (this.mode === 'ai') ? `Stockfish (${this.difficulty})` : (this.peerClient?.opponentName || 'Rival'),
+          opponentAvatar: (this.mode === 'ai') ? '🤖' : (this.peerClient?.opponentAvatar || '♟️'),
+          myColor: this.playerColor,
+          result: outcome,
+          reason: reason,
+          movesCount: this.game.getHistory().length,
+          fen: this.game.getFEN()
+        });
+        this.checkActiveOnlineSessionBanner();
       }
 
       this.showGameOverModalCustom(title, reason, icon);
