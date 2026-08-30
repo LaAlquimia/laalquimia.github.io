@@ -110,7 +110,8 @@
         playerColor: 'w',
         onlineSide: 'random',
         faceToFace: true,
-        assistedMode: false
+        assistedMode: false,
+        showHintButton: false
       };
 
       // Check URL query parameters for mode preset (e.g., pvp.html or ?mode=pvp)
@@ -230,6 +231,27 @@
       }
       if (this.dom.btnHeaderHint) {
         this.dom.btnHeaderHint.classList.toggle('active', !!this.settings.assistedMode);
+      }
+
+      // Show Hint Button Toggle & Visibility
+      const showHintToggle = document.getElementById('setting-show-hint-button');
+      if (showHintToggle) {
+        showHintToggle.checked = !!this.settings.showHintButton;
+      }
+      this._syncHintButtonsVisibility();
+    }
+
+    _syncHintButtonsVisibility() {
+      const show = !!this.settings.showHintButton;
+      const displayVal = show ? '' : 'none';
+      if (this.dom.btnHeaderHint) {
+        this.dom.btnHeaderHint.style.display = displayVal;
+      }
+      if (this.dom.btnDockHint) {
+        this.dom.btnDockHint.style.display = displayVal;
+      }
+      if (this.dom.btnSidebarHint) {
+        this.dom.btnSidebarHint.style.display = displayVal;
       }
     }
 
@@ -359,6 +381,10 @@
         btnSidebarResign: document.getElementById('btn-sidebar-resign'),
         btnSidebarDraw: document.getElementById('btn-sidebar-draw'),
         btnSidebarHint: document.getElementById('btn-sidebar-hint'),
+
+        // Settings controls
+        settingAssistedMode: document.getElementById('setting-assisted-mode'),
+        settingShowHintButton: document.getElementById('setting-show-hint-button'),
 
         // Toast Container
         toastContainer: document.getElementById('toast-container')
@@ -1813,6 +1839,14 @@
         });
       }
 
+      // Show Hint Buttons Toggle
+      const showHintToggle = document.getElementById('setting-show-hint-button');
+      if (showHintToggle) {
+        showHintToggle.addEventListener('change', (e) => {
+          this.setShowHintButton(e.target.checked);
+        });
+      }
+
       // Close buttons
       document.querySelectorAll('[data-close-modal]').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -1820,6 +1854,13 @@
           if (modal) modal.classList.remove('open');
         });
       });
+    }
+
+    setShowHintButton(enabled) {
+      this.settings.showHintButton = !!enabled;
+      this._saveSettings();
+      this._syncSettingsFormControls();
+      this.showToast(enabled ? 'Botón de pistas IA visible 💡' : 'Botón de pistas IA ocultado', 'info');
     }
 
     setAssistedMode(enabled) {

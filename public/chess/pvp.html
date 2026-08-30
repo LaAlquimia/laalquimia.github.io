@@ -314,20 +314,6 @@
           </select>
         </div>
 
-        <!-- Assisted Mode (Stockfish AI Suggestions) -->
-        <div class="settings-section">
-          <div class="setting-toggle-row">
-            <div>
-              <span class="section-label" style="margin-bottom: 2px;">Modo Asistido (Sugerencias Stockfish IA)</span>
-              <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Stockfish analiza la posición en tiempo real y resalta visualmente la mejor jugada en tu turno.</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="setting-assisted-mode">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
         <!-- Tabletop / Face-to-Face Mode (Opponent piece rotation) -->
         <div class="settings-section">
           <div class="setting-toggle-row">
@@ -483,6 +469,37 @@
               <input type="range" id="setting-volume-slider" class="range-slider" min="0" max="1" step="0.05" value="0.5">
               <span>🔊</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Ayudas y Trucos de Pistas IA (Al final) -->
+        <div class="settings-section" style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 8px;">
+          <span class="section-label" style="color: var(--accent-gold); display: flex; align-items: center; gap: 6px;">
+            💡 Ayudas y Pistas IA (Asistencia)
+          </span>
+
+          <!-- Toggle 1: Mostrar Botón de Pistas IA -->
+          <div class="setting-toggle-row" style="margin-bottom: 14px;">
+            <div>
+              <span class="section-label" style="margin-bottom: 2px;">Mostrar Botón de Pistas IA</span>
+              <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Muestra el botón de pistas (💡) en la cabecera, barra lateral y dock inferior para solicitar una jugada sugerida.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-show-hint-button">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- Toggle 2: Modo Asistido (Sugerencias Continuas Stockfish IA) -->
+          <div class="setting-toggle-row">
+            <div>
+              <span class="section-label" style="margin-bottom: 2px;">Modo Asistido (Sugerencias Continuas)</span>
+              <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Stockfish analiza la posición en tiempo real y resalta visualmente en el tablero la mejor jugada en cada turno.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-assisted-mode">
+              <span class="toggle-slider"></span>
+            </label>
           </div>
         </div>
 
