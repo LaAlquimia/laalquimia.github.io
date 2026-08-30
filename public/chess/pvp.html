@@ -39,6 +39,9 @@
     </div>
 
     <div class="header-actions">
+      <button id="btn-header-hint" class="btn-icon" title="Pista / Sugerencia IA (H)" aria-label="Sugerencia IA">
+        💡
+      </button>
       <button id="btn-header-online" class="btn-icon" title="Multijugador Online / LAN P2P" aria-label="Online Multiplayer">
         🌐
       </button>
@@ -159,6 +162,9 @@
 
       <!-- Quick Action Buttons -->
       <div class="sidebar-actions-grid">
+        <button id="btn-sidebar-hint" class="btn-sidebar" title="Pista / Sugerencia Stockfish IA (H)">
+          <span>💡</span> Pista IA
+        </button>
         <button id="btn-sidebar-newgame" class="btn-sidebar btn-primary" title="Nueva partida">
           <span>↻</span> Nueva Partida
         </button>
@@ -198,6 +204,10 @@
 
     <!-- 2. Action Buttons Row -->
     <div class="dock-actions-row">
+      <button id="btn-dock-hint" class="dock-btn" title="Pista / Sugerencia IA">
+        <span class="btn-icon-svg">💡</span>
+        <span class="btn-label">Pista</span>
+      </button>
       <button id="btn-dock-draw" class="dock-btn btn-dock-draw" title="Ofrecer Tablas (Empate)">
         <span class="btn-icon-svg">🤝</span>
         <span class="btn-label">Tablas</span>
@@ -255,6 +265,20 @@
             <option value="ai">Play vs Stockfish AI</option>
             <option value="online">🌐 Online / LAN P2P</option>
           </select>
+        </div>
+
+        <!-- Assisted Mode (Stockfish AI Suggestions) -->
+        <div class="settings-section">
+          <div class="setting-toggle-row">
+            <div>
+              <span class="section-label" style="margin-bottom: 2px;">Modo Asistido (Sugerencias Stockfish IA)</span>
+              <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Stockfish analiza la posición en tiempo real y resalta visualmente la mejor jugada en tu turno.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-assisted-mode">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
         </div>
 
         <!-- Tabletop / Face-to-Face Mode (Opponent piece rotation) -->

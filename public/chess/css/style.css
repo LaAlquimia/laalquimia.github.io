@@ -329,7 +329,8 @@ button {
   background: rgba(18, 23, 31, 0.9);
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center center;
   user-select: none;
 }
 
@@ -341,7 +342,6 @@ button {
 /* Face-to-Face / Tabletop mode (Rotates top player bar 180° for opponent sitting opposite) */
 .player-bar.face-to-face-top {
   transform: rotate(180deg);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-board-theme="cyber"] .player-bar.active-turn {
@@ -759,6 +759,59 @@ button {
 @keyframes captureRingPulse {
   0%, 100% { transform: scale(0.92); opacity: 0.8; }
   50% { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   SUGGESTED MOVE HIGHLIGHTS (Assisted Mode & Instant Hint)
+   ========================================================================== */
+.square.suggested-move-from,
+.square.suggested-from {
+  box-shadow: inset 0 0 0 3px #10b981, inset 0 0 16px rgba(16, 185, 129, 0.4) !important;
+  background-color: rgba(16, 185, 129, 0.22) !important;
+  animation: pulse-hint-from 1.8s infinite ease-in-out;
+  z-index: 5;
+}
+
+.square.suggested-move-to,
+.square.suggested-to {
+  box-shadow: inset 0 0 0 3px #059669, inset 0 0 14px rgba(5, 150, 105, 0.45) !important;
+  background-color: rgba(16, 185, 129, 0.28) !important;
+  animation: pulse-hint-to 1.8s infinite ease-in-out;
+  z-index: 5;
+}
+
+@keyframes pulse-hint-from {
+  0%, 100% {
+    box-shadow: inset 0 0 0 3px #10b981, inset 0 0 12px rgba(16, 185, 129, 0.35);
+    background-color: rgba(16, 185, 129, 0.20);
+  }
+  50% {
+    box-shadow: inset 0 0 0 4px #34d399, inset 0 0 20px rgba(52, 211, 153, 0.6);
+    background-color: rgba(16, 185, 129, 0.32);
+  }
+}
+
+@keyframes pulse-hint-to {
+  0%, 100% {
+    box-shadow: inset 0 0 0 3px #059669, inset 0 0 10px rgba(5, 150, 105, 0.35);
+    background-color: rgba(16, 185, 129, 0.24);
+  }
+  50% {
+    box-shadow: inset 0 0 0 4px #10b981, inset 0 0 18px rgba(16, 185, 129, 0.55);
+    background-color: rgba(16, 185, 129, 0.36);
+  }
+}
+
+[data-board-theme="cyber"] .square.suggested-move-from,
+[data-board-theme="cyber"] .square.suggested-from {
+  box-shadow: inset 0 0 0 3px #00f0ff, inset 0 0 20px rgba(0, 240, 255, 0.5) !important;
+  background-color: rgba(0, 240, 255, 0.2) !important;
+}
+
+[data-board-theme="cyber"] .square.suggested-move-to,
+[data-board-theme="cyber"] .square.suggested-to {
+  box-shadow: inset 0 0 0 3px #00ff88, inset 0 0 20px rgba(0, 255, 136, 0.5) !important;
+  background-color: rgba(0, 255, 136, 0.2) !important;
 }
 
 /* ==========================================================================

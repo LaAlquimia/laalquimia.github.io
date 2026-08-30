@@ -41,6 +41,7 @@
       this.legalMovesForSelected = []; // array of move objects
       this.lastMove = null; // { from: {x,y}, to: {x,y} }
       this.pendingPromotionMove = null; // { from: {x,y}, to: {x,y} }
+      this.suggestedMove = null; // { from: {x, y}, to: {x, y}, uci, san }
       this.isAiThinking = false;
       this.isCustomGameOver = false;
       this.evalScore = 0.0;
@@ -83,6 +84,8 @@
       // 10. Auto-start AI if player is black
       if (this.mode === 'ai' && this.playerColor === 'b' && this.game.getTurn() === 'w') {
         setTimeout(() => this.triggerAIMove(), 600);
+      } else if (this.settings.assistedMode && (this.mode !== 'ai' || this.playerColor === 'w')) {
+        setTimeout(() => this.requestAssistedHint(), 500);
       }
     }
 
@@ -100,7 +103,8 @@
         gameMode: 'ai',
         playerColor: 'w',
         onlineSide: 'random',
-        faceToFace: true
+        faceToFace: true,
+        assistedMode: false
       };
 
       // Check URL query parameters for mode preset (e.g., pvp.html or ?mode=pvp)
@@ -206,7 +210,20 @@
         faceToFaceToggle.checked = (this.settings.faceToFace !== false);
       }
       if (this.dom.btnHeaderTabletop) {
-        this.dom.btnHeaderTabletop.classList.toggle('active', (this.settings.faceToFace !== false));
+        const isFaceToFaceActive = (this.mode === 'pvp') && (this.settings.faceToFace !== false);
+        this.dom.btnHeaderTabletop.classList.toggle('active', isFaceToFaceActive);
+        this.dom.btnHeaderTabletop.title = (this.mode === 'pvp')
+          ? (this.settings.faceToFace !== false ? 'Modo Mesa Activo (Girar fichas rival 180°)' : 'Modo Mesa Desactivado')
+          : 'Modo Mesa / Cara a Cara (Disponible en Modo 2 Jugadores)';
+      }
+
+      // Assisted Mode Toggle & Header Button
+      const assistedToggle = document.getElementById('setting-assisted-mode');
+      if (assistedToggle) {
+        assistedToggle.checked = !!this.settings.assistedMode;
+      }
+      if (this.dom.btnHeaderHint) {
+        this.dom.btnHeaderHint.classList.toggle('active', !!this.settings.assistedMode);
       }
     }
 
@@ -261,6 +278,7 @@
         btnHeaderMute: document.getElementById('btn-header-mute'),
         btnHeaderTheme: document.getElementById('btn-header-theme'),
         btnHeaderTabletop: document.getElementById('btn-header-tabletop'),
+        btnHeaderHint: document.getElementById('btn-header-hint'),
 
         btnDockDraw: document.getElementById('btn-dock-draw'),
         btnDockResign: document.getElementById('btn-dock-resign'),
@@ -269,6 +287,7 @@
         btnDockNewGame: document.getElementById('btn-dock-newgame'),
         btnDockFlip: document.getElementById('btn-dock-flip'),
         btnDockSettings: document.getElementById('btn-dock-settings'),
+        btnDockHint: document.getElementById('btn-dock-hint'),
 
         // Online P2P Elements
         onlineStatusHud: document.getElementById('online-status-hud'),
@@ -302,6 +321,7 @@
         btnSidebarSettings: document.getElementById('btn-sidebar-settings'),
         btnSidebarResign: document.getElementById('btn-sidebar-resign'),
         btnSidebarDraw: document.getElementById('btn-sidebar-draw'),
+        btnSidebarHint: document.getElementById('btn-sidebar-hint'),
 
         // Toast Container
         toastContainer: document.getElementById('toast-container')
@@ -389,6 +409,18 @@
             sq.classList.add('is-dragging');
           }
 
+          // Assisted Mode / Suggested Move highlight
+          if (this.suggestedMove) {
+            const isSuggestedFrom = (this.suggestedMove.from.x === x && this.suggestedMove.from.y === y);
+            const isSuggestedTo = (this.suggestedMove.to.x === x && this.suggestedMove.to.y === y);
+            if (isSuggestedFrom) {
+              sq.classList.add('suggested-move-from', 'suggested-from');
+            }
+            if (isSuggestedTo) {
+              sq.classList.add('suggested-move-to', 'suggested-to');
+            }
+          }
+
           // Clear square inner contents
           sq.innerHTML = '';
 
@@ -416,10 +448,10 @@
               const pieceWrapper = document.createElement('div');
               pieceWrapper.className = 'piece-svg';
 
-              // Face-to-Face Tabletop mode: Rotate top player pieces 180° so opponent sees them right-side-up
+              // Face-to-Face Tabletop mode: Rotate top player pieces 180° so opponent sees them right-side-up (PvP mode only)
               const isWhitePiece = (piece === piece.toUpperCase());
               const isTopPiece = flipped ? isWhitePiece : !isWhitePiece;
-              const isFaceToFace = (this.settings.faceToFace !== false) && (this.mode === 'pvp' || this.settings.alwaysFaceToFace);
+              const isFaceToFace = (this.mode === 'pvp') && (this.settings.faceToFace !== false);
               if (isFaceToFace && isTopPiece) {
                 pieceWrapper.classList.add('rotated-piece');
               }
@@ -458,8 +490,8 @@
       const topColor = flipped ? 'w' : 'b';
       const bottomColor = flipped ? 'b' : 'w';
 
-      // Face-to-Face Tabletop mode check
-      const isFaceToFace = (this.settings.faceToFace !== false) && (this.mode === 'pvp' || this.settings.alwaysFaceToFace);
+      // Face-to-Face Tabletop mode check (Strictly PvP mode only)
+      const isFaceToFace = (this.mode === 'pvp') && (this.settings.faceToFace !== false);
 
       // Top Player Data
       const topIsActive = (turn === topColor);
@@ -641,6 +673,7 @@
       this._setupBoardInteractions();
 
       // 2. Header Action Buttons
+      if (this.dom.btnHeaderHint) this.dom.btnHeaderHint.addEventListener('click', () => this.requestAssistedHint(true));
       if (this.dom.btnHeaderOnline) this.dom.btnHeaderOnline.addEventListener('click', () => this.openOnlineModal('create'));
       if (this.dom.btnHeaderSettings) this.dom.btnHeaderSettings.addEventListener('click', () => this.openSettingsModal());
       if (this.dom.btnHeaderFlip) this.dom.btnHeaderFlip.addEventListener('click', () => this.flipBoard());
@@ -650,6 +683,7 @@
       if (this.dom.btnHeaderTabletop) this.dom.btnHeaderTabletop.addEventListener('click', () => this.toggleFaceToFace());
 
       // 3. Mobile Bottom Dock
+      if (this.dom.btnDockHint) this.dom.btnDockHint.addEventListener('click', () => this.requestAssistedHint(true));
       if (this.dom.btnDockDraw) this.dom.btnDockDraw.addEventListener('click', () => this.handleOfferDraw());
       if (this.dom.btnDockResign) this.dom.btnDockResign.addEventListener('click', () => this.handleResign());
       if (this.dom.btnDockOnline) this.dom.btnDockOnline.addEventListener('click', () => this.openOnlineModal('create'));
@@ -792,6 +826,7 @@
       });
 
       // 5. Desktop Sidebar Buttons
+      if (this.dom.btnSidebarHint) this.dom.btnSidebarHint.addEventListener('click', () => this.requestAssistedHint(true));
       if (this.dom.btnSidebarNewGame) this.dom.btnSidebarNewGame.addEventListener('click', () => this.restartGame());
       if (this.dom.btnSidebarUndo) this.dom.btnSidebarUndo.addEventListener('click', () => this.undoMove());
       if (this.dom.btnSidebarFlip) this.dom.btnSidebarFlip.addEventListener('click', () => this.flipBoard());
@@ -934,10 +969,10 @@
         const ghost = document.createElement('div');
         ghost.className = 'drag-ghost';
 
-        // Rotate ghost if piece is rotated in face-to-face mode
+        // Rotate ghost if piece is rotated in face-to-face mode (PvP only)
         const isWhitePiece = (state.piece === state.piece.toUpperCase());
         const isTopPiece = this.boardFlipped ? isWhitePiece : !isWhitePiece;
-        const isFaceToFace = (this.settings.faceToFace !== false) && (this.mode === 'pvp' || this.settings.alwaysFaceToFace);
+        const isFaceToFace = (this.mode === 'pvp') && (this.settings.faceToFace !== false);
         if (isFaceToFace && isTopPiece) {
           ghost.classList.add('rotated-piece');
         }
@@ -1163,6 +1198,7 @@
      * Execute a move on the board and handle sound & AI triggers
      */
     executeMove(from, to, promotion = 'Q', isRemote = false) {
+      this.suggestedMove = null;
       const moveResult = this.game.makeMove(from, to, promotion);
       if (!moveResult) {
         this.audio.play('illegal');
@@ -1218,6 +1254,8 @@
       // Trigger Stockfish AI if AI Mode & it's AI's turn
       if (this.mode === 'ai' && this.game.getTurn() !== this.playerColor) {
         setTimeout(() => this.triggerAIMove(), 150);
+      } else if (this.settings.assistedMode && !this.game.isGameOver()) {
+        setTimeout(() => this.requestAssistedHint(), 100);
       }
 
       return true;
@@ -1380,6 +1418,7 @@
 
       this.selectedSquare = null;
       this.legalMovesForSelected = [];
+      this.suggestedMove = null;
       const updatedHistory = this.game.getHistory();
       this.lastMove = updatedHistory.length > 0 
         ? { from: updatedHistory[updatedHistory.length - 1].from, to: updatedHistory[updatedHistory.length - 1].to } 
@@ -1395,6 +1434,10 @@
 
       this.render();
       this.showToast('Move undone', 'info');
+
+      if (this.settings.assistedMode && !this.game.isGameOver() && (this.mode !== 'ai' || this.game.getTurn() === this.playerColor)) {
+        setTimeout(() => this.requestAssistedHint(), 100);
+      }
     }
 
     flipBoard() {
@@ -1412,6 +1455,7 @@
       this.legalMovesForSelected = [];
       this.lastMove = null;
       this.pendingPromotionMove = null;
+      this.suggestedMove = null;
       this.isAiThinking = false;
       this.isCustomGameOver = false;
       this.evalScore = 0.0;
@@ -1429,6 +1473,8 @@
       // If AI mode and playing as Black, AI plays White first move
       if (this.mode === 'ai' && this.playerColor === 'b' && this.game.getTurn() === 'w') {
         setTimeout(() => this.triggerAIMove(), 600);
+      } else if (this.settings.assistedMode && (this.mode !== 'ai' || this.playerColor === this.game.getTurn())) {
+        setTimeout(() => this.requestAssistedHint(), 400);
       }
     }
 
@@ -1598,6 +1644,14 @@
         });
       }
 
+      // Assisted Mode Toggle
+      const assistedToggle = document.getElementById('setting-assisted-mode');
+      if (assistedToggle) {
+        assistedToggle.addEventListener('change', (e) => {
+          this.setAssistedMode(e.target.checked);
+        });
+      }
+
       // Close buttons
       document.querySelectorAll('[data-close-modal]').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -1607,12 +1661,87 @@
       });
     }
 
+    setAssistedMode(enabled) {
+      this.settings.assistedMode = !!enabled;
+      this._saveSettings();
+      this._syncSettingsFormControls();
+      if (this.settings.assistedMode) {
+        this.showToast('Modo Asistido activado (sugerencias Stockfish)', 'info');
+        this.requestAssistedHint();
+      } else {
+        this.suggestedMove = null;
+        this.render();
+        this.showToast('Modo Asistido desactivado', 'info');
+      }
+    }
+
+    requestAssistedHint(forceHint = false) {
+      if (!this.settings.assistedMode && !forceHint) return;
+      if (this.game.isGameOver() || this.isCustomGameOver) return;
+      if (this.isAiThinking) return;
+
+      const turn = this.game.getTurn();
+      if (this.mode === 'ai' && turn !== this.playerColor) return;
+      if (this.mode === 'online' && turn !== this.playerColor) return;
+
+      const fen = this.game.getFEN();
+      const requestFen = fen;
+      const requestTurn = turn;
+
+      if (!this.ai) return;
+
+      this.ai.findBestMove(
+        fen,
+        { skill: 20, depth: 12, movetime: 350 },
+        (bestMove, ponder, evaluation) => {
+          if (this.game.getFEN() !== requestFen || this.game.getTurn() !== requestTurn) {
+            return;
+          }
+          if (!bestMove || bestMove === '(none)' || bestMove.length < 4) {
+            return;
+          }
+
+          const fromSq = bestMove.slice(0, 2);
+          const toSq = bestMove.slice(2, 4);
+          const from = this._squareToCoords(fromSq);
+          const to = this._squareToCoords(toSq);
+          if (!from || !to) return;
+
+          let san = bestMove;
+          const legalMoves = this.game.getLegalMoves(from.x, from.y);
+          const matchMove = legalMoves.find(m => m.x === to.x && m.y === to.y);
+          if (matchMove && matchMove.san) {
+            san = matchMove.san;
+          }
+
+          this.suggestedMove = {
+            from,
+            to,
+            uci: bestMove,
+            san: san
+          };
+
+          this.render();
+
+          if (forceHint) {
+            this.showToast(`💡 Sugerencia Stockfish: ${san} (${bestMove})`, 'info');
+          }
+        }
+      ).catch(err => {
+        console.warn('Assisted hint calculation failed:', err);
+      });
+    }
+
     setFaceToFace(enabled) {
       this.settings.faceToFace = !!enabled;
       this._saveSettings();
       this._syncSettingsFormControls();
       this.render();
-      this.showToast(this.settings.faceToFace ? 'Modo Mesa activado (fichas rival giradas 180°)' : 'Orientación estándar activada', 'info');
+      if (this.mode === 'pvp') {
+        this.showToast(this.settings.faceToFace ? 'Modo Mesa activado (fichas rival giradas 180°)' : 'Orientación estándar activada', 'info');
+      } else {
+        this.showToast(this.settings.faceToFace ? 'Modo Mesa activado (activo en Modo 2 Jugadores)' : 'Orientación estándar activada', 'info');
+      }
     }
 
     toggleFaceToFace() {
@@ -2109,6 +2238,8 @@
         this.toggleMute();
       } else if (key === 's') {
         this.openSettingsModal();
+      } else if (key === 'h') {
+        this.requestAssistedHint(true);
       }
     }
   }
