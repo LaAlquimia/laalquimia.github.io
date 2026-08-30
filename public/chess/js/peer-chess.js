@@ -356,6 +356,9 @@
             helloCount++;
             sendHello();
           }, 500);
+          if (this._handshakeTimer && typeof this._handshakeTimer.unref === 'function') {
+            this._handshakeTimer.unref();
+          }
         }
       });
 
@@ -595,6 +598,9 @@
           this._send({ type: 'PING', payload: { t: this._lastPingTimestamp } });
         }
       }, 4000);
+      if (this._pingTimer && typeof this._pingTimer.unref === 'function') {
+        this._pingTimer.unref();
+      }
     }
 
     _stopPingInterval() {

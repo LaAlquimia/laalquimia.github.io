@@ -120,4 +120,10 @@ assert.strictEqual(guestConnectedData.assignedColor, 'b');
 
 console.log('Passed Complete 3-Way Handshake Simulation test.');
 
+// Clean up all clients
+hostClient.leaveRoom();
+guestClient.leaveRoom();
+client.leaveRoom();
+
 console.log('\nALL PEER CHESS PROTOCOL TESTS PASSED SUCCESSFULLY! 🎉');
+process.exit(0);
