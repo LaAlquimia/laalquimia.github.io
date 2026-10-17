@@ -1,0 +1,570 @@
+/* Wireless Payments — Global Layout & Presentation Styles */
+* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background:
+        radial-gradient(circle at 88% 14%, rgba(124, 138, 45, 0.42) 0%, transparent 42%),
+        radial-gradient(circle at 85% 88%, rgba(42, 145, 92, 0.45) 0%, transparent 48%),
+        linear-gradient(135deg, #091812 0%, #112d21 48%, #1b4d37 100%);
+      color: var(--text-white);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Línea sutil superior de progreso (2px) */
+    .deck-progress-track {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.05);
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    .deck-progress-fill {
+      height: 100%;
+      width: 14.28%;
+      background: linear-gradient(90deg, #34c77b 0%, var(--dot-blue) 55%, #f5c43d 100%);
+      box-shadow: 0 0 10px rgba(52, 199, 123, 0.6);
+      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Contenedor de Diapositivas */
+    main#deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    section.slide {
+      position: absolute;
+      inset: 0;
+      padding: 36px 64px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(18px) scale(0.985);
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  visibility 0.4s;
+    }
+
+    section.slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Etiqueta de tiempo sugerido por diapositiva */
+    .slide-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .slide-tag {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: var(--dot-gold);
+      background: var(--gold-pill-bg);
+      border: 1px solid var(--gold-pill-border);
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    .slide-time-hint {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Tipografía Principal fiel al documento Pages */
+    h1.hero-title {
+      font-size: clamp(46px, 5.6vw, 76px);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -2px;
+      margin-bottom: 22px;
+    }
+
+    h2.slide-title {
+      font-size: clamp(32px, 3.6vw, 48px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.2px;
+      margin-bottom: 10px;
+    }
+
+    .gold-text {
+      color: var(--dot-gold);
+    }
+
+    .green-text {
+      color: var(--dot-green);
+    }
+
+    .coral-text {
+      color: var(--dot-coral);
+    }
+
+    .mint-subtitle {
+      font-size: clamp(18px, 2vw, 25px);
+      font-weight: 500;
+      color: var(--text-mint);
+      letter-spacing: -0.4px;
+      line-height: 1.4;
+    }
+
+    /* Los 5 círculos del diseño original */
+    .palette-dots {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 38px;
+    }
+
+    .palette-dots .dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .dot.d-black { background: var(--dot-black); border: 2px solid rgba(255,255,255,0.22); }
+    .dot.d-green { background: var(--dot-green); }
+    .dot.d-gold  { background: var(--dot-gold); }
+    .dot.d-coral { background: var(--dot-coral); }
+    .dot.d-white { background: var(--dot-white); }
+
+    /* Grids y Tarjetas */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 26px;
+      backdrop-filter: blur(16px);
+      transition: transform 0.25s ease, border-color 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(245, 196, 61, 0.45);
+    }
+
+    .card-accent-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    /* Diapositiva 1: Hero Card estilo Diseñodiapositivas.pages */
+    .hero-frame {
+      background:
+        radial-gradient(circle at 86% 18%, rgba(168, 179, 54, 0.38) 0%, transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(52, 199, 123, 0.38) 0%, transparent 50%),
+        linear-gradient(125deg, #0d2219 0%, #163d2c 55%, #236446 100%);
+      border: 1px solid rgba(167, 215, 197, 0.24);
+      border-radius: 32px;
+      padding: 54px 64px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+      position: relative;
+      overflow: hidden;
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .hero-frame-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+    }
+
+    .hero-frame-brand {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-mint);
+      letter-spacing: -0.5px;
+    }
+
+    .hero-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 42px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .team-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .team-chip {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-mint);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(167, 215, 197, 0.2);
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+
+    /* Diapositiva 2: "Picture this." */
+    .story-layout {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 36px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .scene-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .scene-item {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 16px 22px;
+      border-radius: 18px;
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .scene-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(245, 196, 61, 0.14);
+      border: 1px solid rgba(245, 196, 61, 0.32);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .phone-mockup {
+      background: linear-gradient(165deg, #111c18 0%, #0a1410 100%);
+      border: 2px solid rgba(242, 92, 102, 0.55);
+      border-radius: 36px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(242, 92, 102, 0.18);
+      text-align: center;
+      position: relative;
+    }
+
+    .phone-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(242, 92, 102, 0.18);
+      border: 1px solid var(--dot-coral);
+      color: var(--dot-coral);
+      font-weight: 800;
+      font-size: 22px;
+      padding: 10px 22px;
+      border-radius: 999px;
+      margin: 16px 0;
+      letter-spacing: -0.3px;
+    }
+
+    /* Diapositiva 3: Problema */
+    .problem-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(90deg, rgba(242, 92, 102, 0.16) 0%, rgba(16, 41, 31, 0.75) 100%);
+      border: 1px solid rgba(242, 92, 102, 0.4);
+      border-radius: 22px;
+      padding: 22px 30px;
+      margin: 16px 0 24px;
+      gap: 24px;
+    }
+
+    .big-stat-number {
+      font-size: clamp(38px, 4.2vw, 56px);
+      font-weight: 900;
+      color: var(--dot-gold);
+      letter-spacing: -1.5px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .pillar-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 16px;
+    }
+
+    .pillar-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.4px;
+    }
+
+    .pillar-desc {
+      font-size: 15px;
+      color: var(--text-mint);
+      line-height: 1.5;
+    }
+
+    /* Diapositiva 4: Solución Bluetooth + Open Payments */
+    .arch-flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+      align-items: stretch;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .arch-node {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .arch-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--dot-gold);
+      font-weight: 800;
+      font-size: 22px;
+      padding: 0 4px;
+    }
+
+    .arch-arrow span {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-mint);
+      background: rgba(255,255,255,0.06);
+      padding: 3px 7px;
+      border-radius: 6px;
+      margin-top: 4px;
+      white-space: nowrap;
+    }
+
+    .badge-chip {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      width: fit-content;
+    }
+
+    /* Diapositiva 5: TAM SAM SOM */
+    .market-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+    }
+
+    .market-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .market-acronym {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .metric-box {
+      background: rgba(9, 24, 18, 0.55);
+      border: 1px solid rgba(167, 215, 197, 0.16);
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .metric-val {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      line-height: 1.15;
+    }
+
+    .metric-sub {
+      font-size: 12.5px;
+      color: var(--text-mint);
+      margin-top: 3px;
+    }
+
+    .som-phases {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .som-phase-item {
+      background: rgba(9, 24, 18, 0.6);
+      border-left: 3px solid var(--dot-gold);
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    .som-phase-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--dot-gold);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .som-phase-details {
+      font-size: 12.5px;
+      color: var(--text-white);
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    /* Tabla comparativa compacta */
+    .comp-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      margin-top: 10px;
+    }
+
+    .comp-table th {
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      padding: 6px 14px;
+    }
+
+    .comp-table td {
+      background: var(--card-bg);
+      padding: 12px 14px;
+      font-size: 14px;
+      border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .comp-table td:first-child {
+      border-left: 1px solid var(--card-border);
+      border-radius: 12px 0 0 12px;
+      font-weight: 700;
+    }
+
+    .comp-table td:last-child {
+      border-right: 1px solid var(--card-border);
+      border-radius: 0 12px 12px 0;
+    }
+
+    /* Barra de progreso inferior */
+    .progress-bar {
+      height: 5px;
+      background: rgba(255, 255, 255, 0.08);
+      width: 100%;
+      position: relative;
+      z-index: 100;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--dot-green), var(--dot-gold), var(--dot-coral));
+      width: 14.28%;
+      transition: width 0.35s ease;
+    }
+
+    @media print {
+      body { height: auto; overflow: visible; }
+      header, .progress-bar { display: none; }
+      main#deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+      section.slide {
+        position: relative;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        page-break-after: always;
+        height: 100vh;
+      }
+    }

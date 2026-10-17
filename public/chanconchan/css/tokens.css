@@ -1,0 +1,34 @@
+/* Wireless Payments — Design System Tokens */
+:root {
+      /* Tipografía Estandarizada Global */
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Space Grotesk', -apple-system, BlinkMacSystemFont, monospace;
+      --font-code: 'JetBrains Mono', monospace;
+
+      /* Paleta original */
+      --bg-deep: #07120d;
+      --bg-mid: #0d1f17;
+      --bg-emerald: #1c523b;
+      --bg-olive-glow: #4d5928;
+      --card-bg: rgba(12, 30, 22, 0.72);
+      --card-bg-solid: #10291f;
+      --card-border: rgba(163, 209, 188, 0.18);
+      --card-border-strong: rgba(52, 199, 123, 0.45);
+
+      /* Los 5 puntos de color originales */
+      --dot-black: #131c18;
+      --dot-green: #34c77b;
+      --dot-gold: #f5c43d;
+      --dot-coral: #f25c66;
+      --dot-white: #ffffff;
+      --dot-blue: #3d9bff;      /* Azul de conexión: Bluetooth, señal, enlaces — acento en todas las diapositivas */
+      --blue-rgb: 61, 155, 255;
+
+      /* Texto */
+      --text-white: #ffffff;
+      --text-mint: #a7d7c5;
+      --text-muted: #8ea89d;
+      --gold-pill-bg: rgba(245, 196, 61, 0.16);
+      --gold-pill-border: rgba(245, 196, 61, 0.35);
+    }

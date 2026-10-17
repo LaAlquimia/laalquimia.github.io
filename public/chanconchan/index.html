@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wireless Payments — Pagos que llegan hasta donde no hay señal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/slides.css" />
+  <script src="https://unpkg.com/globe.gl"></script>
+</head>
+<body>
+
+  <!-- Barra superior removida - Vista completa 100vh -->
+  <div class="deck-progress-track">
+    <div class="deck-progress-fill" id="progressFill"></div>
+  </div>
+
+  <main id="deck">
+
+    <!-- ==========================================
+         DIAPOSITIVA 1: PORTADA (Diseño diapositiva_diseno.html)
+         ========================================== -->
+    <section class="slide active" id="slide1" style="padding: 0;">
+
+      <div class="s1-viewport">
+        <!-- Ambient Glow Orbs -->
+        <div class="s1-ambient-glow s1-glow-top-right"></div>
+        <div class="s1-ambient-glow s1-glow-bottom-left"></div>
+
+        <!-- Top Bar (sin "Diapositiva 1 : Wireless Payments") -->
+        <div class="s1-header-bar"></div>
+
+        <!-- Central Impact Content -->
+        <div class="s1-content-container">
+          <div class="s1-main-headline">
+            <h1 class="s1-line-white" data-step="0">Without signal</h1>
+            <h1 class="s1-line-yellow" data-step="1">You don't exist</h1>
+          </div>
+
+          <div class="s1-impact-stat-box" data-step="2">
+            <span class="s1-stat-number">3.4 billion people</span>
+            <span class="s1-stat-text">can't pay</span>
+          </div>
+
+          <!-- Aparecen uno a uno con → -->
+          <div class="s1-stat-items">
+            <span class="s1-item-pill" data-step="3">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16M8 18v3M16 18v3"/><circle cx="8" cy="14.5" r="0.6"/><circle cx="16" cy="14.5" r="0.6"/></svg>
+              Transport
+            </span>
+            <span class="s1-item-pill" data-step="4">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V2M6 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+              Food
+            </span>
+            <span class="s1-item-pill" data-step="5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5 20.5 10.5a5 5 0 0 0-7-7L3.5 13.5a5 5 0 0 0 7 7z"/><path d="m8.5 8.5 7 7"/></svg>
+              Medicine
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         DIAPOSITIVA 2: INTRODUCCIÓN (DIA2.pages)
+         ========================================== -->
+    <section class="slide" id="slide2" style="padding: 0;">
+
+      <div class="s2-viewport">
+        <div class="s2-content">
+          <div class="s2-top-grid">
+            <!-- Columna Izquierda: Título + 3 Numerales -->
+            <div>
+              <h2 class="s2-title">
+                You have money in your bank account, <span>but...</span>
+              </h2>
+
+              <!-- Aparecen uno a uno con → -->
+              <div class="s2-numerals">
+                <div class="s2-numeral-item" data-step="1">
+                  <span class="s2-num-badge">1</span>
+                  <span>The transaction fails</span>
+                </div>
+                <div class="s2-numeral-item" data-step="2">
+                  <span class="s2-num-badge">2</span>
+                  <span>The customer walks away frustrated</span>
+                </div>
+                <div class="s2-numeral-item" data-step="3">
+                  <span class="s2-num-badge">3</span>
+                  <span>The merchant loses a sale</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Columna Derecha: Imagen de No Conexión a Wi-Fi -->
+            <div class="s2-wifi-card">
+              <div class="s2-wifi-icon-wrap">
+                <svg width="88" height="88" viewBox="0 0 24 24" fill="none" stroke="#FC5B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                  <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+                  <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+                  <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+                  <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+                  <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                  <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                </svg>
+              </div>
+              <div class="s2-wifi-label">No Wi-Fi · No Signal</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso final: se ocultan los numerales y aparece en grande -->
+        <div class="s2-finale" aria-hidden="true">
+          <div class="s2-finale-statement">
+            Time is <span class="s2-highlight-coral">wasted.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+            <!-- ==========================================
+         DIAPOSITIVA 3: PROBLEMA (Globo Holográfico Gigante al Fondo + Colombia Enorme)
+         ========================================== -->
+    <section class="slide" id="slide3" style="padding: 0;">
+
+      <div class="s3-viewport">
+        <!-- 1. GLOBO HOLOGRÁFICO A PANTALLA COMPLETA AL FONDO -->
+        <div class="s3-globe-bg">
+          <div id="globeViz"></div>
+        </div>
+
+        <!-- 2. TEXTO AL FRENTE A LA DERECHA -->
+        <div class="s3-content-wrapper">
+          <div class="s3-text-column">
+            <div class="s3-stat-block" data-step="0">
+              <div class="s3-stat-number">3.45B</div>
+              <div class="s3-stat-label-wrap">
+                <span class="s3-stat-label-top">People excluded</span>
+                <span class="s3-stat-label-sub">from real-time digital payments</span>
+              </div>
+            </div>
+
+            <div class="s3-main-statement" data-step="1">
+              Cut off at the <br />
+              <span class="s3-highlight-coral">last mile.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Cadena de conexión (paso a paso con →): la señal llega del servidor al usuario y se corta en la última milla, antes del comercio -->
+        <div class="s3-nodes-timeline">
+          <div class="s3-chain-node blue" data-step="2">
+            <span class="s3-chain-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01"/></svg></span>
+            <span class="s3-chain-label">Server</span>
+          </div>
+          <div class="s3-chain-link blue" data-step="3"></div>
+          <div class="s3-chain-node blue" data-step="3">
+            <span class="s3-chain-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+            <span class="s3-chain-label">ISP</span>
+          </div>
+          <div class="s3-chain-link green" data-step="4"></div>
+          <div class="s3-chain-node green" data-step="4">
+            <span class="s3-chain-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10v11M8 21h8M9.5 21 12 10l2.5 11"/><path d="M7.8 5.8a6 6 0 0 0 0 8.4M16.2 5.8a6 6 0 0 1 0 8.4M5 3a10 10 0 0 0 0 14M19 3a10 10 0 0 1 0 14"/><circle cx="12" cy="10" r="1.2"/></svg></span>
+            <span class="s3-chain-label">Cell tower</span>
+          </div>
+          <div class="s3-chain-link gold" data-step="5"></div>
+          <div class="s3-chain-node gold" data-step="5">
+            <span class="s3-chain-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></span>
+            <span class="s3-chain-label">User</span>
+          </div>
+          <div class="s3-chain-link broken" data-step="6">
+            <span class="s3-chain-break">
+              <span class="s3-chain-x">✕</span>
+              Last mile
+            </span>
+          </div>
+          <div class="s3-chain-node coral" data-step="7">
+            <span class="s3-chain-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9M3 9v11h18V9M3 9h18"/><path d="M9 20v-6h6v6"/></svg></span>
+            <span class="s3-chain-label">Merchant · not paid</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         DIAPOSITIVA 4: DINERO · piloto → empresa → lo que se pierde hoy en el mundo (mapa con cámara: Medellín → Colombia y región → Mundo, info paso a paso)
+         ========================================== -->
+    <section class="slide" id="slide5" style="padding: 0;">
+
+      <div class="s5-viewport">
+        <!-- 1. MAPA A PANTALLA COMPLETA (SVG generado en js/deck.js; la cámara vuela entre niveles) -->
+        <div class="s5-map-bg">
+          <svg id="s5MapSvg" class="s5-map-svg" data-stage="0" aria-hidden="true"></svg>
+        </div>
+
+        <!-- 2. TEXTO AL FRENTE A LA DERECHA -->
+        <div class="s5-content-wrapper">
+          <div class="s5-text-column">
+            <div class="s5-kicker" id="s5Kicker" data-stage="0">
+              <span class="s5-kicker-dot"></span>
+              <span id="s5KickerText">What we earn as a pilot · Medellín</span>
+            </div>
+
+            <div class="s5-stage">
+              <!-- ===== MEDELLÍN · LO QUE GANAMOS COMO PILOTO ===== -->
+              <div class="s5-step active" data-s5-step="0">
+                <div class="s5-step-phase">Pilot · Funding</div>
+                <div class="s5-stat-number gold">$50k–150k</div>
+                <div class="s5-stat-label-wrap">
+                  <span class="s5-stat-label-top">In ILF grants to prove it on the street</span>
+                  <span class="s5-stat-label-sub">Medellín campuses, festivals, congested corridors &amp; the W3C standard.</span>
+                </div>
+              </div>
+
+              <div class="s5-step" data-s5-step="1">
+                <div class="s5-step-phase">Pilot · 12 months</div>
+                <div class="s5-stat-number mint">$1.5k–3.1k</div>
+                <div class="s5-stat-label-wrap">
+                  <span class="s5-stat-label-top">Revenue from 5,000 users in Medellín</span>
+                  <span class="s5-stat-label-sub"><strong>$1.54M – $3.09M</strong> TPV · 0.10% take-rate.</span>
+                </div>
+              </div>
+
+              <div class="s5-step" data-s5-step="2">
+                <div class="s5-step-phase">Pilot · 24–36 months</div>
+                <div class="s5-stat-number green">~$30.9k</div>
+                <div class="s5-stat-label-wrap">
+                  <span class="s5-stat-label-top">Revenue from 50,000 users inside <span class="s5-highlight-green">Open Payments banks.</span></span>
+                  <span class="s5-stat-label-sub"><strong>~$30.88M</strong> TPV · cost <strong>&lt;$0.0008</strong>/tx · margin <strong>&gt;85%</strong>.</span>
+                </div>
+              </div>
+
+              <!-- ===== COLOMBIA · LO QUE GANAMOS COMO EMPRESA ===== -->
+              <div class="s5-step" data-s5-step="3">
+                <div class="s5-step-phase">Company · Volume</div>
+                <div class="s5-stat-number gold">$33.3B</div>
+                <div class="s5-stat-label-wrap">
+                  <span class="s5-stat-label-top">Moves every year through instant payments in Colombia</span>
+                  <span class="s5-stat-label-sub"><strong>Bre-B, Nequi, Daviplata</strong> · all of it depends on signal.</span>
+                </div>
+              </div>
+
+              <div class="s5-step" data-s5-step="4">
+                <div class="s5-step-phase">Company · Per user</div>
+                <div class="s5-stat-number mint">~$618</div>
+                <div class="s5-stat-label-wrap">
+                  <span class="s5-stat-label-top">Per user per year across Colombia &amp; <span class="s5-highlight-gold">LatAm.</span></span>
+                  <span class="s5-stat-label-sub"><strong>53.9M</strong> instant-payment users · plus airplane-mode tourists without roaming.</span>
+                </div>
+              </div>
+
+              <div class="s5-step" data-s5-step="5">
+                <div class="s5-step-phase">Company · Revenue</div>
+                <div class="s5-stat-number green">$33.3M</div>
+                <div class="s5-stat-label-wrap">
+                  <span class="s5-stat-label-top">Net fees per year as a company</span>
+                  <span class="s5-stat-label-sub"><strong>0.10% take-rate</strong> over ILP STREAM.</span>
+                </div>
+              </div>
+
+              <!-- ===== MUNDO · LO QUE SE PIERDE HOY Y HACIA DONDE VAMOS ===== -->
+              <div class="s5-step" data-s5-step="6">
+                <div class="s5-step-phase">Lost today · World</div>
+                <div class="s5-stat-number coral">$6.2T</div>
+                <div class="s5-stat-label-wrap">
+                  <span class="s5-stat-label-top">Slips out of digital payments every year</span>
+                  <span class="s5-stat-label-sub">Slice of <strong>$30T</strong> global POS · <strong>3.45B</strong> people without data at checkout.</span>
+                </div>
+              </div>
+
+              <div class="s5-step" data-s5-step="7">
+                <div class="s5-step-phase">Lost today · Cash</div>
+                <div class="s5-stat-number coral">$5.6T</div>
+                <div class="s5-stat-label-wrap">
+                  <span class="s5-stat-label-top">Forced back into cash</span>
+                  <span class="s5-stat-label-sub">The rest dies in 4G/5G blind spots · <strong>+150M merchants</strong> lose the sale.</span>
+                </div>
+              </div>
+
+              <div class="s5-step" data-s5-step="8">
+                <div class="s5-step-phase">Where we're heading</div>
+                <div class="s5-stat-number green">$6.2B</div>
+                <div class="s5-stat-label-wrap">
+                  <span class="s5-stat-label-top">Per year to own the <span class="s5-highlight-coral">last mile.</span></span>
+                  <span class="s5-stat-label-sub"><strong>0.10%</strong> take-rate over the <strong>$6.2T</strong> lost today.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Barra inferior: piloto → empresa → mundo, con un punto por dato -->
+        <div class="s5-phases-timeline">
+          <div class="s5-phase-line"></div>
+          <div class="s5-stage-group" data-s5-group="0">
+            <div class="s5-mini-dots"><i data-s5-dot="0"></i><i data-s5-dot="1"></i><i data-s5-dot="2"></i></div>
+            <span>Pilot · Medellín</span>
+          </div>
+          <div class="s5-phase-line" data-s5-line="3"></div>
+          <div class="s5-stage-group" data-s5-group="1">
+            <div class="s5-mini-dots"><i data-s5-dot="3"></i><i data-s5-dot="4"></i><i data-s5-dot="5"></i></div>
+            <span>Company · Colombia</span>
+          </div>
+          <div class="s5-phase-line" data-s5-line="6"></div>
+          <div class="s5-stage-group" data-s5-group="2">
+            <div class="s5-mini-dots"><i data-s5-dot="6"></i><i data-s5-dot="7"></i><i data-s5-dot="8"></i></div>
+            <span>Lost today · World</span>
+          </div>
+          <div class="s5-phase-line"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         DIAPOSITIVA 5: SOLUCIÓN · Bluetooth + Open Payments 3D (diapositiva_5_bluetooth_ilp.html)
+         ========================================== -->
+    <section class="slide" id="slide4" style="padding: 0;">
+
+      <div class="s4-viewport">
+        <!-- INTRO: la frase completa en grande; con → queda solo "Bluetooth." arriba y entra el proceso -->
+        <div class="s4-intro" aria-hidden="true">
+          <p class="s4-intro-lead">
+            <span class="w" style="--i:0">The</span> <span class="w s4-intro-magic" style="--i:1">magic</span> <span class="w" style="--i:2">of</span> <span class="w" style="--i:3">the</span> <span class="w" style="--i:4">frictionless</span> <span class="w" style="--i:5">payments</span> <span class="w" style="--i:6">has</span> <span class="w" style="--i:7">a</span> <span class="w" style="--i:8">name:</span>
+          </p>
+          <div class="s4-intro-bt" style="--i:9">Bluetooth.</div>
+        </div>
+
+        <!-- TEXTO ARRIBA -->
+        <div class="s4-top-text">
+          <h2 class="s4-headline">
+            <span>Bluetooth.</span>
+          </h2>
+        </div>
+
+        <!-- GRÁFICO ABAJO -->
+        <div class="s4-graphic-stage">
+          <!-- 1. Celular Offline (Realista 3D) -->
+          <div class="s4-phone-scene">
+            <div class="s4-phone offline">
+              <div class="s4-phone-btn-left1"></div>
+              <div class="s4-phone-btn-left2"></div>
+              <div class="s4-phone-btn-right"></div>
+
+              <div class="s4-phone-screen">
+                <div class="s4-statusbar">
+                  <span>9:41</span>
+                  <div class="s4-dynamic-island">
+                    <span class="s4-island-dot"></span>
+                    <span class="s4-island-cam"></span>
+                  </div>
+                  <div class="s4-status-icons">
+                    <span style="color:#FC5B5B; font-size:0.6rem;">SOS</span>
+                    <div class="s4-battery">
+                      <div class="s4-battery-fill" style="width:75%; background:#FC5B5B;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <span class="s4-phone-pill">Offline</span>
+
+                <div class="s4-phone-center">
+                  <div class="s4-phone-screen-icon">
+                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="1" y1="1" x2="23" y2="23"></line>
+                      <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+                      <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+                      <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+                      <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+                      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                      <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                    </svg>
+                  </div>
+
+                  <div class="s4-phone-ui-card">
+                    <div class="s4-ui-left">
+                      <div class="s4-ui-label">Token firmado</div>
+                      <div class="s4-ui-val">$25.000</div>
+                    </div>
+                    <span class="s4-ui-badge"><span class="s4-badge-idle">BLE Ready</span><span class="s4-badge-done">✓ Pagado</span></span>
+                  </div>
+                </div>
+
+                <div class="s4-phone-footer">
+                  <div class="s4-phone-role">Celular Offline</div>
+                  <div class="s4-phone-sub">Sin datos · Sin señal</div>
+                  <div class="s4-home-indicator"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Conexión Bluetooth -->
+          <div class="s4-bt-bridge">
+            <div class="s4-bt-wave-row">
+              <div class="s4-bt-dash"></div>
+              <div class="s4-bt-orb-wrap">
+                <div class="s4-bt-orb">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="s4-bt-dash"></div>
+            </div>
+            <span class="s4-bt-label">Bluetooth</span>
+          </div>
+
+          <!-- 3. Celular Online (Realista 3D) -->
+          <div class="s4-phone-scene">
+            <div class="s4-phone online">
+              <div class="s4-phone-btn-left1"></div>
+              <div class="s4-phone-btn-left2"></div>
+              <div class="s4-phone-btn-right"></div>
+
+              <div class="s4-phone-screen">
+                <div class="s4-statusbar">
+                  <span>9:41</span>
+                  <div class="s4-dynamic-island">
+                    <span class="s4-island-dot"></span>
+                    <span class="s4-island-cam"></span>
+                  </div>
+                  <div class="s4-status-icons">
+                    <span style="color:#31BD70; font-size:0.6rem;">5G</span>
+                    <div class="s4-battery">
+                      <div class="s4-battery-fill" style="width:92%; background:#31BD70;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <span class="s4-phone-pill">Online</span>
+
+                <div class="s4-phone-center">
+                  <div class="s4-phone-screen-icon">
+                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                      <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                      <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                    </svg>
+                  </div>
+
+                  <div class="s4-phone-ui-card">
+                    <div class="s4-ui-left">
+                      <div class="s4-ui-label">Relay Activo</div>
+                      <div class="s4-ui-val">ILP Packet</div>
+                    </div>
+                    <span class="s4-ui-badge"><span class="s4-badge-idle">5G Sync</span><span class="s4-badge-done">✓ Recibido</span></span>
+                  </div>
+                </div>
+
+                <div class="s4-phone-footer">
+                  <div class="s4-phone-role">Celular Online</div>
+                  <div class="s4-phone-sub">Comercio conectado</div>
+                  <div class="s4-home-indicator"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Enlace 3D hacia Open Payments -->
+          <div class="s4-op-connector">
+            <div class="s4-op-tunnel">
+              <div class="s4-op-connector-line"></div>
+              <svg class="s4-chevron-3d" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFC938" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="13 17 18 12 13 7"></polyline>
+                <polyline points="6 17 11 12 6 7"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 5. Ecosistema 3D: Open Payments / Interledger (ASE) -> Interbank & Other Banks -->
+          <div class="s4-3d-scene">
+            <div class="s4-op-ecosystem-3d">
+              <div class="s4-3d-backdrop"></div>
+
+              <span class="s4-ase-tag">ASE</span>
+
+              <div class="s4-op-cloud">
+                <div class="s4-op-header-badge">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#31BD70" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                  </svg>
+                  Account Servicing Entity
+                </div>
+                <div class="s4-op-title">Open Payments</div>
+                <div class="s4-op-subtitle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                  Interledger Protocol
+                </div>
+              </div>
+
+              <!-- Conductos 3D que bajan a los bancos -->
+              <div class="s4-3d-conduits">
+                <div class="s4-conduit-left">
+                  <div class="s4-conduit-line"></div>
+                </div>
+                <div class="s4-conduit-right">
+                  <div class="s4-conduit-line"></div>
+                </div>
+              </div>
+
+              <!-- Nodos Bancarios en 3D -->
+              <div class="s4-bank-branches">
+                <div class="s4-bank-card primary">
+                  <div class="s4-bank-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="3" y1="22" x2="21" y2="22"></line>
+                      <line x1="6" y1="18" x2="6" y2="11"></line>
+                      <line x1="10" y1="18" x2="10" y2="11"></line>
+                      <line x1="14" y1="18" x2="14" y2="11"></line>
+                      <line x1="18" y1="18" x2="18" y2="11"></line>
+                      <polygon points="12 2 20 7 4 7"></polygon>
+                    </svg>
+                  </div>
+                  <div>Interbank</div>
+                  <div class="s4-bank-sub">Nodo Liquidador</div>
+                </div>
+
+                <div class="s4-bank-card secondary">
+                  <div class="s4-bank-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                  </div>
+                  <div>Other Banks</div>
+                  <div class="s4-bank-sub">Red Interoperable</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Token de pago que recorre el flujo (lo mueve js/slide-bluetooth.js) -->
+        <div class="s4-packet" id="s4Packet" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span id="s4PacketLabel">$25.000 · Token</span>
+        </div>
+
+        <!-- Pie: explicación del paso + barra de pasos (mismo lenguaje que las diapositivas 3 y 4) -->
+        <div class="s4-flow-footer">
+          <div class="s4-flow-caption">
+            <span class="s4-flow-num" id="s4FlowNum">01</span>
+            <span id="s4FlowText">No signal: the buyer's wallet signs a $25,000 payment token offline.</span>
+          </div>
+          <div class="s4-flow-timeline">
+            <div class="s4-flow-line"></div>
+            <div class="s4-flow-node" data-s4-node="0"><span>Sign offline</span></div>
+            <div class="s4-flow-line" data-s4-line="1"></div>
+            <div class="s4-flow-node" data-s4-node="1"><span>Bluetooth</span></div>
+            <div class="s4-flow-line" data-s4-line="2"></div>
+            <div class="s4-flow-node" data-s4-node="2"><span>Relay</span></div>
+            <div class="s4-flow-line" data-s4-line="3"></div>
+            <div class="s4-flow-node" data-s4-node="3"><span>Open Payments</span></div>
+            <div class="s4-flow-line" data-s4-line="4"></div>
+            <div class="s4-flow-node" data-s4-node="4"><span>Settled</span></div>
+            <div class="s4-flow-line"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         DIAPOSITIVA 7: GRAN CIERRE (DIA7.pages)
+         ========================================== -->
+    <section class="slide" id="slide7" style="padding: 0;">
+
+      <div class="s7-viewport">
+        <!-- FONDO: Globo holográfico (mismo de la diapositiva 3) con las ciudades interconectadas — js/slide-closing.js -->
+        <div class="s7-globe-bg">
+          <div id="s7Globe"></div>
+        </div>
+        <div class="s7-veil"></div>
+
+        <!-- Espaciador superior -->
+        <div></div>
+
+        <!-- CONTENIDO CENTRAL: título → cita en dos partes (→ / ←) -->
+        <div class="s7-hero-center" data-s7-step="0">
+          <div class="s7-phase s7-phase--title">
+            <div class="s7-finale-pill">
+              <span class="s7-finale-dot"></span>
+              Wireless Payments × Open Payments
+            </div>
+
+            <h1 class="s7-grand-title">
+              The Physical Bridge of<br />
+              <span class="s7-gold">Open Payments</span> and the <span class="s7-green">Real World.</span>
+            </h1>
+          </div>
+
+          <div class="s7-phase s7-phase--quote">
+            <p class="s7-quote s7-quote--1" data-s7-words>“Open Payments built the most advanced <em>digital highway</em> on the planet so money can travel as freely as information.</p>
+            <p class="s7-quote s7-quote--2" data-s7-words><strong>Wireless Payments builds the physical bridge</strong> so that highway reaches <em>everyone, everywhere</em>—even without internet connection.”</p>
+          </div>
+        </div>
+
+        <!-- PIE DE CIERRE -->
+        <div class="s7-footer">
+          <div class="s7-capitals-legend">
+            <span>● Cities connected over Interledger</span>
+            <span>·</span>
+            <span>Americas · Europe · Africa · Asia · Oceania</span>
+          </div>
+          <div class="s7-team">
+            Isaac Flórez · Jhan Carlos Canchila · Luz Mariana Clavijo · Juan Esteban Aristizábal · Silvia Rosa Martínez
+          </div>
+        </div>
+      </div>
+    </section>
+
+      <!-- ==========================================
+         DIAPOSITIVA 7: EQUIPO FUNDADOR Y PARTICIPANTES
+         ========================================== -->
+    <section class="slide" id="slide-team" style="padding: 0;">
+
+      <div class="s-team-viewport">
+        <!-- Encabezado de la diapositiva -->
+        <div class="s-team-header">
+          <div class="s-team-pill-row">
+            <div class="s-team-pill">
+              <span class="s-team-dot"></span>
+              Equipo Fundador · La Alquimia
+            </div>
+          </div>
+          <h2 class="s-team-title">
+            The Builders Behind <span class="gold">Wireless</span> <span class="green">Payments.</span>
+          </h2>
+          <p class="s-team-subtitle">
+            Ingeniería de protocolo, sistemas de hardware IoT, blindaje legal no-custodia y diseño de experiencia sin fricción.
+          </p>
+        </div>
+
+        <!-- Rejilla de 5 Participantes: Jhan · Mariana · Silvia · Isaac · Juanes -->
+        <div class="s-team-grid">
+
+          <!-- 1. Jhan Carlos Canchila -->
+          <div class="s-team-card has-qr" data-step="1">
+            <div class="s-team-avatar-box">
+              <div class="s-team-avatar-ring">
+                <div class="s-team-avatar-inner">
+                  <img src="team/jhan.jpg" alt="Jhan Carlos Canchila" class="s-team-avatar-img" onerror="this.classList.add('img-fallback');" />
+                  <div class="s-team-placeholder-ui">
+                    <span class="s-team-initials">JC</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h3 class="s-team-name">Jhan Carlos Canchila</h3>
+            <span class="s-team-role-pill">Tech Lead & Protocol</span>
+            <p class="s-team-bio">Diseño del protocolo criptográfico asimétrico PO2, sincronización de malla BLE y backend.</p>
+            <div class="s-team-tag-pill"><span>•</span> BLE Core & Crypto</div>
+            <div class="s-team-back" aria-hidden="true">
+              <div class="s-team-peek"><img src="team/jhan.jpg" alt="" /></div>
+              <div class="s-team-qr"><img src="team/jhan-qr.svg" alt="LinkedIn QR" /></div>
+              <h3 class="s-team-back-name">Jhan Carlos Canchila</h3>
+              <div class="s-team-li"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4H4.4V19h2.7V9.4zM5.75 5a1.57 1.57 0 1 0 0 3.14 1.57 1.57 0 0 0 0-3.14zM19.6 13.6c0-2.6-.56-4.4-3.58-4.4-1.45 0-2.42.8-2.82 1.55h-.04V9.4H10.6V19h2.7v-4.75c0-1.25.24-2.47 1.79-2.47 1.53 0 1.55 1.43 1.55 2.55V19h2.96v-5.4z"/></svg> LinkedIn</div>
+              <span class="s-team-li-handle">/in/canchilasanchez</span>
+            </div>
+          </div>
+
+          <!-- 2. Luz Mariana Clavijo -->
+          <div class="s-team-card has-qr" data-step="1">
+            <div class="s-team-avatar-box">
+              <div class="s-team-avatar-ring">
+                <div class="s-team-avatar-inner">
+                  <img src="team/luz.jpg" alt="Luz Mariana Clavijo" class="s-team-avatar-img" onerror="this.classList.add('img-fallback');" />
+                  <div class="s-team-placeholder-ui">
+                    <span class="s-team-initials">LC</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h3 class="s-team-name">Luz Mariana Clavijo</h3>
+            <span class="s-team-role-pill">Legal & Compliance</span>
+            <p class="s-team-bio">Blindaje de no-custodia e intermediación, cumplimiento SARLAFT, Open Finance y marco Bre-B.</p>
+            <div class="s-team-tag-pill"><span>•</span> Legal & Regulatory</div>
+            <div class="s-team-back" aria-hidden="true">
+              <div class="s-team-peek"><img src="team/luz.jpg" alt="" /></div>
+              <div class="s-team-qr"><img src="team/luz-qr.svg" alt="LinkedIn QR" /></div>
+              <h3 class="s-team-back-name">Luz Mariana Clavijo</h3>
+              <div class="s-team-li"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4H4.4V19h2.7V9.4zM5.75 5a1.57 1.57 0 1 0 0 3.14 1.57 1.57 0 0 0 0-3.14zM19.6 13.6c0-2.6-.56-4.4-3.58-4.4-1.45 0-2.42.8-2.82 1.55h-.04V9.4H10.6V19h2.7v-4.75c0-1.25.24-2.47 1.79-2.47 1.53 0 1.55 1.43 1.55 2.55V19h2.96v-5.4z"/></svg> LinkedIn</div>
+              <span class="s-team-li-handle">/in/luz-mariana-clavijo-zapata</span>
+            </div>
+          </div>
+
+          <!-- 3. Silvia Rosa Martínez -->
+          <div class="s-team-card has-qr" data-step="1">
+            <div class="s-team-avatar-box">
+              <div class="s-team-avatar-ring">
+                <div class="s-team-avatar-inner">
+                  <img src="team/silvia.jpg" alt="Silvia Rosa Martínez" class="s-team-avatar-img" onerror="this.classList.add('img-fallback');" />
+                  <div class="s-team-placeholder-ui">
+                    <span class="s-team-initials">SM</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h3 class="s-team-name">Silvia Rosa Martínez</h3>
+            <span class="s-team-role-pill">Product Design & UX</span>
+            <p class="s-team-bio">Diseño de interfaz sin fricción para inclusión financiera, investigación de usuarios y merchant UX.</p>
+            <div class="s-team-tag-pill"><span>•</span> UX & Merchant Flow</div>
+            <div class="s-team-back" aria-hidden="true">
+              <div class="s-team-peek"><img src="team/silvia.jpg" alt="" /></div>
+              <div class="s-team-qr"><img src="team/silvia-qr.svg" alt="LinkedIn QR" /></div>
+              <h3 class="s-team-back-name">Silvia Rosa Martínez</h3>
+              <div class="s-team-li"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4H4.4V19h2.7V9.4zM5.75 5a1.57 1.57 0 1 0 0 3.14 1.57 1.57 0 0 0 0-3.14zM19.6 13.6c0-2.6-.56-4.4-3.58-4.4-1.45 0-2.42.8-2.82 1.55h-.04V9.4H10.6V19h2.7v-4.75c0-1.25.24-2.47 1.79-2.47 1.53 0 1.55 1.43 1.55 2.55V19h2.96v-5.4z"/></svg> LinkedIn</div>
+              <span class="s-team-li-handle">/in/silvia-rosa-martinez-medina</span>
+            </div>
+          </div>
+
+          <!-- 4. Isaac Flórez -->
+          <div class="s-team-card has-qr" data-step="1">
+            <div class="s-team-avatar-box">
+              <div class="s-team-avatar-ring">
+                <div class="s-team-avatar-inner">
+                  <img src="team/isaac.jpg" alt="Isaac Flórez" class="s-team-avatar-img" onerror="this.classList.add('img-fallback');" />
+                  <div class="s-team-placeholder-ui">
+                    <span class="s-team-initials">IF</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h3 class="s-team-name">Isaac Flórez</h3>
+            <span class="s-team-role-pill">Product & Architecture</span>
+            <p class="s-team-bio">Estrategia general, arquitectura de protocolo offline, modelo tokenomics e integración Interledger.</p>
+            <div class="s-team-tag-pill"><span>•</span> ILP & Strategy</div>
+            <div class="s-team-back" aria-hidden="true">
+              <div class="s-team-peek"><img src="team/isaac.jpg" alt="" /></div>
+              <div class="s-team-qr"><img src="team/isaac-qr.svg" alt="LinkedIn QR" /></div>
+              <h3 class="s-team-back-name">Isaac Flórez</h3>
+              <div class="s-team-li"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4H4.4V19h2.7V9.4zM5.75 5a1.57 1.57 0 1 0 0 3.14 1.57 1.57 0 0 0 0-3.14zM19.6 13.6c0-2.6-.56-4.4-3.58-4.4-1.45 0-2.42.8-2.82 1.55h-.04V9.4H10.6V19h2.7v-4.75c0-1.25.24-2.47 1.79-2.47 1.53 0 1.55 1.43 1.55 2.55V19h2.96v-5.4z"/></svg> LinkedIn</div>
+              <span class="s-team-li-handle">/in/isaac-florez-jimenez</span>
+            </div>
+          </div>
+
+          <!-- 5. Juan Esteban Aristizábal -->
+          <div class="s-team-card has-qr" data-step="1">
+            <div class="s-team-avatar-box">
+              <div class="s-team-avatar-ring">
+                <div class="s-team-avatar-inner">
+                  <img src="team/juan.jpg" alt="Juan Esteban Aristizábal" class="s-team-avatar-img" onerror="this.classList.add('img-fallback');" />
+                  <div class="s-team-placeholder-ui">
+                    <span class="s-team-initials">JA</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h3 class="s-team-name">Juan Esteban Aristizábal</h3>
+            <span class="s-team-role-pill">Hardware & IoT</span>
+            <p class="s-team-bio">Ingeniería de balizas BLE, integración de terminales POS offline y firmware embebido.</p>
+            <div class="s-team-tag-pill"><span>•</span> Hardware & Beacons</div>
+            <div class="s-team-back" aria-hidden="true">
+              <div class="s-team-peek"><img src="team/juan.jpg" alt="" /></div>
+              <div class="s-team-qr"><img src="team/juan-qr.svg" alt="LinkedIn QR" /></div>
+              <h3 class="s-team-back-name">Juan Esteban Aristizábal</h3>
+              <div class="s-team-li"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4H4.4V19h2.7V9.4zM5.75 5a1.57 1.57 0 1 0 0 3.14 1.57 1.57 0 0 0 0-3.14zM19.6 13.6c0-2.6-.56-4.4-3.58-4.4-1.45 0-2.42.8-2.82 1.55h-.04V9.4H10.6V19h2.7v-4.75c0-1.25.24-2.47 1.79-2.47 1.53 0 1.55 1.43 1.55 2.55V19h2.96v-5.4z"/></svg> LinkedIn</div>
+              <span class="s-team-li-handle">/in/juan-esteban-aristizabal-foronda</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer del slide -->
+        <div class="s-team-footer">
+          <div class="s-team-footer-meta">
+            <span>● Hackatón Open Payments 2026</span>
+            <span>·</span>
+            <span>Medellín, Colombia</span>
+          </div>
+          <div class="s-team-dots">
+            <span style="background: var(--dot-black); border: 1px solid rgba(255,255,255,0.3);"></span>
+            <span style="background: var(--dot-green);"></span>
+            <span style="background: var(--dot-gold);"></span>
+            <span style="background: var(--dot-blue);"></span>
+            <span style="background: var(--dot-coral);"></span>
+            <span style="background: var(--dot-white);"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+    <script src="data/world-countries.js"></script>
+    <script src="data/valle-aburra.js"></script>
+    <script src="js/deck.js"></script>
+    <script src="js/slide-bluetooth.js"></script>
+    <script src="js/slide-closing.js"></script>
+
+</body>
+</html>
